@@ -1,8 +1,11 @@
 import heroImage from "../../assets/hero-img.svg";
 import logoImage from "../../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 import "./LandingPage.css";
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="landing-page">
       <header className="landing-header">
@@ -20,7 +23,9 @@ export default function LandingPage() {
             </nav>
           </div>
           <div className="landing-auth">
-            <button type="button" className="landing-login-btn">Login</button>
+            <button type="button" className="landing-login-btn" onClick={() => navigate("/login")}>
+              Login
+            </button>
             <button type="button" className="landing-signup-btn">Sign up</button>
           </div>
         </div>

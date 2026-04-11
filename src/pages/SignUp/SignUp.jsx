@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import logoWithText from "../../assets/logoWithText.png";
 import googleIcon from "../../assets/icons/google.svg";
 import "./SignUp.css";
@@ -18,6 +19,14 @@ export function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "", confirmPassword: "" });
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const id = window.setTimeout(() => setResendCooldown((s) => s - 1), 1000);
+    return () => window.clearTimeout(id);
+  }, [resendCooldown]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -65,7 +74,26 @@ export function SignUp() {
 
     if (!hasError) {
       console.log("Sign up:", { email, password, confirmPassword });
+      setVerificationSent(true);
+      setResendCooldown(0);
     }
+  };
+
+  const handleResendVerification = () => {
+    if (resendCooldown > 0) return;
+    console.log("Resend verification email to:", email);
+    setResendCooldown(60);
+  };
+
+  const handleUseDifferentEmail = () => {
+    setVerificationSent(false);
+    setResendCooldown(0);
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+    setErrors({ email: "", password: "", confirmPassword: "" });
   };
 
   const handleGoogleAuth = () => {
@@ -113,92 +141,128 @@ export function SignUp() {
 
       <section className="login-right-panel">
         <div className="login-card">
-          <h2>Sign Up</h2>
-          <form onSubmit={handleSignup} noValidate>
-            <div className="field-wrap">
-              <label htmlFor="signup-email">Email</label>
-              <input
-                id="signup-email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setErrors((prev) => ({ ...prev, email: "" }));
-                }}
-              />
-              {errors.email ? <p className="field-error">{errors.email}</p> : null}
-            </div>
+          <h2>{verificationSent ? "Check your email" : "Sign Up"}</h2>
 
-            <div className="field-wrap">
-              <label htmlFor="signup-password">Password</label>
-              <div className="password-input-wrap">
-                <input
-                  id="signup-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setErrors((prev) => ({ ...prev, password: "" }));
-                  }}
-                />
+          {verificationSent ? (
+            <>
+              <div className="signup-verification-box" role="status" aria-live="polite">
+                <p className="signup-verification-lead">
+                  We sent a verification link to <strong>{email}</strong>. Please check your inbox to complete your signup.
+                </p>
+                <p className="signup-verification-hint">
+                  Didn&apos;t get the email? Check your spam folder, or resend below.
+                </p>
                 <button
                   type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  title={showPassword ? "Hide password" : "Show password"}
+                  className="signup-verification-resend"
+                  onClick={handleResendVerification}
+                  disabled={resendCooldown > 0}
                 >
-                  {passwordToggleIcon(showPassword)}
+                  {resendCooldown > 0
+                    ? `Resend available in ${resendCooldown}s`
+                    : "Resend verification email"}
+                </button>
+                <button type="button" className="signup-verification-back" onClick={handleUseDifferentEmail}>
+                  Use a different email
                 </button>
               </div>
-              {errors.password ? <p className="field-error">{errors.password}</p> : null}
-            </div>
-
-            <div className="field-wrap">
-              <label htmlFor="signup-confirm-password">Confirm Password</label>
-              <div className="password-input-wrap">
+              <p className="login-signup-text">
+                Already have an account? <Link to="/login">Login</Link>
+              </p>
+            </>
+          ) : (
+            <form onSubmit={handleSignup} noValidate autoComplete="off">
+              <div className="field-wrap">
+                <label htmlFor="signup-email">Email</label>
                 <input
-                  id="signup-confirm-password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
-                  value={confirmPassword}
+                  id="signup-email"
+                  name="signup-email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                  value={email}
                   onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+                    setEmail(e.target.value);
+                    setErrors((prev) => ({ ...prev, email: "" }));
                   }}
                 />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                  title={showConfirmPassword ? "Hide password" : "Show password"}
-                >
-                  {passwordToggleIcon(showConfirmPassword)}
-                </button>
+                {errors.email ? <p className="field-error">{errors.email}</p> : null}
               </div>
-              {errors.confirmPassword ? <p className="field-error">{errors.confirmPassword}</p> : null}
-            </div>
 
-            <div className="or-divider">
-              <span>Or with</span>
-            </div>
+              <div className="field-wrap">
+                <label htmlFor="signup-password">Password</label>
+                <div className="password-input-wrap">
+                  <input
+                    id="signup-password"
+                    name="new-password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, password: "" }));
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {passwordToggleIcon(showPassword)}
+                  </button>
+                </div>
+                {errors.password ? <p className="field-error">{errors.password}</p> : null}
+              </div>
 
-            <button type="button" className="google-btn" onClick={handleGoogleAuth}>
-              <img src={googleIcon} alt="Google" className="google-icon" />
-              <span>Sign Up with Google</span>
-            </button>
+              <div className="field-wrap">
+                <label htmlFor="signup-confirm-password">Confirm Password</label>
+                <div className="password-input-wrap">
+                  <input
+                    id="signup-confirm-password"
+                    name="confirm-new-password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    title={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {passwordToggleIcon(showConfirmPassword)}
+                  </button>
+                </div>
+                {errors.confirmPassword ? <p className="field-error">{errors.confirmPassword}</p> : null}
+              </div>
 
-            <button type="submit" className="login-submit-btn">
-              Sign Up
-            </button>
+              <div className="or-divider">
+                <span>Or with</span>
+              </div>
 
-            <p className="login-signup-text">
-              Already have an account? <a href="/login">Login</a>
-            </p>
-          </form>
+              <button type="button" className="google-btn" onClick={handleGoogleAuth}>
+                <img src={googleIcon} alt="Google" className="google-icon" />
+                <span>Sign Up with Google</span>
+              </button>
+
+              <button type="submit" className="login-submit-btn">
+                Sign Up
+              </button>
+
+              <p className="login-signup-text">
+                Already have an account? <Link to="/login">Login</Link>
+              </p>
+            </form>
+          )}
         </div>
       </section>
     </div>

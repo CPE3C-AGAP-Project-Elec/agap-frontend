@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import logoWithText from "../../assets/logoWithText.png";
 import googleIcon from "../../assets/icons/google.svg";
 import "./LoginPage.css";
@@ -145,7 +146,7 @@ export default function LoginPage() {
                 />
                 <span>Remember me</span>
               </label>
-              <a href="/forgot-password">Forget Password?</a>
+              <Link to="/forgot-password">Forget Password?</Link>
             </div>
 
             <div className="or-divider">

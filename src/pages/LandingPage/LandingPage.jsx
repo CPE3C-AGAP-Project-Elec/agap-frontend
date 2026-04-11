@@ -26,7 +26,9 @@ export default function LandingPage() {
             <button type="button" className="landing-login-btn" onClick={() => navigate("/login")}>
               Login
             </button>
-            <button type="button" className="landing-signup-btn">Sign up</button>
+            <button type="button" className="landing-signup-btn" onClick={() => navigate("/signup")}>
+              Sign up
+            </button>
           </div>
         </div>
       </header>

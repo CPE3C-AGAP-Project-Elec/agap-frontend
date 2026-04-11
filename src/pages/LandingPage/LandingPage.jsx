@@ -19,6 +19,7 @@ export default function LandingPage() {
             <nav className="landing-nav">
               <Link to="/">Home</Link>
               <Link to="/about">About Us</Link>
+              <Link to="/result">Flood map</Link>
               <Link to="/about#contact">Contact</Link>
             </nav>
           </div>
@@ -47,6 +48,15 @@ export default function LandingPage() {
             <br />
             <span className="landing-highlight">make smarter decisions</span> for your safety.
           </p>
+          <div className="landing-hero-cta-wrap">
+            <button
+              type="button"
+              className="landing-hero-cta"
+              onClick={() => navigate("/result")}
+            >
+              Explore flood map
+            </button>
+          </div>
         </div>
 
         <div className="landing-hero-image-wrap">

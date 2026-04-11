@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Menu, X, Search } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
-import philippinesMapBg from '../../assets/philippines-map-bg.svg';
+import philippinesMapBg from '../../assets/philippines-hero-relief.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -48,7 +48,7 @@ function Navigation() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5">
+            <div className="w-12 h-12 shrink-0 flex items-center justify-center">
               <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={48} height={48} />
             </div>
             <div className="hidden lg:block">
@@ -140,7 +140,7 @@ function HeroSection() {
       <div className="absolute inset-0">
         <ImageWithFallback
           src={philippinesMapBg}
-          alt="Map of the Philippines"
+          alt="Philippines terrain relief"
           className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
@@ -148,11 +148,11 @@ function HeroSection() {
 
       <div className="relative h-full flex items-center justify-center">
         <div className="text-center text-white px-4 flex flex-col items-center gap-5 md:gap-6">
-          <div className="rounded-full bg-black/35 p-3 md:p-4 ring-1 ring-white/15 backdrop-blur-[2px] shadow-lg">
+          <div className="flex items-center justify-center p-3 md:p-4">
             <img
               src={logoImage}
               alt="AGAP logo"
-              className="w-20 h-20 md:w-28 md:h-28 object-contain"
+              className="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-md"
               width={112}
               height={112}
             />
@@ -302,7 +302,7 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
           {/* Logo and Platform Name */}
           <div className="flex items-start gap-4">
-            <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-2">
+            <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
               <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={80} height={80} />
             </div>
             <div className="pt-2">

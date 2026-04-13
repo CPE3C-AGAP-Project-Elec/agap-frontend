@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import philippinesMapBg from '../../assets/philippines-hero-relief.png';
@@ -33,6 +33,7 @@ function ImageWithFallback(props) {
 
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -48,7 +49,7 @@ function Navigation() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 shrink-0 flex items-center justify-center">
+            <div className="w-12 h-12 shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5">
               <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={48} height={48} />
             </div>
             <div className="hidden lg:block">
@@ -61,7 +62,7 @@ function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-10">
             <button
-              onClick={() => scrollToSection('home')}
+              onClick={() => navigate('/')}
               className="text-sm hover:text-gray-200 transition-colors"
             >
               Home
@@ -104,7 +105,10 @@ function Navigation() {
         <div className="md:hidden bg-[#234d73] border-t border-white/20">
           <div className="px-4 py-3 space-y-3">
             <button
-              onClick={() => scrollToSection('home')}
+              onClick={() => {
+                navigate('/');
+                setIsMenuOpen(false);
+              }}
               className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
             >
               Home
@@ -140,7 +144,7 @@ function HeroSection() {
       <div className="absolute inset-0">
         <ImageWithFallback
           src={philippinesMapBg}
-          alt="Philippines terrain relief"
+          alt="Topographic map of the Philippines"
           className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
@@ -148,15 +152,13 @@ function HeroSection() {
 
       <div className="relative h-full flex items-center justify-center">
         <div className="text-center text-white px-4 flex flex-col items-center gap-5 md:gap-6">
-          <div className="flex items-center justify-center p-3 md:p-4">
-            <img
-              src={logoImage}
-              alt="AGAP logo"
-              className="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-md"
-              width={112}
-              height={112}
-            />
-          </div>
+          <img
+            src={logoImage}
+            alt="AGAP logo"
+            className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_4px_28px_rgba(0,0,0,0.5)]"
+            width={128}
+            height={128}
+          />
           <h1 className="text-5xl md:text-7xl tracking-wide drop-shadow-md">About Us</h1>
         </div>
       </div>

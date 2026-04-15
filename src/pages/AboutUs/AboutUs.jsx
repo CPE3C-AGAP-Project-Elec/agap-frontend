@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
-import philippinesHeroBg from '../../assets/philippines-hero-relief.png';
+import philippinesMapBg from '../../assets/philippines-hero-relief.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -33,6 +33,7 @@ function ImageWithFallback(props) {
 
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -61,7 +62,7 @@ function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-10">
             <button
-              onClick={() => scrollToSection('home')}
+              onClick={() => navigate('/')}
               className="text-sm hover:text-gray-200 transition-colors"
             >
               Home
@@ -104,7 +105,10 @@ function Navigation() {
         <div className="md:hidden bg-[#234d73] border-t border-white/20">
           <div className="px-4 py-3 space-y-3">
             <button
-              onClick={() => scrollToSection('home')}
+              onClick={() => {
+                navigate('/');
+                setIsMenuOpen(false);
+              }}
               className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
             >
               Home
@@ -139,7 +143,7 @@ function HeroSection() {
     <section id="home" className="relative h-[350px] md:h-[450px] overflow-hidden">
       <div className="absolute inset-0">
         <ImageWithFallback
-          src={philippinesHeroBg}
+          src={philippinesMapBg}
           alt="Topographic map of the Philippines"
           className="w-full h-full object-cover object-center"
         />
@@ -300,7 +304,7 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
           {/* Logo and Platform Name */}
           <div className="flex items-start gap-4">
-            <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-2">
+            <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
               <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={80} height={80} />
             </div>
             <div className="pt-2">

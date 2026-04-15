@@ -1,0 +1,233 @@
+.welcome-page {
+  min-height: 100vh;
+  background: #dce5f0;
+  font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #0f172a;
+}
+
+.welcome-header {
+  background: #1f5f9f;
+  color: #fff;
+}
+
+.welcome-header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  min-height: 64px;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.welcome-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.welcome-brand-logo {
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: 0.5px;
+}
+
+.welcome-brand-text {
+  display: grid;
+  gap: 1px;
+}
+
+.welcome-brand-text p {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+.welcome-nav {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.welcome-nav a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.welcome-nav a:hover {
+  text-decoration: underline;
+}
+
+.welcome-user-link {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-main {
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 44px 20px;
+  background:
+    linear-gradient(rgba(209, 221, 236, 0.77), rgba(209, 221, 236, 0.77)),
+    radial-gradient(circle at 30% 20%, rgba(165, 187, 215, 0.55), transparent 40%),
+    radial-gradient(circle at 75% 70%, rgba(157, 181, 210, 0.55), transparent 45%),
+    repeating-linear-gradient(
+      130deg,
+      rgba(134, 161, 194, 0.2) 0px,
+      rgba(134, 161, 194, 0.2) 2px,
+      transparent 2px,
+      transparent 24px
+    );
+}
+
+.welcome-search-card {
+  width: min(680px, 94vw);
+  background: rgba(242, 245, 251, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.15);
+  padding: 32px 36px 30px;
+  text-align: center;
+}
+
+.welcome-search-card h1 {
+  margin: 0 0 10px;
+  color: #0f172a;
+  font-size: 50px;
+  line-height: 1.06;
+  font-weight: 700;
+}
+
+.welcome-search-card p {
+  margin: 0 auto 24px;
+  max-width: 500px;
+  font-size: 27px;
+  line-height: 1.25;
+  color: #1e293b;
+}
+
+.welcome-search-row {
+  position: relative;
+}
+
+.welcome-search-row input {
+  width: 100%;
+  height: 54px;
+  border-radius: 5px;
+  border: 2px solid #111827;
+  background: #edf2f8;
+  font-size: 18px;
+  color: #0f172a;
+  padding: 0 58px 0 46px;
+  outline: none;
+}
+
+.welcome-search-row input::placeholder {
+  color: #9ca3af;
+}
+
+.welcome-input-icon-left {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: #1f5f9f;
+}
+
+.welcome-search-row button {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #1f5f9f;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.welcome-spacer {
+  min-height: 220px;
+  background: #e4e9f2;
+}
+
+.welcome-footer {
+  background: #1f5f9f;
+  color: #fff;
+  padding: 24px 24px 10px;
+}
+
+.welcome-footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.welcome-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.welcome-footer-contact h3 {
+  margin: 0 0 6px;
+  font-size: 38px;
+  line-height: 1;
+}
+
+.welcome-footer-contact p {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+.welcome-footer-copy {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .welcome-nav {
+    gap: 14px;
+  }
+
+  .welcome-nav a {
+    font-size: 15px;
+  }
+
+  .welcome-search-card h1 {
+    font-size: 38px;
+  }
+
+  .welcome-search-card p {
+    font-size: 20px;
+  }
+
+  .welcome-footer-contact h3 {
+    font-size: 28px;
+  }
+
+  .welcome-footer-contact p {
+    font-size: 16px;
+  }
+}

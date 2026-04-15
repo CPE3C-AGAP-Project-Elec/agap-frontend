@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoWithText from "../../assets/logoWithText.png";
 import googleIcon from "../../assets/icons/google.svg";
 import "./SignUp.css";
 
 export function SignUp() {
+  const navigate = useNavigate();
   const welcomeLines = [
     ["SIGN UP", "NOW"],
     ["GET STARTED", "WITH AGAP"],
@@ -76,6 +77,7 @@ export function SignUp() {
       console.log("Sign up:", { email, password, confirmPassword });
       setVerificationSent(true);
       setResendCooldown(0);
+      navigate("/welcome");
     }
   };
 
@@ -169,6 +171,9 @@ export function SignUp() {
               <p className="login-signup-text">
                 Already have an account? <Link to="/login">Login</Link>
               </p>
+              <p className="login-signup-text">
+                Back to <Link to="/welcome">Welcome</Link>
+              </p>
             </>
           ) : (
             <form onSubmit={handleSignup} noValidate autoComplete="off">
@@ -260,6 +265,9 @@ export function SignUp() {
 
               <p className="login-signup-text">
                 Already have an account? <Link to="/login">Login</Link>
+              </p>
+              <p className="login-signup-text">
+                Back to <Link to="/welcome">Welcome</Link>
               </p>
             </form>
           )}

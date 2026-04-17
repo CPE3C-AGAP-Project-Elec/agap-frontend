@@ -1,6 +1,6 @@
 import heroImage from "../../assets/hero-img.svg";
 import logoImage from "../../assets/logo.png";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./LandingPage.css";
 
 export default function LandingPage() {
@@ -18,15 +18,7 @@ export default function LandingPage() {
             </div>
             <nav className="landing-nav">
               <a href="#">Home</a>
-              <a
-                href="/about-us"
-                onClick={(event) => {
-                  event.preventDefault();
-                  navigate("/about-us");
-                }}
-              >
-                About Us
-              </a>
+              <a href="#">About Us</a>
               <a href="#">Contact</a>
             </nav>
           </div>
@@ -55,6 +47,15 @@ export default function LandingPage() {
             <br />
             <span className="landing-highlight">make smarter decisions</span> for your safety.
           </p>
+          <div className="landing-hero-cta-wrap">
+            <button
+              type="button"
+              className="landing-hero-cta"
+              onClick={() => navigate("/result")}
+            >
+              Explore flood map
+            </button>
+          </div>
         </div>
 
         <div className="landing-hero-image-wrap">

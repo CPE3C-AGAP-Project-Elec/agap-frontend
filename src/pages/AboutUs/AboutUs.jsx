@@ -2,10 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
-import philippinesMapBg from '../../assets/hero-img.svg';
-import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
-import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
-import abigailImage from '../../assets/team/abigail-b-nicolas.png';
+import philippinesMapBg from '../../assets/philippines-hero-relief.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -297,7 +294,7 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
           {/* Logo and Platform Name */}
           <div className="flex items-start gap-4">
-            <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-2">
+            <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
               <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={80} height={80} />
             </div>
             <div className="pt-2">

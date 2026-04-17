@@ -114,7 +114,14 @@ function FloodHazardLevel({ level }) {
             key={lvl.id}
             className={`result-hazard__row result-hazard__row--${lvl.id}${isActive ? ' is-active' : ''}`}
           >
-            <div className="result-hazard__swatch" aria-hidden />
+            <div className="result-hazard__swatch" aria-label={`${lvl.id} warning symbol`}>
+              <span
+                className={`result-warning-triangle result-warning-triangle--${lvl.id}`}
+                aria-hidden
+              >
+                <span className="result-warning-triangle__mark">!</span>
+              </span>
+            </div>
             <span>{lvl.label}</span>
           </div>
         );
@@ -123,8 +130,14 @@ function FloodHazardLevel({ level }) {
   );
 }
 
-function FloodHistory({ hasData }) {
-  if (!hasData) {
+function FloodHistory({ data }) {
+  const floodLevelMeta = {
+    low: { label: 'Low', value: 1, colorVar: '--result-hazard-low' },
+    medium: { label: 'Medium', value: 2, colorVar: '--result-hazard-medium' },
+    high: { label: 'High', value: 3, colorVar: '--result-hazard-high' },
+  };
+
+  if (!data?.length) {
     return (
       <div className="result-placeholder">
         <div className="result-placeholder__row">
@@ -142,8 +155,54 @@ function FloodHistory({ hasData }) {
   }
 
   return (
-    <div className="result-placeholder">
-      <p className="result-weather__empty">Historical flood data will appear here</p>
+    <div className="result-weather-chart">
+      <div className="result-weather-chart__plot">
+        <div className="result-weather-chart__y-axis">
+          <span>High</span>
+          <span>Medium</span>
+          <span>Low</span>
+        </div>
+
+        <div className="result-weather-chart__bars">
+          {data.map((item) => {
+            const levelMeta = floodLevelMeta[item.level] ?? floodLevelMeta.low;
+            const barHeight = `${(levelMeta.value / 3) * 100}%`;
+
+            return (
+              <div key={`${item.date}-${item.level}`} className="result-weather-chart__col">
+                <div className="result-weather-chart__bar-wrap">
+                  <div
+                    className="result-weather-chart__bar"
+                    style={{ height: barHeight, backgroundColor: `var(${levelMeta.colorVar})` }}
+                    title={`${item.date} - ${levelMeta.label}`}
+                    aria-label={`${item.date} flood level ${levelMeta.label}`}
+                  >
+                    <span
+                      className={`result-warning-triangle result-warning-triangle--${item.level}`}
+                      aria-hidden
+                    >
+                      <span className="result-warning-triangle__mark">!</span>
+                    </span>
+                  </div>
+                </div>
+                <span className="result-weather-chart__date">{item.date}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="result-weather-chart__legend">
+        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--low">
+          Low
+        </span>
+        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--medium">
+          Medium
+        </span>
+        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--high">
+          High
+        </span>
+      </div>
     </div>
   );
 }
@@ -161,6 +220,14 @@ function WeatherHistory({ data }) {
         return <Sun className="result-weather__icon result-weather__icon--sun" aria-hidden />;
     }
   };
+
+  if (!data?.length) {
+    return (
+      <div className="result-placeholder">
+        <p className="result-weather__empty">No weather history to display.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="result-weather">
@@ -299,6 +366,16 @@ export default function Result() {
 
   const [floodLevel, setFloodLevel] = useState(null);
 
+  const historyLevels = ['low', 'medium', 'high', floodLevel ?? 'medium'];
+  const floodHistoryData = Array.from({ length: 4 }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (3 - index));
+    return {
+      date: date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
+      level: historyLevels[index],
+    };
+  });
+
   const weatherData = [
     { date: 'Mar. 30', condition: 'Sunny' },
     { date: 'Mar. 31', condition: 'Cloudy' },
@@ -310,6 +387,13 @@ export default function Result() {
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
+
+    const levels = ['low', 'medium', 'high'];
+    const randomLevel = levels[Math.floor(Math.random() * levels.length)];
+    setFloodLevel(randomLevel);
+    setShowFloodHazardOpen(true);
+    setShowFloodHistory(false);
+    setShowWeatherHistory(false);
 
     try {
       const response = await fetch(
@@ -323,10 +407,6 @@ export default function Result() {
           latitude: parseFloat(lat),
           longitude: parseFloat(lon),
         });
-
-        const levels = ['low', 'medium', 'high'];
-        const randomLevel = levels[Math.floor(Math.random() * levels.length)];
-        setFloodLevel(randomLevel);
       } else {
         alert('Location not found in the Philippines. Please try a different search term.');
       }
@@ -366,7 +446,7 @@ export default function Result() {
                 <span>FLOOD HISTORY</span>
                 {showFloodHistory ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
-              {showFloodHistory && <FloodHistory hasData={false} />}
+              {showFloodHistory && <FloodHistory data={floodHistoryData} />}
             </section>
 
             <section className="result-section">

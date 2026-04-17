@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
-import philippinesMapBg from '../../assets/philippines-hero-relief.png';
+import heroImage from '../../assets/hero-img.svg';
+import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
+import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
+import abigailImage from '../../assets/team/abigail-b-nicolas.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -68,6 +71,12 @@ function Navigation() {
               Home
             </button>
             <button
+              onClick={() => navigate('/result')}
+              className="text-sm hover:text-gray-200 transition-colors"
+            >
+              Explore Map
+            </button>
+            <button
               onClick={() => scrollToSection('about')}
               className="text-sm hover:text-gray-200 transition-colors"
             >
@@ -108,6 +117,15 @@ function Navigation() {
               Home
             </button>
             <button
+              onClick={() => {
+                navigate('/result');
+                setIsMenuOpen(false);
+              }}
+              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+            >
+              Explore Map
+            </button>
+            <button
               onClick={() => scrollToSection('about')}
               className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
             >
@@ -131,7 +149,7 @@ function HeroSection() {
     <section id="home" className="relative h-[350px] md:h-[450px] overflow-hidden">
       <div className="absolute inset-0">
         <ImageWithFallback
-          src={philippinesMapBg}
+          src={heroImage}
           alt="Topographic map of the Philippines"
           className="w-full h-full object-cover object-center"
         />

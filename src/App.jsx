@@ -3,6 +3,8 @@ import LandingPage from "./pages/LandingPage/LandingPage";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import { SignUp } from "./pages/SignUp/SignUp";
 import { ForgotPassword } from "./pages/ForgotPass/ForgotPass";
+import Result from "./pages/Result/Result";
+import AboutUs from "./pages/AboutUs/AboutUs";
 
 function App() {
   return (

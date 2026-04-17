@@ -1,6 +1,6 @@
 import heroImage from "../../assets/hero-img.svg";
 import logoImage from "../../assets/logo.png";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./LandingPage.css";
 
 export default function LandingPage() {
@@ -17,10 +17,42 @@ export default function LandingPage() {
               </div>
             </div>
             <nav className="landing-nav">
-              <Link to="/">Home</Link>
-              <Link to="/about">About Us</Link>
-              <Link to="/result">Flood map</Link>
-              <Link to="/about#contact">Contact</Link>
+              <a
+                href="/"
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate("/");
+                }}
+              >
+                Home
+              </a>
+              <a
+                href="/about-us"
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate("/about-us");
+                }}
+              >
+                About Us
+              </a>
+              <a
+                href="/result"
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate("/result");
+                }}
+              >
+                Explore Map
+              </a>
+              <a
+                href="#contact"
+                onClick={(event) => {
+                  event.preventDefault();
+                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                Contact
+              </a>
             </nav>
           </div>
           <div className="landing-auth">
@@ -48,15 +80,6 @@ export default function LandingPage() {
             <br />
             <span className="landing-highlight">make smarter decisions</span> for your safety.
           </p>
-          <div className="landing-hero-cta-wrap">
-            <button
-              type="button"
-              className="landing-hero-cta"
-              onClick={() => navigate("/result")}
-            >
-              Explore flood map
-            </button>
-          </div>
         </div>
 
         <div className="landing-hero-image-wrap">
@@ -64,7 +87,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <footer className="landing-footer">
+      <footer id="contact" className="landing-footer">
         <div className="landing-container">
           <div className="landing-footer-inner">
             <div className="landing-footer-brand">

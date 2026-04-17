@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
-import philippinesMapBg from '../../assets/philippines-hero-relief.png';
+import heroImage from '../../assets/hero-img.svg';
+import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
+import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
+import abigailImage from '../../assets/team/abigail-b-nicolas.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -68,16 +71,16 @@ function Navigation() {
               Home
             </button>
             <button
+              onClick={() => navigate('/result')}
+              className="text-sm hover:text-gray-200 transition-colors"
+            >
+              Explore Map
+            </button>
+            <button
               onClick={() => scrollToSection('about')}
               className="text-sm hover:text-gray-200 transition-colors"
             >
               About
-            </button>
-            <button
-              onClick={() => scrollToSection('donate')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Donate
             </button>
             <button
               onClick={() => scrollToSection('contact')}
@@ -114,16 +117,19 @@ function Navigation() {
               Home
             </button>
             <button
+              onClick={() => {
+                navigate('/result');
+                setIsMenuOpen(false);
+              }}
+              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+            >
+              Explore Map
+            </button>
+            <button
               onClick={() => scrollToSection('about')}
               className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
             >
               About
-            </button>
-            <button
-              onClick={() => scrollToSection('donate')}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
-            >
-              Donate
             </button>
             <button
               onClick={() => scrollToSection('contact')}
@@ -143,7 +149,7 @@ function HeroSection() {
     <section id="home" className="relative h-[350px] md:h-[450px] overflow-hidden">
       <div className="absolute inset-0">
         <ImageWithFallback
-          src={philippinesMapBg}
+          src={heroImage}
           alt="Topographic map of the Philippines"
           className="w-full h-full object-cover object-center"
         />
@@ -202,27 +208,27 @@ function TeamMembers() {
   const teamMembers = [
     {
       id: 1,
-      name: 'MEMBER 1',
+      name: 'ALLEAH JOY M. BALBIN',
       image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop'
     },
     {
       id: 2,
-      name: 'MEMBER 1',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'
+      name: 'FIONA ROSE A. BALALA',
+      image: fionaRoseImage
     },
     {
       id: 3,
-      name: 'MEMBER 1',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop'
+      name: 'ABIGAIL B. NICOLAS',
+      image: abigailImage
     },
     {
       id: 4,
-      name: 'MEMBER 1',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop'
+      name: 'LEANNA ROSE S. SANTOS',
+      image: leannaRoseImage
     },
     {
       id: 5,
-      name: 'MEMBER 1',
+      name: 'RYZA GWEN P. VILLAFRANCA',
       image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop'
     }
   ];
@@ -264,7 +270,8 @@ function TeamMembers() {
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#1E73BE] text-sm tracking-wider">{member.name}</h3>
+                  <h3 className="text-[#2B5F8E] text-base font-semibold tracking-wide">{member.name}</h3>
+                  <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>
             ))}
@@ -286,7 +293,8 @@ function TeamMembers() {
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#1E73BE] text-sm tracking-wider">{member.name}</h3>
+                  <h3 className="text-[#2B5F8E] text-base font-semibold tracking-wide">{member.name}</h3>
+                  <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>
             ))}

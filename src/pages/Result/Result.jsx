@@ -63,8 +63,9 @@ function Header() {
 
       <nav className="result-header__nav">
         <Link to="/">Home</Link>
-        <Link to="/about">About Us</Link>
-        <Link to="/about#contact">Contact</Link>
+        <Link to="/about-us">About Us</Link>
+        <Link to="/result">Explore Map</Link>
+        <Link to="/about-us#contact">Contact</Link>
         <button type="button" className="result-header__account">
           <User aria-hidden />
         </button>

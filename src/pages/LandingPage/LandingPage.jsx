@@ -18,7 +18,15 @@ export default function LandingPage() {
             </div>
             <nav className="landing-nav">
               <a href="#">Home</a>
-              <a href="#">About Us</a>
+              <a
+                href="/about-us"
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate("/about-us");
+                }}
+              >
+                About Us
+              </a>
               <a href="#">Contact</a>
             </nav>
           </div>

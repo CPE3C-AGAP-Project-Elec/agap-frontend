@@ -3,9 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, User } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
-import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
-import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
-import abigailImage from '../../assets/team/abigail-b-nicolas.png';
 import SiteFooter from '../../components/SiteFooter/SiteFooter';
 import leanaImage from '../../assets/team/leana.png';
 import abigailImage from '../../assets/team/abigail.png';
@@ -46,66 +43,16 @@ function ImageWithFallback(props) {
 
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="about-nav bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
+    <nav className="about-nav bg-[#2B5F8E] text-white shadow-md sticky top-0 z-50">
       <div className="about-nav__inner app-nav-inner">
         <div className="flex items-center gap-3">
           <Link
             to="/"
             className="app-nav-logo-box shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5"
             onClick={closeMenu}
-    <nav className="bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <img src={logoImage} alt="AGAP" className="w-12 h-12 object-contain shrink-0" width={48} height={48} />
-            <div className="hidden lg:block">
-              <span className="text-lg font-bold leading-5 flex flex-col">
-                <span>AUTOMATED GEOSPATIAL</span>
-                <span>ALERT PLATFORM</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-10">
-            <button
-              onClick={() => navigate('/welcome')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Home
-            </button>
-            <button
-              onClick={() => navigate('/result')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Explore Map
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection('contact')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Contact
-            </button>
-            <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
-              <Search size={20} />
-            </button>
-          </div>
- 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={56} height={56} />
           </Link>
@@ -123,6 +70,9 @@ function Navigation() {
             <Link to="/about-us#about" className="app-nav-link text-white px-3 py-2">
               About Us
             </Link>
+            <Link to="/result" className="app-nav-link text-white px-3 py-2">
+              Explore Map
+            </Link>
             <Link to="/about-us#contact" className="app-nav-link text-white px-3 py-2">
               Contact
             </Link>
@@ -130,7 +80,12 @@ function Navigation() {
           <Link to="/login" className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Go to login">
             <User size={20} className="md:scale-110" />
           </Link>
-          <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
+          <button
+            type="button"
+            className="md:hidden p-2.5"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -154,13 +109,20 @@ function Navigation() {
               About Us
             </Link>
             <Link
+              to="/result"
+              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              onClick={closeMenu}
+            >
+              Explore Map
+            </Link>
+            <Link
               to="/about-us#contact"
               className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
               onClick={closeMenu}
             >
               Contact
             </Link>
-                      </div>
+          </div>
         </div>
       )}
     </nav>
@@ -270,8 +232,7 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover rounded-lg"
-                    className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
+                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
@@ -296,8 +257,7 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover rounded-lg"
-                    className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
+                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
@@ -312,62 +272,6 @@ function TeamMembers() {
         </div>
       </div>
     </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer id="contact" className="bg-[#2B5F8E] text-white py-12">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
-          {/* Logo and Platform Name */}
-          <div className="flex items-start gap-4">
-            <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
-              <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={80} height={80} />
-            </div>
-            <div className="pt-2">
-              <h3 className="text-xs tracking-wider leading-tight flex flex-col">
-                <span>AUTOMATED GEOSPATIAL</span>
-                <span>ALERT PLATFORM</span>
-              </h3>
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div>
-            <h3 className="text-2xl mb-4 tracking-wide">Contact Us</h3>
-            <div className="space-y-2 text-sm">
-              <p>
-                <span className="font-semibold">Email:</span>{' '}
-                <a
-                  href="mailto:agap.systemtoolkit@gmail.com"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  agap.systemtoolkit@gmail.com
-                </a>
-              </p>
-              <p>
-                <span className="font-semibold">Phone:</span>{' '}
-                <a
-                  href="tel:+639XXXXXXXXX"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  +63 9XX XXX XXXX (optional)
-                </a>
-              </p>
-              <p>
-                <span className="font-semibold">Location:</span> Butuan City, Agusan del Norte
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Copyright */}
-        <div className="border-t border-white/20 pt-6 text-center">
-          <p className="text-xs">Copyright © 2025 AGAP All Rights Reserved</p>
-        </div>
-      </div>
-    </footer>
   );
 }
 

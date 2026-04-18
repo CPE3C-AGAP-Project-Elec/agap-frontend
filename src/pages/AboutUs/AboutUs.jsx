@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
-import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
-import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
-import abigailImage from '../../assets/team/abigail-b-nicolas.png';
-import alleahImage from '../../assets/team/alleah-joy-m-balbin-new.png';
-import ryzaImage from '../../assets/team/ryza-gwen-p-villafranca.png';
+import leanaImage from '../../assets/team/leana.png';
+import abigailImage from '../../assets/team/abigail.png';
+import alleahImage from '../../assets/team/alleah.png';
+import fionaImage from '../../assets/team/fiona.png';
+import ryzaImage from '../../assets/team/ryza.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -205,33 +205,13 @@ function AboutContent() {
 }
 
 function TeamMembers() {
+  // Alphabetical by first name; each image matches the person from your uploads.
   const teamMembers = [
-    {
-      id: 1,
-      name: 'ALLEAH JOY M. BALBIN',
-      image: alleahImage,
-      imageClassName: 'object-contain bg-white'
-    },
-    {
-      id: 2,
-      name: 'FIONA ROSE A. BALALA',
-      image: fionaRoseImage
-    },
-    {
-      id: 3,
-      name: 'ABIGAIL B. NICOLAS',
-      image: abigailImage
-    },
-    {
-      id: 4,
-      name: 'LEANNA ROSE S. SANTOS',
-      image: leannaRoseImage
-    },
-    {
-      id: 5,
-      name: 'RYZA GWEN P. VILLAFRANCA',
-      image: ryzaImage
-    }
+    { id: 1, name: 'Abigail B. Nicolas', image: abigailImage },
+    { id: 2, name: 'Alleah Joy M. Balbin', image: alleahImage },
+    { id: 3, name: 'Fiona Rose A. Balala', image: fionaImage },
+    { id: 4, name: 'Leana Rose S. Santos', image: leanaImage },
+    { id: 5, name: 'Ryza Gwen P. Villafranca', image: ryzaImage }
   ];
 
   const handleMeetOurTeam = () => {
@@ -250,7 +230,7 @@ function TeamMembers() {
           >
             MEET OUR
           </button>
-          <h2 className="text-4xl md:text-5xl text-[#8B1C1C] tracking-wide">
+          <h2 className="text-4xl md:text-5xl text-[#0c2d48] tracking-wide">
             Team Members
           </h2>
         </div>
@@ -271,7 +251,9 @@ function TeamMembers() {
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#2B5F8E] text-base font-semibold tracking-wide">{member.name}</h3>
+                  <h3 className="text-[#0c2d48] text-sm sm:text-base font-semibold tracking-wide leading-snug">
+                    {member.name}
+                  </h3>
                   <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>
@@ -294,7 +276,9 @@ function TeamMembers() {
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#2B5F8E] text-base font-semibold tracking-wide">{member.name}</h3>
+                  <h3 className="text-[#0c2d48] text-sm sm:text-base font-semibold tracking-wide leading-snug">
+                    {member.name}
+                  </h3>
                   <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>

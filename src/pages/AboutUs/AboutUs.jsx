@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut, Menu, X } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, Menu, X } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
 import SiteFooter from '../../components/SiteFooter/SiteFooter';
@@ -57,15 +55,6 @@ function Navigation() {
     closeMenu();
     navigate('/');
   };
-  const handleExploreMap = () => {
-    closeMenu();
-    navigate(isLoggedIn ? '/result' : '/login');
-  };
-  const handleLogout = () => {
-    localStorage.removeItem('agapIsLoggedIn');
-    closeMenu();
-    navigate('/');
-  };
 
   return (
     <nav className="about-nav bg-[#2B5F8E] text-white shadow-md sticky top-0 z-50">
@@ -92,9 +81,6 @@ function Navigation() {
             <Link to="/about-us#about" className="app-nav-link text-white px-3 py-2">
               About Us
             </Link>
-            <button type="button" className="app-nav-link text-white px-3 py-2" onClick={handleExploreMap}>
-              Explore Map
-            </button>
             <button type="button" className="app-nav-link text-white px-3 py-2" onClick={handleExploreMap}>
               Explore Map
             </button>
@@ -154,13 +140,6 @@ function Navigation() {
                 Logout
               </button>
             ) : null}
-            <button
-              type="button"
-              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
-              onClick={handleExploreMap}
-            >
-              Explore Map
-            </button>
             <Link
               to="/about-us#contact"
               className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
@@ -168,13 +147,6 @@ function Navigation() {
             >
               Contact
             </Link>
-            <button
-              type="button"
-              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
           </div>
         </div>
       )}

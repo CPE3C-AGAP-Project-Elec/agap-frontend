@@ -75,6 +75,7 @@ export function SignUp() {
 
     if (!hasError) {
       console.log("Sign up:", { email, password, confirmPassword });
+      localStorage.setItem("agapIsLoggedIn", "true");
       setVerificationSent(true);
       setResendCooldown(0);
       navigate("/welcome");

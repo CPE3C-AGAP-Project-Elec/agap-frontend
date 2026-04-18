@@ -54,6 +54,7 @@ export default function LoginPage() {
 
     if (!hasError) {
       console.log("Login:", { email, password, rememberMe });
+      localStorage.setItem("agapIsLoggedIn", "true");
       navigate("/welcome");
     }
   };

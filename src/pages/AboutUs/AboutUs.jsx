@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, Menu, X } from 'lucide-react';
+import { Menu, User, X } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
 import SiteFooter from '../../components/SiteFooter/SiteFooter';
@@ -50,11 +50,6 @@ function Navigation() {
     closeMenu();
     navigate(isLoggedIn ? '/result' : '/login');
   };
-  const handleLogout = () => {
-    localStorage.removeItem('agapIsLoggedIn');
-    closeMenu();
-    navigate('/');
-  };
 
   return (
     <nav className="about-nav bg-[#2B5F8E] text-white shadow-md sticky top-0 z-50">
@@ -88,14 +83,9 @@ function Navigation() {
               Contact
             </Link>
           </div>
-          <button
-            type="button"
-            className="app-profile-link app-profile-link--on-dark p-2 md:p-3"
-            aria-label="Logout"
-            onClick={handleLogout}
-          >
-            <LogOut size={20} className="md:scale-110" />
-          </button>
+          <Link to="/profile" className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Go to profile">
+            <User size={20} className="md:scale-110" />
+          </Link>
           <button
             type="button"
             className="md:hidden p-2.5"
@@ -131,15 +121,6 @@ function Navigation() {
             >
               Explore Map
             </button>
-            {isLoggedIn ? (
-              <button
-                type="button"
-                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            ) : null}
             <Link
               to="/about-us#contact"
               className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"

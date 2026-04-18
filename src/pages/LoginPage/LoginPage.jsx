@@ -168,7 +168,7 @@ export default function LoginPage() {
               Don't have an account? <Link to="/signup">Sign Up</Link>
             </p>
             <p className="login-signup-text">
-              Back to <Link to="/welcome">Welcome</Link>
+              Back to <Link to="/">Home</Link>
             </p>
           </form>
         </div>

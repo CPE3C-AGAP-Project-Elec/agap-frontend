@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   User,
   Search,
+  Menu,
+  X,
   ChevronDown,
   ChevronUp,
   Plus,
@@ -51,25 +53,75 @@ L.Icon.Default.mergeOptions({
 });
 
 function Header() {
-  return (
-    <header className="result-header">
-      <Link to="/" className="result-header__brand">
-        <ImageWithFallback src={logoImage} alt="AGAP logo" className="result-header__logo" />
-        <div className="result-header__titles">
-          <h1>AUTOMATED GEOSPATIAL</h1>
-          <h2>ALERT PLATFORM</h2>
-        </div>
-      </Link>
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const closeMenu = () => setIsMenuOpen(false);
 
-      <nav className="result-header__nav">
-        <Link to="/">Home</Link>
-        <Link to="/about-us">About Us</Link>
-        <Link to="/result">Explore Map</Link>
-        <Link to="/about-us#contact">Contact</Link>
-        <button type="button" className="result-header__account">
-          <User aria-hidden />
-        </button>
-      </nav>
+  return (
+    <header className="result-header about-nav text-white shadow-md sticky top-0 z-50">
+      <div className="about-nav__inner app-nav-inner">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="app-nav-logo-box shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5"
+            onClick={closeMenu}
+          >
+            <ImageWithFallback src={logoImage} alt="AGAP logo" className="result-header__logo h-full w-full object-contain" />
+          </Link>
+          <div className="hidden lg:grid app-nav-brand text-white">
+            <p>AUTOMATED GEOSPATIAL</p>
+            <p>ALERT PLATFORM</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 md:gap-10">
+          <div className="hidden md:flex items-center gap-10">
+            <Link to="/" className="app-nav-link text-white">
+              Home
+            </Link>
+            <Link to="/about-us" className="app-nav-link text-white">
+              About Us
+            </Link>
+            <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link text-white">
+              Contact
+            </Link>
+          </div>
+          <Link to="/login" className="app-profile-link app-profile-link--on-dark" aria-label="Go to login">
+            <User size={20} aria-hidden />
+          </Link>
+          <button type="button" className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {isMenuOpen && (
+        <div className="md:hidden bg-[#234d73] border-t border-white/20">
+          <div className="px-4 py-3 space-y-3">
+            <Link
+              to="/"
+              className="app-nav-link block w-full text-left py-2 text-white"
+              onClick={closeMenu}
+            >
+              Home
+            </Link>
+            <Link
+              to="/about-us"
+              className="app-nav-link block w-full text-left py-2 text-white"
+              onClick={closeMenu}
+            >
+              About Us
+            </Link>
+            <Link
+              to="/"
+              state={{ scrollToLandingContact: true }}
+              className="app-nav-link block w-full text-left py-2 text-white"
+              onClick={closeMenu}
+            >
+              Contact
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
@@ -342,6 +394,9 @@ function MapView({ latitude, longitude, locationName }) {
 }
 
 export default function Result() {
+  const location = useLocation();
+  const welcomeSearchHandledKey = useRef(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [showFloodHazardOpen, setShowFloodHazardOpen] = useState(true);
   const [showFloodHistory, setShowFloodHistory] = useState(false);
@@ -386,8 +441,11 @@ export default function Result() {
 
   const [coordinates, setCoordinates] = useState(null);
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  const performSearch = useCallback(async (rawQuery) => {
+    const q = String(rawQuery ?? '').trim();
+    if (!q) return;
+
+    setSearchQuery(q);
 
     const levels = ['low', 'medium', 'high'];
     const randomLevel = levels[Math.floor(Math.random() * levels.length)];
@@ -398,7 +456,7 @@ export default function Result() {
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&countrycodes=ph&format=json&limit=1`
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=ph&format=json&limit=1`
       );
       const data = await response.json();
 
@@ -415,6 +473,18 @@ export default function Result() {
       console.error('Geocoding error:', error);
       alert('Error searching for location. Please try again.');
     }
+  }, []);
+
+  useEffect(() => {
+    const q = location.state?.welcomeSearchQuery;
+    if (!q || !String(q).trim()) return;
+    if (welcomeSearchHandledKey.current === location.key) return;
+    welcomeSearchHandledKey.current = location.key;
+    void performSearch(String(q).trim());
+  }, [location.key, location.state, performSearch]);
+
+  const handleSearch = async () => {
+    await performSearch(searchQuery);
   };
 
   return (

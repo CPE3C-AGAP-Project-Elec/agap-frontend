@@ -17,13 +17,9 @@
 }
 
 .welcome-header-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  min-height: 64px;
-  padding: 10px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  /* sizing from siteChrome .app-nav-inner */
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .welcome-brand {
@@ -40,18 +36,14 @@
 }
 
 .welcome-brand-logo-img {
-  width: auto;
-  height: 2.6em;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
 }
 
-.welcome-header .welcome-brand-logo-img {
-  height: 3.2em;
-}
-
-.welcome-footer .welcome-brand-logo-img {
-  height: 3em;
+.welcome-brand-text--light {
+  color: #fff;
 }
 
 .welcome-brand-text {
@@ -61,17 +53,6 @@
 
 .welcome-brand-text p {
   margin: 0;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  line-height: 1.2;
-}
-
-.welcome-header .welcome-brand-text p {
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: 0;
 }
 
 .welcome-nav {
@@ -80,25 +61,13 @@
   gap: 34px;
 }
 
-.welcome-nav a {
+.welcome-nav__link {
   color: #fff;
   text-decoration: none;
-  font-size: 18px;
-  font-weight: 500;
 }
 
-.welcome-nav a:hover {
+.welcome-nav__link:hover {
   text-decoration: underline;
-}
-
-.welcome-user-link {
-  width: 34px;
-  height: 34px;
-  border: 2px solid #fff;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .welcome-main {
@@ -129,10 +98,9 @@
 
 .welcome-search-card p {
   margin: 0 auto 24px;
-  max-width: none;
+  max-width: 36ch;
   font-size: 20px;
   line-height: 1.2;
-  white-space: nowrap;
   color: #1e293b;
 }
 
@@ -180,68 +148,32 @@
   cursor: pointer;
 }
 
+.welcome-search-row button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.welcome-search-row input:disabled {
+  opacity: 0.85;
+}
+
+.welcome-search-error {
+  margin: 12px 0 0;
+  color: #b91c1c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+}
+
 .welcome-spacer {
   min-height: 220px;
   background: transparent;
 }
 
-.welcome-footer {
-  background: #1f5b9f;
-  color: #fff;
-  padding: 34px 0 12px;
-}
-
-.welcome-footer-inner {
-  width: min(1200px, calc(100% - 40px));
-  margin: 0 auto;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.welcome-footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.welcome-footer-contact h3 {
-  margin: 0 0 14px;
-  font-size: clamp(26px, 2.6vw, 36px);
-  line-height: 1;
-  font-weight: 700;
-}
-
-.welcome-footer-contact p {
-  margin: 0 0 4px;
-  font-size: clamp(15px, 1.15vw, 18px);
-  line-height: 1.3;
-  font-weight: 500;
-}
-
-.welcome-footer .welcome-brand-text p {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.welcome-footer-copy {
-  margin: 28px 0 0;
-  text-align: center;
-  font-size: 13px;
-  opacity: 0.9;
-}
-
 @media (max-width: 900px) {
   .welcome-nav {
     gap: 14px;
-  }
-
-  .welcome-nav a {
-    font-size: 15px;
   }
 
   .welcome-search-card h1 {
@@ -250,19 +182,5 @@
 
   .welcome-search-card p {
     font-size: 16px;
-  }
-
-  .welcome-footer-contact h3 {
-    font-size: 28px;
-  }
-
-  .welcome-footer-contact p {
-    font-size: 16px;
-  }
-
-  .welcome-footer-inner {
-    flex-direction: column;
-    gap: 18px;
-    width: calc(100% - 24px);
   }
 }

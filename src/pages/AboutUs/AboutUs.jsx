@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, User } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
+import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
+import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
+import abigailImage from '../../assets/team/abigail-b-nicolas.png';
+import SiteFooter from '../../components/SiteFooter/SiteFooter';
 import leanaImage from '../../assets/team/leana.png';
 import abigailImage from '../../assets/team/abigail.png';
 import alleahImage from '../../assets/team/alleah.png';
@@ -42,17 +46,17 @@ function ImageWithFallback(props) {
 
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMenuOpen(false);
-    }
-  };
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
+    <nav className="about-nav bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
+      <div className="about-nav__inner app-nav-inner">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="app-nav-logo-box shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5"
+            onClick={closeMenu}
     <nav className="bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex items-center justify-between h-20">
@@ -103,46 +107,60 @@ function Navigation() {
             className="md:hidden p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
+            <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={56} height={56} />
+          </Link>
+          <div className="hidden lg:grid app-nav-brand text-white">
+            <p>AUTOMATED GEOSPATIAL</p>
+            <p>ALERT PLATFORM</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-6 md:gap-12">
+          <div className="hidden md:flex items-center gap-8 lg:gap-12">
+            <Link to="/" className="app-nav-link text-white px-3 py-2">
+              Home
+            </Link>
+            <Link to="/about-us#about" className="app-nav-link text-white px-3 py-2">
+              About Us
+            </Link>
+            <Link to="/about-us#contact" className="app-nav-link text-white px-3 py-2">
+              Contact
+            </Link>
+          </div>
+          <Link to="/login" className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Go to login">
+            <User size={20} className="md:scale-110" />
+          </Link>
+          <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden bg-[#234d73] border-t border-white/20">
-          <div className="px-4 py-3 space-y-3">
-            <button
-              onClick={() => {
-                navigate('/welcome');
-                setIsMenuOpen(false);
-              }}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+          <div className="px-6 py-4 space-y-2">
+            <Link
+              to="/"
+              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              onClick={closeMenu}
             >
               Home
-            </button>
-            <button
-              onClick={() => {
-                navigate('/result');
-                setIsMenuOpen(false);
-              }}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+            </Link>
+            <Link
+              to="/about-us#about"
+              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              onClick={closeMenu}
             >
-              Explore Map
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection('contact')}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+              About Us
+            </Link>
+            <Link
+              to="/about-us#contact"
+              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              onClick={closeMenu}
             >
               Contact
-            </button>
-          </div> 
+            </Link>
+                      </div>
         </div>
       )}
     </nav>
@@ -151,26 +169,26 @@ function Navigation() {
 
 function HeroSection() {
   return (
-    <section id="home" className="relative h-[350px] md:h-[450px] overflow-hidden">
+    <section id="home" className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] overflow-hidden">
       <div className="absolute inset-0">
         <ImageWithFallback
           src={heroImage}
-          alt="Topographic map of the Philippines"
+          alt="Topographic map of Philippines"
           className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
       </div>
 
-      <div className="relative h-full flex items-center justify-center">
-        <div className="text-center text-white px-4 flex flex-col items-center gap-5 md:gap-6">
+      <div className="relative h-full flex items-center justify-center px-4">
+        <div className="text-center text-white flex flex-col items-center gap-4 sm:gap-5 md:gap-6">
           <img
             src={logoImage}
             alt="AGAP logo"
-            className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_4px_28px_rgba(0,0,0,0.5)]"
+            className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_4px_28px_rgba(0,0,0,0.5)]"
             width={128}
             height={128}
           />
-          <h1 className="text-5xl md:text-7xl tracking-wide drop-shadow-md">About Us</h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-wide drop-shadow-md">About Us</h1>
         </div>
       </div>
     </section>
@@ -179,26 +197,26 @@ function HeroSection() {
 
 function AboutContent() {
   return (
-    <section id="about" className="py-16 md:py-20 bg-[#F5F5F5]">
-      <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
+    <section id="about" className="py-12 sm:py-16 md:py-20 bg-[#F5F5F5]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-12">
         <div className="space-y-6 text-gray-800">
-          <p className="leading-relaxed text-base">
+          <p className="leading-relaxed text-sm sm:text-base">
             AGAP (Automated Geospatial Alert Platform) is a web-based tool that was
             developed for communities and government agencies. These institutions can
-            significantly improve operations with the help of geospatial technology.
+            significantly improve operations with help of geospatial technology.
             We provide real-time monitoring of changes in land use, forests, and
             vegetation with our alerts, location-based mapping, and risk analysis; thus
             allows users to respond swiftly to environment shifts and help enhance
             decision-making and operations.
           </p>
 
-          <p className="leading-relaxed text-base">
+          <p className="leading-relaxed text-sm sm:text-base">
             Our platform integrates with satellite data and geographic Information
             systems, and data visualization to original unify widespread data. Besides,
             AGAP supports organizations in risk assessment and resource management.
           </p>
 
-          <p className="leading-relaxed text-base">
+          <p className="leading-relaxed text-sm sm:text-base">
             We decided to make and were prompted community by empowering
             governments and organizations to use geo-technology in their operations,
             enabling immediate responses and informed decisions.
@@ -246,12 +264,13 @@ function TeamMembers() {
             {teamMembers.slice(0, 3).map((member) => (
               <div
                 key={member.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow w-64"
+                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow w-full max-w-xs"
               >
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-square overflow-hidden p-4">
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
+                    className="w-full h-full object-cover rounded-lg"
                     className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
@@ -267,16 +286,17 @@ function TeamMembers() {
         </div>
 
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-[580px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl">
             {teamMembers.slice(3, 5).map((member) => (
               <div
                 key={member.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow w-64 mx-auto"
+                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow w-full max-w-xs mx-auto"
               >
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-square overflow-hidden p-4">
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
+                    className="w-full h-full object-cover rounded-lg"
                     className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
@@ -367,7 +387,7 @@ export default function AboutUs() {
       <HeroSection />
       <AboutContent />
       <TeamMembers />
-      <Footer />
+      <SiteFooter />
     </div>
   );
 }

@@ -6,6 +6,8 @@ import heroImage from '../../assets/hero-img.svg';
 import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
 import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
 import abigailImage from '../../assets/team/abigail-b-nicolas.png';
+import alleahImage from '../../assets/team/alleah-joy-m-balbin-new.png';
+import ryzaImage from '../../assets/team/ryza-gwen-p-villafranca.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -52,11 +54,9 @@ function Navigation() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5">
-              <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={48} height={48} />
-            </div>
+            <img src={logoImage} alt="AGAP" className="w-12 h-12 object-contain shrink-0" width={48} height={48} />
             <div className="hidden lg:block">
-              <span className="text-xs font-semibold tracking-wider leading-tight">
+              <span className="text-lg font-bold leading-5">
                 AUTOMATED GEOSPATIAL<br />ALERT PLATFORM
               </span>
             </div>
@@ -209,7 +209,8 @@ function TeamMembers() {
     {
       id: 1,
       name: 'ALLEAH JOY M. BALBIN',
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop'
+      image: alleahImage,
+      imageClassName: 'object-contain bg-white'
     },
     {
       id: 2,
@@ -229,7 +230,7 @@ function TeamMembers() {
     {
       id: 5,
       name: 'RYZA GWEN P. VILLAFRANCA',
-      image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop'
+      image: ryzaImage
     }
   ];
 
@@ -266,7 +267,7 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
@@ -289,7 +290,7 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">

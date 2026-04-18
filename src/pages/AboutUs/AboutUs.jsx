@@ -22,16 +22,20 @@ function ImageWithFallback(props) {
 
   const { src, alt, style, className, ...rest } = props;
 
-  return didError ? (
-    <div
-      className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
-      style={style}
-    >
-      <div className="flex items-center justify-center w-full h-full">
-        <img src={ERROR_IMG_SRC} alt="Error loading image" {...rest} data-original-url={src} />
+  if (didError) {
+    return (
+      <div
+        className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
+        style={style}
+      >
+        <div className="flex items-center justify-center w-full h-full">
+          <img src={ERROR_IMG_SRC} alt="Error loading image" {...rest} data-original-url={src} />
+        </div>
       </div>
-    </div>
-  ) : (
+    );
+  }
+
+  return (
     <img src={src} alt={alt} className={className} style={style} {...rest} onError={handleError} />
   );
 }
@@ -56,8 +60,9 @@ function Navigation() {
           <div className="flex items-center gap-3">
             <img src={logoImage} alt="AGAP" className="w-12 h-12 object-contain shrink-0" width={48} height={48} />
             <div className="hidden lg:block">
-              <span className="text-lg font-bold leading-5">
-                AUTOMATED GEOSPATIAL<br />ALERT PLATFORM
+              <span className="text-lg font-bold leading-5 flex flex-col">
+                <span>AUTOMATED GEOSPATIAL</span>
+                <span>ALERT PLATFORM</span>
               </span>
             </div>
           </div>
@@ -301,8 +306,9 @@ function Footer() {
               <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={80} height={80} />
             </div>
             <div className="pt-2">
-              <h3 className="text-xs tracking-wider leading-tight">
-                AUTOMATED GEOSPATIAL<br />ALERT PLATFORM
+              <h3 className="text-xs tracking-wider leading-tight flex flex-col">
+                <span>AUTOMATED GEOSPATIAL</span>
+                <span>ALERT PLATFORM</span>
               </h3>
             </div>
           </div>

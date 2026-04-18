@@ -3,10 +3,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut, Menu, X } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
-import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
-import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
-import abigailImage from '../../assets/team/abigail-b-nicolas.png';
 import SiteFooter from '../../components/SiteFooter/SiteFooter';
+import leanaImage from '../../assets/team/leana.png';
+import abigailImage from '../../assets/team/abigail.png';
+import alleahImage from '../../assets/team/alleah.png';
+import fionaImage from '../../assets/team/fiona.png';
+import ryzaImage from '../../assets/team/ryza.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -21,25 +23,26 @@ function ImageWithFallback(props) {
 
   const { src, alt, style, className, ...rest } = props;
 
-  return didError ? (
-    <div
-      className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
-      style={style}
-    >
-      <div className="flex items-center justify-center w-full h-full">
-        <img src={ERROR_IMG_SRC} alt="Error loading image" {...rest} data-original-url={src} />
+  if (didError) {
+    return (
+      <div
+        className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
+        style={style}
+      >
+        <div className="flex items-center justify-center w-full h-full">
+          <img src={ERROR_IMG_SRC} alt="Error loading image" {...rest} data-original-url={src} />
+        </div>
       </div>
-    </div>
-  ) : (
+    );
+  }
+
+  return (
     <img src={src} alt={alt} className={className} style={style} {...rest} onError={handleError} />
   );
 }
 
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
-  const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
-
   const closeMenu = () => setIsMenuOpen(false);
   const handleExploreMap = () => {
     closeMenu();
@@ -52,7 +55,7 @@ function Navigation() {
   };
 
   return (
-    <nav className="about-nav bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
+    <nav className="about-nav bg-[#2B5F8E] text-white shadow-md sticky top-0 z-50">
       <div className="about-nav__inner app-nav-inner">
         <div className="flex items-center gap-3">
           <Link
@@ -83,15 +86,15 @@ function Navigation() {
               Contact
             </Link>
           </div>
+          <Link to="/login" className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Go to login">
+            <User size={20} className="md:scale-110" />
+          </Link>
           <button
             type="button"
-            className="app-profile-link app-profile-link--on-dark p-2 md:p-3"
-            aria-label="Logout"
-            onClick={handleLogout}
+            className="md:hidden p-2.5"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
           >
-            <LogOut size={20} className="md:scale-110" />
-          </button>
-          <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -137,7 +140,7 @@ function Navigation() {
             >
               Contact
             </Link>
-                      </div>
+          </div>
         </div>
       )}
     </nav>
@@ -205,32 +208,13 @@ function AboutContent() {
 }
 
 function TeamMembers() {
+  // Alphabetical by first name; each image matches the person from your uploads.
   const teamMembers = [
-    {
-      id: 1,
-      name: 'ALLEAH JOY M. BALBIN',
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop'
-    },
-    {
-      id: 2,
-      name: 'FIONA ROSE A. BALALA',
-      image: fionaRoseImage
-    },
-    {
-      id: 3,
-      name: 'ABIGAIL B. NICOLAS',
-      image: abigailImage
-    },
-    {
-      id: 4,
-      name: 'LEANNA ROSE S. SANTOS',
-      image: leannaRoseImage
-    },
-    {
-      id: 5,
-      name: 'RYZA GWEN P. VILLAFRANCA',
-      image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop'
-    }
+    { id: 1, name: 'Abigail B. Nicolas', image: abigailImage },
+    { id: 2, name: 'Alleah Joy M. Balbin', image: alleahImage },
+    { id: 3, name: 'Fiona Rose A. Balala', image: fionaImage },
+    { id: 4, name: 'Leana Rose S. Santos', image: leanaImage },
+    { id: 5, name: 'Ryza Gwen P. Villafranca', image: ryzaImage }
   ];
 
   const handleMeetOurTeam = () => {
@@ -249,7 +233,7 @@ function TeamMembers() {
           >
             MEET OUR
           </button>
-          <h2 className="text-4xl md:text-5xl text-[#8B1C1C] tracking-wide">
+          <h2 className="text-4xl md:text-5xl text-[#0c2d48] tracking-wide">
             Team Members
           </h2>
         </div>
@@ -266,11 +250,13 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover rounded-lg"
+                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#2B5F8E] text-base font-semibold tracking-wide">{member.name}</h3>
+                  <h3 className="text-[#0c2d48] text-sm sm:text-base font-semibold tracking-wide leading-snug">
+                    {member.name}
+                  </h3>
                   <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>
@@ -289,11 +275,13 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover rounded-lg"
+                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#2B5F8E] text-base font-semibold tracking-wide">{member.name}</h3>
+                  <h3 className="text-[#0c2d48] text-sm sm:text-base font-semibold tracking-wide leading-snug">
+                    {member.name}
+                  </h3>
                   <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>

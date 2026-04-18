@@ -139,6 +139,31 @@
   gap: 8px;
 }
 
+.landing-profile-btn {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(31, 91, 159, 0.35);
+  border-radius: 999px;
+  background: rgba(31, 91, 159, 0.08);
+  color: #1f5b9f;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.landing-profile-btn:hover {
+  background: rgba(31, 91, 159, 0.14);
+  border-color: rgba(31, 91, 159, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(31, 91, 159, 0.18);
+}
+
+.landing-profile-btn:active {
+  transform: translateY(0);
+}
+
 .landing-login-btn,
 .landing-signup-btn {
   font-size: 18px;
@@ -190,6 +215,8 @@
   text-align: center;
   padding: 42px 20px 18px;
   animation: fadeUp 0.7s ease both;
+  position: relative;
+  z-index: 2;
 }
 
 .landing-hero-copy h1 {
@@ -247,6 +274,8 @@
   height: auto;
   margin-top: -220px;
   overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
 @media (min-width: 1200px) {
@@ -262,6 +291,7 @@
   transform-origin: center bottom;
   animation: heroWaveMotion 10s ease-in-out infinite;
   filter: drop-shadow(0 10px 20px rgba(25, 74, 122, 0.15));
+  pointer-events: none;
 }
 
 @keyframes heroWaveMotion {

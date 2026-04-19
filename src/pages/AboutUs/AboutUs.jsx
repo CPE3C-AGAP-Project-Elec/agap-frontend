@@ -3,9 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, User } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
-import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
-import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
-import abigailImage from '../../assets/team/abigail-b-nicolas.png';
 import SiteFooter from '../../components/SiteFooter/SiteFooter';
 import leanaImage from '../../assets/team/leana.png';
 import abigailImage from '../../assets/team/abigail.png';
@@ -26,81 +23,36 @@ function ImageWithFallback(props) {
 
   const { src, alt, style, className, ...rest } = props;
 
-  return didError ? (
-    <div
-      className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
-      style={style}
-    >
-      <div className="flex items-center justify-center w-full h-full">
-        <img src={ERROR_IMG_SRC} alt="Error loading image" {...rest} data-original-url={src} />
+  if (didError) {
+    return (
+      <div
+        className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
+        style={style}
+      >
+        <div className="flex items-center justify-center w-full h-full">
+          <img src={ERROR_IMG_SRC} alt="Error loading image" {...rest} data-original-url={src} />
+        </div>
       </div>
-    </div>
-  ) : (
+    );
+  }
+
+  return (
     <img src={src} alt={alt} className={className} style={style} {...rest} onError={handleError} />
   );
 }
 
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="about-nav bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
+    <nav className="about-nav bg-[#2B5F8E] text-white shadow-md sticky top-0 z-50">
       <div className="about-nav__inner app-nav-inner">
         <div className="flex items-center gap-3">
           <Link
             to="/"
             className="app-nav-logo-box shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5"
             onClick={closeMenu}
-    <nav className="bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <img src={logoImage} alt="AGAP" className="w-12 h-12 object-contain shrink-0" width={48} height={48} />
-            <div className="hidden lg:block">
-              <span className="text-lg font-bold leading-5">
-                AUTOMATED GEOSPATIAL<br />ALERT PLATFORM
-              </span>
-            </div>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-10">
-            <button
-              onClick={() => navigate('/welcome')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Home
-            </button>
-            <button
-              onClick={() => navigate('/result')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Explore Map
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection('contact')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Contact
-            </button>
-            <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
-              <Search size={20} />
-            </button>
-          </div>
- 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={56} height={56} />
           </Link>
@@ -118,6 +70,9 @@ function Navigation() {
             <Link to="/about-us#about" className="app-nav-link text-white px-3 py-2">
               About Us
             </Link>
+            <Link to="/result" className="app-nav-link text-white px-3 py-2">
+              Explore Map
+            </Link>
             <Link to="/about-us#contact" className="app-nav-link text-white px-3 py-2">
               Contact
             </Link>
@@ -125,7 +80,12 @@ function Navigation() {
           <Link to="/login" className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Go to login">
             <User size={20} className="md:scale-110" />
           </Link>
-          <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
+          <button
+            type="button"
+            className="md:hidden p-2.5"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -149,13 +109,20 @@ function Navigation() {
               About Us
             </Link>
             <Link
+              to="/result"
+              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              onClick={closeMenu}
+            >
+              Explore Map
+            </Link>
+            <Link
               to="/about-us#contact"
               className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
               onClick={closeMenu}
             >
               Contact
             </Link>
-                      </div>
+          </div>
         </div>
       )}
     </nav>
@@ -265,8 +232,7 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover rounded-lg"
-                    className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
+                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
@@ -291,8 +257,7 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover rounded-lg"
-                    className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
+                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapPin, Search, User } from "lucide-react";
+import { MapPin, Search, User, Menu, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../../assets/logo.png";
 import SiteFooter from "../../components/SiteFooter/SiteFooter";
@@ -26,6 +26,9 @@ export default function Welcome() {
   const [locationQuery, setLocationQuery] = useState("");
   const [searchError, setSearchError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const closeMenu = () => setIsMenuOpen(false);
 
   useEffect(() => {
     if (location.hash !== "#contact") return;
@@ -65,7 +68,7 @@ export default function Welcome() {
     <div className="welcome-page">
       <header className="welcome-header">
         <div className="welcome-header-inner app-nav-inner">
-          <div className="welcome-brand">
+          <div className="flex items-center gap-3">
             <div className="welcome-brand-logo app-nav-logo-box">
               <img src={logoImage} alt="AGAP logo" className="welcome-brand-logo-img" />
             </div>
@@ -75,21 +78,54 @@ export default function Welcome() {
             </div>
           </div>
 
-          <nav className="welcome-nav">
-            <Link to="/" className="app-nav-link welcome-nav__link">
-              Home
+          <div className="flex items-center gap-6 md:gap-12">
+            <div className="hidden md:flex items-center gap-8 lg:gap-12">
+              <Link to="/" className="app-nav-link welcome-nav__link text-white px-3 py-2">
+                Home
+              </Link>
+              <Link to="/about-us" className="app-nav-link welcome-nav__link text-white px-3 py-2">
+                About Us
+              </Link>
+              <Link to="/welcome#contact" className="app-nav-link welcome-nav__link text-white px-3 py-2">
+                Contact
+              </Link>
+            </div>
+            <Link to="/login" className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Go to login">
+              <User size={20} className="md:scale-110" />
             </Link>
-            <Link to="/about-us" className="app-nav-link welcome-nav__link">
-              About Us
-            </Link>
-            <Link to="/welcome#contact" className="app-nav-link welcome-nav__link">
-              Contact
-            </Link>
-            <Link to="/login" className="app-profile-link app-profile-link--on-dark" aria-label="Go to login">
-              <User size={20} />
-            </Link>
-          </nav>
+            <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
+
+        {isMenuOpen && (
+          <div className="md:hidden bg-[#234d73] border-t border-white/20">
+            <div className="px-6 py-4 space-y-2">
+              <Link
+                to="/"
+                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                onClick={closeMenu}
+              >
+                Home
+              </Link>
+              <Link
+                to="/about-us"
+                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                onClick={closeMenu}
+              >
+                About Us
+              </Link>
+              <Link
+                to="/welcome#contact"
+                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                onClick={closeMenu}
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       <main className="welcome-main">

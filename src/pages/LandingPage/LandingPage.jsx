@@ -1,3 +1,4 @@
+import { useState } from "react";
 import heroImage from "../../assets/hero-img.svg";
 import logoImage from "../../assets/logo.png";
 import { useLayoutEffect } from "react";
@@ -6,6 +7,7 @@ import SiteFooter from "../../components/SiteFooter/SiteFooter";
 import "./LandingPage.css";
 
 export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const scrollFromResult = location.state?.scrollToLandingContact === true;
@@ -35,20 +37,18 @@ export default function LandingPage() {
                 <img src={logoImage} alt="AGAP logo" className="landing-logo-image" />
               </div>
             </div>
-            <nav className="landing-nav">
-              <Link to="/" className="landing-nav-link">
+            <nav className={`landing-nav ${mobileMenuOpen ? 'landing-nav--open' : ''}`}>
+              <Link to="/" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
                 Home
               </Link>
-              <Link to="/about-us" className="landing-nav-link">
+              <Link to="/about-us" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
                 About Us
-              </Link>
-              <Link to="/result" className="landing-nav-link">
-                Explore Map
               </Link>
               <Link
                 to="/#contact"
                 className="landing-nav-link"
                 onClick={() => {
+                  setMobileMenuOpen(false);
                   requestAnimationFrame(() => {
                     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
                   });
@@ -56,14 +56,47 @@ export default function LandingPage() {
               >
                 Contact
               </Link>
+              <div className="landing-nav-auth">
+                <button 
+                  type="button" 
+                  className="landing-login-btn landing-nav-auth-btn" 
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigate("/login");
+                  }}
+                >
+                  Login
+                </button>
+                <button 
+                  type="button" 
+                  className="landing-signup-btn landing-nav-auth-btn" 
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigate("/signup");
+                  }}
+                >
+                  Sign up
+                </button>
+              </div>
             </nav>
           </div>
-          <div className="landing-auth">
-            <button type="button" className="landing-login-btn" onClick={() => navigate("/login")}>
-              Login
-            </button>
-            <button type="button" className="landing-signup-btn" onClick={() => navigate("/signup")}>
-              Sign up
+          <div className="landing-header-right">
+            <div className="landing-auth">
+              <button type="button" className="landing-login-btn" onClick={() => navigate("/login")}>
+                Login
+              </button>
+              <button type="button" className="landing-signup-btn" onClick={() => navigate("/signup")}>
+                Sign up
+              </button>
+            </div>
+            <button 
+              className="landing-mobile-menu-btn" 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
             </button>
           </div>
         </div>

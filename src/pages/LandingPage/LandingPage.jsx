@@ -1,10 +1,29 @@
 import heroImage from "../../assets/hero-img.svg";
 import logoImage from "../../assets/logo.png";
-import { useNavigate } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import SiteFooter from "../../components/SiteFooter/SiteFooter";
 import "./LandingPage.css";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const scrollFromResult = location.state?.scrollToLandingContact === true;
+
+  useLayoutEffect(() => {
+    const hashContact = location.hash === "#contact";
+    if (!hashContact && !scrollFromResult) return;
+
+    const scroll = () =>
+      document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    scroll();
+    requestAnimationFrame(scroll);
+
+    if (scrollFromResult) {
+      navigate({ pathname: "/", hash: "contact" }, { replace: true, state: {} });
+    }
+  }, [location.hash, location.pathname, scrollFromResult, navigate]);
 
   return (
     <div className="landing-page">
@@ -12,47 +31,31 @@ export default function LandingPage() {
         <div className="landing-container landing-header-inner">
           <div className="landing-header-left">
             <div className="landing-logo">
-              <div className="landing-logo-icon">
+              <div className="landing-logo-icon app-nav-logo-box">
                 <img src={logoImage} alt="AGAP logo" className="landing-logo-image" />
               </div>
             </div>
             <nav className="landing-nav">
-              <a
-                href="/"
-                onClick={(event) => {
-                  event.preventDefault();
-                  navigate("/");
-                }}
-              >
+              <Link to="/" className="landing-nav-link">
                 Home
-              </a>
-              <a
-                href="/about-us"
-                onClick={(event) => {
-                  event.preventDefault();
-                  navigate("/about-us");
-                }}
-              >
+              </Link>
+              <Link to="/about-us" className="landing-nav-link">
                 About Us
-              </a>
-              <a
-                href="/result"
-                onClick={(event) => {
-                  event.preventDefault();
-                  navigate("/result");
-                }}
-              >
+              </Link>
+              <Link to="/result" className="landing-nav-link">
                 Explore Map
-              </a>
-              <a
-                href="#contact"
-                onClick={(event) => {
-                  event.preventDefault();
-                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+              </Link>
+              <Link
+                to="/#contact"
+                className="landing-nav-link"
+                onClick={() => {
+                  requestAnimationFrame(() => {
+                    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  });
                 }}
               >
                 Contact
-              </a>
+              </Link>
             </nav>
           </div>
           <div className="landing-auth">
@@ -87,34 +90,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <footer id="contact" className="landing-footer">
-        <div className="landing-container">
-          <div className="landing-footer-inner">
-            <div className="landing-footer-brand">
-              <div className="landing-footer-brand-icon">
-                <img src={logoImage} alt="AGAP logo" className="landing-footer-logo-image" />
-              </div>
-              <div className="landing-footer-brand-text">
-                <div>AGAP</div>
-                <div>AUTOMATED GEOSPATIAL</div>
-                <div>ALERT PLATFORM</div>
-              </div>
-            </div>
-            <div className="landing-footer-contact">
-              <h3>Contact Us</h3>
-              <div>
-                <p>Email: agap.system@gmail.com</p>
-                <p>Phone: +63 912 345 6789</p>
-                <p>Location: Malolos, Bulacan, Philippines</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="landing-copyright">
-            Copyright © 2026 AGAP All Rights Reserved
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

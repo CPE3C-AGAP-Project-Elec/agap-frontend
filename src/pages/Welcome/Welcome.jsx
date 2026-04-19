@@ -1,37 +1,92 @@
+import { useEffect, useState } from "react";
 import { MapPin, Search, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../../assets/logo.png";
+import SiteFooter from "../../components/SiteFooter/SiteFooter";
 import "./Welcome.css";
 
+const NOMINATIM_HEADERS = {
+  Accept: "application/json",
+  "Accept-Language": "en",
+};
+
+async function searchPhilippinesLocation(query) {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(trimmed)}&countrycodes=ph&format=json&limit=1`;
+  const response = await fetch(url, { headers: NOMINATIM_HEADERS });
+  if (!response.ok) throw new Error("Geocoding request failed");
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
+}
+
 export default function Welcome() {
-  const handleContactClick = (event) => {
-    event.preventDefault();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [locationQuery, setLocationQuery] = useState("");
+  const [searchError, setSearchError] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    if (location.hash !== "#contact") return;
     const contactSection = document.getElementById("contact");
     if (contactSection) {
-      contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      requestAnimationFrame(() => {
+        contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [location.pathname, location.hash]);
+
+  const handleSearchSubmit = async (event) => {
+    event.preventDefault();
+    setSearchError("");
+    const trimmed = locationQuery.trim();
+    if (!trimmed) {
+      setSearchError("Invalid location. Try another place.");
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const results = await searchPhilippinesLocation(trimmed);
+      if (!results.length) {
+        setSearchError("Invalid location. Try another place.");
+        return;
+      }
+      navigate("/result", { state: { welcomeSearchQuery: trimmed } });
+    } catch {
+      setSearchError("Invalid location. Try another place.");
+    } finally {
+      setIsSearching(false);
     }
   };
 
   return (
     <div className="welcome-page">
       <header className="welcome-header">
-        <div className="welcome-header-inner">
+        <div className="welcome-header-inner app-nav-inner">
           <div className="welcome-brand">
-            <div className="welcome-brand-logo">
+            <div className="welcome-brand-logo app-nav-logo-box">
               <img src={logoImage} alt="AGAP logo" className="welcome-brand-logo-img" />
             </div>
-            <div className="welcome-brand-text">
+            <div className="welcome-brand-text app-nav-brand welcome-brand-text--light">
               <p>AUTOMATED GEOSPATIAL</p>
               <p>ALERT PLATFORM</p>
             </div>
           </div>
 
           <nav className="welcome-nav">
-            <Link to="/">Home</Link>
-            <Link to="/about-us">About Us</Link>
-            <a href="#contact" onClick={handleContactClick}>Contact</a>
-            <Link to="/login" className="welcome-user-link" aria-label="Go to login">
-              <User size={18} />
+            <Link to="/" className="app-nav-link welcome-nav__link">
+              Home
+            </Link>
+            <Link to="/about-us" className="app-nav-link welcome-nav__link">
+              About Us
+            </Link>
+            <Link to="/welcome#contact" className="app-nav-link welcome-nav__link">
+              Contact
+            </Link>
+            <Link to="/login" className="app-profile-link app-profile-link--on-dark" aria-label="Go to login">
+              <User size={20} />
             </Link>
           </nav>
         </div>
@@ -42,39 +97,36 @@ export default function Welcome() {
           <h1>Find Your Location</h1>
           <p>Get real-time flood risk updates based on your location.</p>
 
-          <div className="welcome-search-row">
-            <MapPin size={18} className="welcome-input-icon-left" />
-            <input type="text" placeholder="Search Location" />
-            <button type="button" aria-label="Search location">
+          <form className="welcome-search-row" onSubmit={handleSearchSubmit}>
+            <MapPin size={18} className="welcome-input-icon-left" aria-hidden />
+            <input
+              type="text"
+              value={locationQuery}
+              onChange={(e) => {
+                setLocationQuery(e.target.value);
+                if (searchError) setSearchError("");
+              }}
+              placeholder="Search Location"
+              aria-label="Search location"
+              aria-invalid={Boolean(searchError)}
+              aria-describedby={searchError ? "welcome-search-error" : undefined}
+              disabled={isSearching}
+            />
+            <button type="submit" aria-label="Search location" disabled={isSearching}>
               <Search size={18} />
             </button>
-          </div>
+          </form>
+          {searchError ? (
+            <p id="welcome-search-error" className="welcome-search-error" role="alert">
+              {searchError}
+            </p>
+          ) : null}
         </section>
       </main>
 
       <div className="welcome-spacer" />
 
-      <footer className="welcome-footer" id="contact">
-        <div className="welcome-footer-inner">
-          <div className="welcome-footer-brand">
-            <div className="welcome-brand-logo">
-              <img src={logoImage} alt="AGAP logo" className="welcome-brand-logo-img" />
-            </div>
-            <div className="welcome-brand-text">
-              <p>AUTOMATED GEOSPATIAL</p>
-              <p>ALERT PLATFORM</p>
-            </div>
-          </div>
-
-          <div className="welcome-footer-contact">
-            <h3>Contact Us</h3>
-            <p>Email: agap.system@gmail.com</p>
-            <p>Phone: +63 9XX XXX XXXX (optional)</p>
-            <p>Location: Bulacan, Philippines</p>
-          </div>
-        </div>
-        <p className="welcome-footer-copy">Copyright © 2026 AGAP All Rights Reserved</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

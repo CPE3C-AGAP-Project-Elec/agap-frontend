@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
-  LogOut,
+  User,
   Search,
   Menu,
   X,
@@ -16,8 +16,7 @@ import {
   Cloud,
   CloudRain,
 } from 'lucide-react';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import GoogleMapView from '../../components/Googlemapview/GoogleMapView.jsx';
 import logoImage from '../../assets/logo.png';
 import './Result.css';
 
@@ -44,23 +43,12 @@ function ImageWithFallback(props) {
   );
 }
 
-// Fix for default marker icons in Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+
+
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const closeMenu = () => setIsMenuOpen(false);
-  const handleLogout = () => {
-    localStorage.removeItem('agapIsLoggedIn');
-    closeMenu();
-    navigate('/');
-  };
 
   return (
     <header className="result-header about-nav text-white shadow-md sticky top-0 z-50">
@@ -91,14 +79,9 @@ function Header() {
               Contact
             </Link>
           </div>
-          <button
-            type="button"
-            className="app-profile-link app-profile-link--on-dark"
-            aria-label="Logout"
-            onClick={handleLogout}
-          >
-            <LogOut size={20} aria-hidden />
-          </button>
+          <Link to="/login" className="app-profile-link app-profile-link--on-dark" aria-label="Go to login">
+            <User size={20} aria-hidden />
+          </Link>
           <button type="button" className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -130,13 +113,6 @@ function Header() {
             >
               Contact
             </Link>
-            <button
-              type="button"
-              className="app-nav-link block w-full text-left py-2 text-white"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
           </div>
         </div>
       )}
@@ -315,98 +291,16 @@ function WeatherHistory({ data }) {
   );
 }
 
-function MapView({ latitude, longitude, locationName }) {
-  const mapContainerRef = useRef(null);
-  const mapRef = useRef(null);
-  const markerRef = useRef(null);
-
-  useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
-
-    const philippinesBounds = [
-      [4.5, 116.0],
-      [21.0, 127.0],
-    ];
-
-    const map = L.map(mapContainerRef.current, {
-      center: [12.8797, 121.774],
-      zoom: 6,
-      minZoom: 6,
-      maxZoom: 18,
-      maxBounds: philippinesBounds,
-      maxBoundsViscosity: 1.0,
-    });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
-
-    mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-      markerRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    if (markerRef.current) {
-      markerRef.current.remove();
-      markerRef.current = null;
-    }
-
-    if (latitude !== undefined && longitude !== undefined) {
-      const newLatLng = [latitude, longitude];
-      mapRef.current.setView(newLatLng, 12);
-
-      const marker = L.marker(newLatLng).addTo(mapRef.current);
-      if (locationName) {
-        marker.bindPopup(locationName);
-      }
-      markerRef.current = marker;
-    }
-  }, [latitude, longitude, locationName]);
-
-  const handleZoomIn = () => {
-    if (mapRef.current) {
-      mapRef.current.zoomIn();
-    }
-  };
-
-  const handleZoomOut = () => {
-    if (mapRef.current) {
-      mapRef.current.zoomOut();
-    }
-  };
-
+// Replace the entire MapView function with this:
+function MapView({ latitude, longitude, locationName, floodRiskLevel }) {
   return (
     <div className="result-map">
-      <div ref={mapContainerRef} className="result-map__canvas" />
-
-      <div className="result-map__controls result-map__controls--side">
-        <button type="button" onClick={handleZoomIn} className="result-map__tool" aria-label="Zoom in">
-          <Plus className="result-map__icon-lg" aria-hidden />
-        </button>
-        <button type="button" onClick={handleZoomOut} className="result-map__tool" aria-label="Zoom out">
-          <Minus className="result-map__icon-lg" aria-hidden />
-        </button>
-      </div>
-
-      <div className="result-map__controls result-map__controls--bottom">
-        <button type="button" className="result-map__tool" aria-label="Edit">
-          <Edit3 className="result-map__icon-sm" aria-hidden />
-        </button>
-        <button type="button" className="result-map__tool" aria-label="Map layers">
-          <MapIcon className="result-map__icon-sm" aria-hidden />
-        </button>
-        <button type="button" className="result-map__tool" aria-label="Search on map">
-          <SearchIcon className="result-map__icon-sm" aria-hidden />
-        </button>
-      </div>
+      <GoogleMapView 
+        latitude={latitude}
+        longitude={longitude}
+        locationName={locationName}
+        floodRiskLevel={floodRiskLevel}
+      />
     </div>
   );
 }
@@ -557,9 +451,12 @@ export default function Result() {
             latitude={coordinates?.latitude}
             longitude={coordinates?.longitude}
             locationName={searchQuery}
+            floodRiskLevel={floodLevel}
           />
         </main>
       </div>
     </div>
   );
 }
+
+

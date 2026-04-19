@@ -70,9 +70,6 @@ function Navigation() {
             <Link to="/about-us#about" className="app-nav-link text-white px-3 py-2">
               About Us
             </Link>
-            <Link to="/result" className="app-nav-link text-white px-3 py-2">
-              Explore Map
-            </Link>
             <Link to="/about-us#contact" className="app-nav-link text-white px-3 py-2">
               Contact
             </Link>
@@ -107,13 +104,6 @@ function Navigation() {
               onClick={closeMenu}
             >
               About Us
-            </Link>
-            <Link
-              to="/result"
-              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
-              onClick={closeMenu}
-            >
-              Explore Map
             </Link>
             <Link
               to="/about-us#contact"

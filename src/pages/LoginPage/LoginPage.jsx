@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoWithText from "../../assets/logoWithText.png";
 import googleIcon from "../../assets/icons/google.svg";
 import "./LoginPage.css";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const welcomeLines = [
     ["HELLO,", "WELCOME!"],
     ["STAY SAFE,", "STAY READY!"],
@@ -53,6 +54,7 @@ export default function LoginPage() {
 
     if (!hasError) {
       console.log("Login:", { email, password, rememberMe });
+      navigate("/welcome");
     }
   };
 
@@ -163,7 +165,10 @@ export default function LoginPage() {
             </button>
 
             <p className="login-signup-text">
-              Don't have an account? <a href="/signup">Sign Up</a>
+              Don't have an account? <Link to="/signup">Sign Up</Link>
+            </p>
+            <p className="login-signup-text">
+              Back to <Link to="/welcome">Welcome</Link>
             </p>
           </form>
         </div>

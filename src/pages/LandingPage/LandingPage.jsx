@@ -67,26 +67,42 @@ export default function LandingPage() {
                 Contact
               </Link>
               <div className="landing-nav-auth">
-                <button 
-                  type="button" 
-                  className="landing-login-btn landing-nav-auth-btn" 
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigate("/login");
-                  }}
-                >
-                  Login
-                </button>
-                <button 
-                  type="button" 
-                  className="landing-signup-btn landing-nav-auth-btn" 
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigate("/signup");
-                  }}
-                >
-                  Sign up
-                </button>
+                {isLoggedIn ? (
+                  <button
+                    type="button"
+                    className="landing-profile-btn landing-nav-auth-btn"
+                    aria-label="Profile"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleProfile();
+                    }}
+                  >
+                    <User size={20} aria-hidden />
+                  </button>
+                ) : (
+                  <>
+                    <button 
+                      type="button" 
+                      className="landing-login-btn landing-nav-auth-btn" 
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/login");
+                      }}
+                    >
+                      Login
+                    </button>
+                    <button 
+                      type="button" 
+                      className="landing-signup-btn landing-nav-auth-btn" 
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/signup");
+                      }}
+                    >
+                      Sign up
+                    </button>
+                  </>
+                )}
               </div>
             </nav>
           </div>

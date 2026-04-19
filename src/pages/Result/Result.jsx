@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
-  LogOut,
   Search,
   Menu,
+  User,
   X,
   ChevronDown,
   ChevronUp,
@@ -54,13 +54,9 @@ L.Icon.Default.mergeOptions({
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
+  const profileRoute = isLoggedIn ? '/welcome' : '/login';
   const closeMenu = () => setIsMenuOpen(false);
-  const handleLogout = () => {
-    localStorage.removeItem('agapIsLoggedIn');
-    closeMenu();
-    navigate('/');
-  };
 
   return (
     <header className="result-header about-nav text-white shadow-md sticky top-0 z-50">
@@ -91,14 +87,9 @@ function Header() {
               Contact
             </Link>
           </div>
-          <button
-            type="button"
-            className="app-profile-link app-profile-link--on-dark"
-            aria-label="Logout"
-            onClick={handleLogout}
-          >
-            <LogOut size={20} aria-hidden />
-          </button>
+          <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
+            <User size={20} aria-hidden />
+          </Link>
           <button type="button" className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -130,13 +121,6 @@ function Header() {
             >
               Contact
             </Link>
-            <button
-              type="button"
-              className="app-nav-link block w-full text-left py-2 text-white"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
           </div>
         </div>
       )}

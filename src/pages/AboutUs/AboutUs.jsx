@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, User, X } from 'lucide-react';
+import { Menu, User, X } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
 import SiteFooter from '../../components/SiteFooter/SiteFooter';

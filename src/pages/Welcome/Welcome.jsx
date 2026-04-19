@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapPin, Search, Menu, User, X } from "lucide-react";
+import { MapPin, Search, Menu, User, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../../assets/logo.png";
 import SiteFooter from "../../components/SiteFooter/SiteFooter";

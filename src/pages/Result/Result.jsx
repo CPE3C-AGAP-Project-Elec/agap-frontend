@@ -482,7 +482,10 @@ export default function Result() {
     if (!q || !String(q).trim()) return;
     if (welcomeSearchHandledKey.current === location.key) return;
     welcomeSearchHandledKey.current = location.key;
-    void performSearch(String(q).trim());
+    const timeoutId = window.setTimeout(() => {
+      void performSearch(String(q).trim());
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, [location.key, location.state, performSearch]);
 
   const handleSearch = async () => {

@@ -7,6 +7,11 @@ import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
 import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
 import abigailImage from '../../assets/team/abigail-b-nicolas.png';
 import SiteFooter from '../../components/SiteFooter/SiteFooter';
+import leanaImage from '../../assets/team/leana.png';
+import abigailImage from '../../assets/team/abigail.png';
+import alleahImage from '../../assets/team/alleah.png';
+import fionaImage from '../../assets/team/fiona.png';
+import ryzaImage from '../../assets/team/ryza.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -48,6 +53,54 @@ function Navigation() {
             to="/"
             className="app-nav-logo-box shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5"
             onClick={closeMenu}
+    <nav className="bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <img src={logoImage} alt="AGAP" className="w-12 h-12 object-contain shrink-0" width={48} height={48} />
+            <div className="hidden lg:block">
+              <span className="text-lg font-bold leading-5">
+                AUTOMATED GEOSPATIAL<br />ALERT PLATFORM
+              </span>
+            </div>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-10">
+            <button
+              onClick={() => navigate('/welcome')}
+              className="text-sm hover:text-gray-200 transition-colors"
+            >
+              Home
+            </button>
+            <button
+              onClick={() => navigate('/result')}
+              className="text-sm hover:text-gray-200 transition-colors"
+            >
+              Explore Map
+            </button>
+            <button
+              onClick={() => scrollToSection('about')}
+              className="text-sm hover:text-gray-200 transition-colors"
+            >
+              About
+            </button>
+            <button
+              onClick={() => scrollToSection('contact')}
+              className="text-sm hover:text-gray-200 transition-colors"
+            >
+              Contact
+            </button>
+            <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+              <Search size={20} />
+            </button>
+          </div>
+ 
+          {/* Mobile menu button */}
+          <button
+            className="md:hidden p-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={56} height={56} />
           </Link>
@@ -170,32 +223,13 @@ function AboutContent() {
 }
 
 function TeamMembers() {
+  // Alphabetical by first name; each image matches the person from your uploads.
   const teamMembers = [
-    {
-      id: 1,
-      name: 'ALLEAH JOY M. BALBIN',
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop'
-    },
-    {
-      id: 2,
-      name: 'FIONA ROSE A. BALALA',
-      image: fionaRoseImage
-    },
-    {
-      id: 3,
-      name: 'ABIGAIL B. NICOLAS',
-      image: abigailImage
-    },
-    {
-      id: 4,
-      name: 'LEANNA ROSE S. SANTOS',
-      image: leannaRoseImage
-    },
-    {
-      id: 5,
-      name: 'RYZA GWEN P. VILLAFRANCA',
-      image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop'
-    }
+    { id: 1, name: 'Abigail B. Nicolas', image: abigailImage },
+    { id: 2, name: 'Alleah Joy M. Balbin', image: alleahImage },
+    { id: 3, name: 'Fiona Rose A. Balala', image: fionaImage },
+    { id: 4, name: 'Leana Rose S. Santos', image: leanaImage },
+    { id: 5, name: 'Ryza Gwen P. Villafranca', image: ryzaImage }
   ];
 
   const handleMeetOurTeam = () => {
@@ -214,7 +248,7 @@ function TeamMembers() {
           >
             MEET OUR
           </button>
-          <h2 className="text-4xl md:text-5xl text-[#8B1C1C] tracking-wide">
+          <h2 className="text-4xl md:text-5xl text-[#0c2d48] tracking-wide">
             Team Members
           </h2>
         </div>
@@ -232,10 +266,13 @@ function TeamMembers() {
                     src={member.image}
                     alt={member.name}
                     className="w-full h-full object-cover rounded-lg"
+                    className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#2B5F8E] text-base font-semibold tracking-wide">{member.name}</h3>
+                  <h3 className="text-[#0c2d48] text-sm sm:text-base font-semibold tracking-wide leading-snug">
+                    {member.name}
+                  </h3>
                   <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>
@@ -255,10 +292,13 @@ function TeamMembers() {
                     src={member.image}
                     alt={member.name}
                     className="w-full h-full object-cover rounded-lg"
+                    className={`w-full h-full ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#2B5F8E] text-base font-semibold tracking-wide">{member.name}</h3>
+                  <h3 className="text-[#0c2d48] text-sm sm:text-base font-semibold tracking-wide leading-snug">
+                    {member.name}
+                  </h3>
                   <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>

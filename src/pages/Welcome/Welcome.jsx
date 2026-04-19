@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapPin, Search, User, Menu, X } from "lucide-react";
+import { LogOut, MapPin, Search, Menu, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../../assets/logo.png";
 import SiteFooter from "../../components/SiteFooter/SiteFooter";
@@ -27,8 +27,14 @@ export default function Welcome() {
   const [searchError, setSearchError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isLoggedIn = localStorage.getItem("agapIsLoggedIn") === "true";
 
   const closeMenu = () => setIsMenuOpen(false);
+  const handleLogout = () => {
+    localStorage.removeItem("agapIsLoggedIn");
+    closeMenu();
+    navigate("/");
+  };
 
   useEffect(() => {
     if (location.hash !== "#contact") return;
@@ -90,9 +96,14 @@ export default function Welcome() {
                 Contact
               </Link>
             </div>
-            <Link to="/login" className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Go to login">
-              <User size={20} className="md:scale-110" />
-            </Link>
+            <button
+              type="button"
+              className="app-profile-link app-profile-link--on-dark p-2 md:p-3"
+              aria-label="Logout"
+              onClick={handleLogout}
+            >
+              <LogOut size={20} className="md:scale-110" />
+            </button>
             <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -123,6 +134,15 @@ export default function Welcome() {
               >
                 Contact
               </Link>
+              {isLoggedIn ? (
+                <button
+                  type="button"
+                  className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              ) : null}
             </div>
           </div>
         )}

@@ -3,6 +3,7 @@ import heroImage from "../../assets/hero-img.svg";
 import logoImage from "../../assets/logo.png";
 import { useLayoutEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { User } from "lucide-react";
 import SiteFooter from "../../components/SiteFooter/SiteFooter";
 import "./LandingPage.css";
 
@@ -11,6 +12,15 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const scrollFromResult = location.state?.scrollToLandingContact === true;
+  const isLoggedIn = localStorage.getItem("agapIsLoggedIn") === "true";
+
+  const handleExploreMap = () => {
+    navigate(isLoggedIn ? "/result" : "/login");
+  };
+
+  const handleProfile = () => {
+    navigate("/welcome");
+  };
 
   useLayoutEffect(() => {
     const hashContact = location.hash === "#contact";
@@ -82,12 +92,20 @@ export default function LandingPage() {
           </div>
           <div className="landing-header-right">
             <div className="landing-auth">
-              <button type="button" className="landing-login-btn" onClick={() => navigate("/login")}>
-                Login
-              </button>
-              <button type="button" className="landing-signup-btn" onClick={() => navigate("/signup")}>
-                Sign up
-              </button>
+              {isLoggedIn ? (
+                <button type="button" className="landing-profile-btn" aria-label="Profile" onClick={handleProfile}>
+                  <User size={20} aria-hidden />
+                </button>
+              ) : (
+                <>
+                  <button type="button" className="landing-login-btn" onClick={() => navigate("/login")}>
+                    Login
+                  </button>
+                  <button type="button" className="landing-signup-btn" onClick={() => navigate("/signup")}>
+                    Sign up
+                  </button>
+                </>
+              )}
             </div>
             <button 
               className="landing-mobile-menu-btn" 
@@ -116,6 +134,11 @@ export default function LandingPage() {
             <br />
             <span className="landing-highlight">make smarter decisions</span> for your safety.
           </p>
+          <div className="landing-hero-cta-wrap">
+            <button type="button" className="landing-hero-cta" onClick={handleExploreMap}>
+              Explore Map
+            </button>
+          </div>
         </div>
 
         <div className="landing-hero-image-wrap">

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, User } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
 import leannaRoseImage from '../../assets/team/leanna-rose-s-santos.png';
 import fionaRoseImage from '../../assets/team/fiona-rose-a-balala.png';
 import abigailImage from '../../assets/team/abigail-b-nicolas.png';
+import SiteFooter from '../../components/SiteFooter/SiteFooter';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -36,108 +37,72 @@ function ImageWithFallback(props) {
 
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMenuOpen(false);
-    }
-  };
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5">
-              <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={48} height={48} />
-            </div>
-            <div className="hidden lg:block">
-              <span className="text-xs font-semibold tracking-wider leading-tight">
-                AUTOMATED GEOSPATIAL<br />ALERT PLATFORM
-              </span>
-            </div>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-10">
-            <button
-              onClick={() => navigate('/welcome')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Home
-            </button>
-            <button
-              onClick={() => navigate('/result')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Explore Map
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection('contact')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Contact
-            </button>
-            <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
-              <Search size={20} />
-            </button>
-          </div>
- 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+    <nav className="about-nav bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
+      <div className="about-nav__inner app-nav-inner">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="app-nav-logo-box shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5"
+            onClick={closeMenu}
           >
+            <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={56} height={56} />
+          </Link>
+          <div className="hidden lg:grid app-nav-brand text-white">
+            <p>AUTOMATED GEOSPATIAL</p>
+            <p>ALERT PLATFORM</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 md:gap-10">
+          <div className="hidden md:flex items-center gap-10">
+            <Link to="/" className="app-nav-link text-white">
+              Home
+            </Link>
+            <Link to="/about-us#about" className="app-nav-link text-white">
+              About Us
+            </Link>
+            <Link to="/about-us#contact" className="app-nav-link text-white">
+              Contact
+            </Link>
+          </div>
+          <Link to="/login" className="app-profile-link app-profile-link--on-dark" aria-label="Go to login">
+            <User size={20} />
+          </Link>
+          <button type="button" className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden bg-[#234d73] border-t border-white/20">
           <div className="px-4 py-3 space-y-3">
-            <button
-              onClick={() => {
-                navigate('/welcome');
-                setIsMenuOpen(false);
-              }}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+            <Link
+              to="/"
+              className="app-nav-link block w-full text-left py-2 text-white"
+              onClick={closeMenu}
             >
               Home
-            </button>
-            <button
-              onClick={() => {
-                navigate('/result');
-                setIsMenuOpen(false);
-              }}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+            </Link>
+            <Link
+              to="/about-us#about"
+              className="app-nav-link block w-full text-left py-2 text-white"
+              onClick={closeMenu}
             >
-              Explore Map
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection('contact')}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+              About Us
+            </Link>
+            <Link
+              to="/about-us#contact"
+              className="app-nav-link block w-full text-left py-2 text-white"
+              onClick={closeMenu}
             >
               Contact
-            </button>
-          </div> 
+            </Link>
+          </div>
         </div>
       )}
     </nav>
@@ -305,61 +270,6 @@ function TeamMembers() {
   );
 }
 
-function Footer() {
-  return (
-    <footer id="contact" className="bg-[#2B5F8E] text-white py-12">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
-          {/* Logo and Platform Name */}
-          <div className="flex items-start gap-4">
-            <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
-              <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={80} height={80} />
-            </div>
-            <div className="pt-2">
-              <h3 className="text-xs tracking-wider leading-tight">
-                AUTOMATED GEOSPATIAL<br />ALERT PLATFORM
-              </h3>
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div>
-            <h3 className="text-2xl mb-4 tracking-wide">Contact Us</h3>
-            <div className="space-y-2 text-sm">
-              <p>
-                <span className="font-semibold">Email:</span>{' '}
-                <a
-                  href="mailto:agap.systemtoolkit@gmail.com"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  agap.systemtoolkit@gmail.com
-                </a>
-              </p>
-              <p>
-                <span className="font-semibold">Phone:</span>{' '}
-                <a
-                  href="tel:+639XXXXXXXXX"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  +63 9XX XXX XXXX (optional)
-                </a>
-              </p>
-              <p>
-                <span className="font-semibold">Location:</span> Butuan City, Agusan del Norte
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Copyright */}
-        <div className="border-t border-white/20 pt-6 text-center">
-          <p className="text-xs">Copyright © 2025 AGAP All Rights Reserved</p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 export default function AboutUs() {
   const location = useLocation();
 
@@ -376,7 +286,7 @@ export default function AboutUs() {
       <HeroSection />
       <AboutContent />
       <TeamMembers />
-      <Footer />
+      <SiteFooter />
     </div>
   );
 }

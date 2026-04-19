@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, User, X } from 'lucide-react';
+import { Menu, User, X } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import heroImage from '../../assets/hero-img.svg';
 import SiteFooter from '../../components/SiteFooter/SiteFooter';
@@ -45,6 +46,7 @@ function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
+  const profileRoute = isLoggedIn ? '/welcome' : '/login';
   const closeMenu = () => setIsMenuOpen(false);
   const handleExploreMap = () => {
     closeMenu();
@@ -83,7 +85,7 @@ function Navigation() {
               Contact
             </Link>
           </div>
-          <Link to="/profile" className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Go to profile">
+          <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
             <User size={20} className="md:scale-110" />
           </Link>
           <button

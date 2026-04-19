@@ -1,6 +1,12 @@
 .welcome-page {
   min-height: 100vh;
-  background: #dce5f0;
+  background-color: #dbe4ef;
+  background-image:
+    linear-gradient(rgba(219, 228, 239, 0.54), rgba(219, 228, 239, 0.54)),
+    url("../../assets/welcome-bg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center 32%;
   font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #0f172a;
 }
@@ -24,13 +30,28 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  font-size: 11px;
 }
 
 .welcome-brand-logo {
-  font-weight: 800;
-  font-size: 24px;
+  display: flex;
+  align-items: center;
   line-height: 1;
-  letter-spacing: 0.5px;
+}
+
+.welcome-brand-logo-img {
+  width: auto;
+  height: 2.6em;
+  object-fit: contain;
+  display: block;
+}
+
+.welcome-header .welcome-brand-logo-img {
+  height: 3.2em;
+}
+
+.welcome-footer .welcome-brand-logo-img {
+  height: 3em;
 }
 
 .welcome-brand-text {
@@ -44,6 +65,13 @@
   font-weight: 700;
   letter-spacing: 0.3px;
   line-height: 1.2;
+}
+
+.welcome-header .welcome-brand-text p {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: 0;
 }
 
 .welcome-nav {
@@ -79,17 +107,7 @@
   align-items: center;
   justify-content: center;
   padding: 44px 20px;
-  background:
-    linear-gradient(rgba(209, 221, 236, 0.77), rgba(209, 221, 236, 0.77)),
-    radial-gradient(circle at 30% 20%, rgba(165, 187, 215, 0.55), transparent 40%),
-    radial-gradient(circle at 75% 70%, rgba(157, 181, 210, 0.55), transparent 45%),
-    repeating-linear-gradient(
-      130deg,
-      rgba(134, 161, 194, 0.2) 0px,
-      rgba(134, 161, 194, 0.2) 2px,
-      transparent 2px,
-      transparent 24px
-    );
+  background: transparent;
 }
 
 .welcome-search-card {
@@ -111,9 +129,10 @@
 
 .welcome-search-card p {
   margin: 0 auto 24px;
-  max-width: 500px;
-  font-size: 27px;
-  line-height: 1.25;
+  max-width: none;
+  font-size: 20px;
+  line-height: 1.2;
+  white-space: nowrap;
   color: #1e293b;
 }
 
@@ -163,47 +182,57 @@
 
 .welcome-spacer {
   min-height: 220px;
-  background: #e4e9f2;
+  background: transparent;
 }
 
 .welcome-footer {
-  background: #1f5f9f;
+  background: #1f5b9f;
   color: #fff;
-  padding: 24px 24px 10px;
+  padding: 34px 0 12px;
 }
 
 .welcome-footer-inner {
-  max-width: 1280px;
+  width: min(1200px, calc(100% - 40px));
   margin: 0 auto;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
 }
 
 .welcome-footer-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  font-size: 13px;
 }
 
 .welcome-footer-contact h3 {
-  margin: 0 0 6px;
-  font-size: 38px;
+  margin: 0 0 14px;
+  font-size: clamp(26px, 2.6vw, 36px);
   line-height: 1;
+  font-weight: 700;
 }
 
 .welcome-footer-contact p {
+  margin: 0 0 4px;
+  font-size: clamp(15px, 1.15vw, 18px);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.welcome-footer .welcome-brand-text p {
   margin: 0;
-  font-size: 19px;
-  line-height: 1.25;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .welcome-footer-copy {
-  margin: 16px 0 0;
+  margin: 28px 0 0;
   text-align: center;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 13px;
+  opacity: 0.9;
 }
 
 @media (max-width: 900px) {
@@ -220,7 +249,7 @@
   }
 
   .welcome-search-card p {
-    font-size: 20px;
+    font-size: 16px;
   }
 
   .welcome-footer-contact h3 {
@@ -229,5 +258,11 @@
 
   .welcome-footer-contact p {
     font-size: 16px;
+  }
+
+  .welcome-footer-inner {
+    flex-direction: column;
+    gap: 18px;
+    width: calc(100% - 24px);
   }
 }

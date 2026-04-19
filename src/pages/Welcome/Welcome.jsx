@@ -1,5 +1,6 @@
 import { MapPin, Search, User } from "lucide-react";
 import { Link } from "react-router-dom";
+import logoImage from "../../assets/logo.png";
 import "./Welcome.css";
 
 export default function Welcome() {
@@ -16,7 +17,9 @@ export default function Welcome() {
       <header className="welcome-header">
         <div className="welcome-header-inner">
           <div className="welcome-brand">
-            <div className="welcome-brand-logo">AGAP</div>
+            <div className="welcome-brand-logo">
+              <img src={logoImage} alt="AGAP logo" className="welcome-brand-logo-img" />
+            </div>
             <div className="welcome-brand-text">
               <p>AUTOMATED GEOSPATIAL</p>
               <p>ALERT PLATFORM</p>
@@ -54,7 +57,9 @@ export default function Welcome() {
       <footer className="welcome-footer" id="contact">
         <div className="welcome-footer-inner">
           <div className="welcome-footer-brand">
-            <div className="welcome-brand-logo">AGAP</div>
+            <div className="welcome-brand-logo">
+              <img src={logoImage} alt="AGAP logo" className="welcome-brand-logo-img" />
+            </div>
             <div className="welcome-brand-text">
               <p>AUTOMATED GEOSPATIAL</p>
               <p>ALERT PLATFORM</p>

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search } from 'lucide-react';
@@ -63,7 +62,7 @@ function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-10">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/welcome')}
               className="text-sm hover:text-gray-200 transition-colors"
             >
               Home
@@ -107,7 +106,7 @@ function Navigation() {
           <div className="px-4 py-3 space-y-3">
             <button
               onClick={() => {
-                navigate('/');
+                navigate('/welcome');
                 setIsMenuOpen(false);
               }}
               className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"

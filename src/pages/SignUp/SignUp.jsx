@@ -172,7 +172,7 @@ export function SignUp() {
                 Already have an account? <Link to="/login">Login</Link>
               </p>
               <p className="login-signup-text">
-                Back to <Link to="/welcome">Welcome</Link>
+                Back to <Link to="/">Home</Link>
               </p>
             </>
           ) : (
@@ -267,7 +267,7 @@ export function SignUp() {
                 Already have an account? <Link to="/login">Login</Link>
               </p>
               <p className="login-signup-text">
-                Back to <Link to="/welcome">Welcome</Link>
+                Back to <Link to="/">Home</Link>
               </p>
             </form>
           )}

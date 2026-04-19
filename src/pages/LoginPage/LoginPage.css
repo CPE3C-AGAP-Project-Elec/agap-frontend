@@ -69,6 +69,7 @@
   color: #121212;
   font-size: 40px;
   line-height: 1;
+  font-weight: 700;
 }
 
 .field-wrap {
@@ -252,6 +253,7 @@
 .login-signup-text a {
   color: #2d6cae;
   text-decoration: none;
+  font-weight: 600;
 }
 
 @media (max-width: 1024px) {

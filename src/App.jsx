@@ -5,6 +5,8 @@ import { SignUp } from "./pages/SignUp/SignUp";
 import { ForgotPassword } from "./pages/ForgotPass/ForgotPass";
 import AboutUs from "./pages/AboutUs/AboutUs";
 import Result from "./pages/Result/Result";
+import Welcome from "./pages/Welcome/Welcome";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/welcome" element={<Welcome />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

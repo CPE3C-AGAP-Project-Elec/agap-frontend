@@ -531,7 +531,7 @@ export default function Result() {
                 className="result-section__toggle"
                 onClick={toggleFloodHistory}
               >
-                <span>FLOOD HISTORY</span>
+                <span>FLOOD FORECAST</span>
                 {showFloodHistory ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
               {showFloodHistory && <FloodHistory data={floodHistoryData} />}
@@ -543,7 +543,7 @@ export default function Result() {
                 className="result-section__toggle"
                 onClick={toggleWeatherHistory}
               >
-                <span>WEATHER HISTORY</span>
+                <span>WEATHER FORECAST</span>
                 {showWeatherHistory ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
               {showWeatherHistory && <WeatherHistory data={weatherData} />}

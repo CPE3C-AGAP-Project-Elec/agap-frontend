@@ -11,7 +11,7 @@ import {
   Cloud,
   CloudRain,
 } from 'lucide-react';
-import GoogleMapView from '../../../agap-backend/GoogleMapView/GoogleMapView.jsx';
+import GoogleMapView from '../../../agap-backend/GoogleMapView/GoogleMapView.js';
 import { getWeatherAndFloodData } from '../../../agap-backend/utils/weatherUtils.js';
 import logoImage from '../../assets/logo.png';
 import './Result.css';

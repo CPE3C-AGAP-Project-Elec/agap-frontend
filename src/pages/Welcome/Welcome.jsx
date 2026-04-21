@@ -28,7 +28,7 @@ export default function Welcome() {
   const [isSearching, setIsSearching] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isLoggedIn = localStorage.getItem("agapIsLoggedIn") === "true";
-  const profileRoute = isLoggedIn ? "/welcome" : "/login";
+  const profileRoute = isLoggedIn ? "/profile" : "/login";
 
   const closeMenu = () => setIsMenuOpen(false);
 

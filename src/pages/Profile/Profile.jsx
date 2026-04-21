@@ -1,10 +1,17 @@
-import { Plus, Minus, Compass, Map, Search, User } from "lucide-react";
+import { Plus, Minus, Compass, Map, User, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import backgroundImage from "../../assets/philippines-map-bg.svg";
 import "./profile.css";
 
 export default function Profile() {
   const navigate = useNavigate();
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   return (
     <div className="profile-page">
@@ -28,7 +35,11 @@ export default function Profile() {
           <Link to="/about#contact" className="profile-nav__link">
             Contact
           </Link>
-          <Link to="/profile" aria-label="Profile" className="profile-nav__icon">
+          <Link
+            to="/profile"
+            aria-label="Profile"
+            className="profile-nav__icon profile-nav__icon--active"
+          >
             <User aria-hidden />
           </Link>
         </nav>
@@ -50,14 +61,12 @@ export default function Profile() {
               <button type="button" className="profile-map__btn" aria-label="Map layers">
                 <Map className="profile-map__icon-sm" aria-hidden />
               </button>
-              <button type="button" className="profile-map__btn" aria-label="Search">
-                <Search className="profile-map__icon-sm" aria-hidden />
-              </button>
             </div>
           </section>
 
           <aside className="profile-panel" aria-label="Account settings">
             <div className="profile-panel__inner">
+              <h2 className="profile-panel__greeting">HI, NAME!!</h2>
               <h1 className="profile-panel__title">ACCOUNT SETTINGS</h1>
 
               <div className="profile-form">
@@ -70,7 +79,13 @@ export default function Profile() {
                       Change Email
                     </button>
                   </div>
-                  <input id="profile-email" type="email" className="profile-field__input" />
+                  <input
+                    id="profile-email"
+                    type="email"
+                    className="profile-field__input"
+                    defaultValue="email@email.com"
+                    readOnly
+                  />
                 </div>
 
                 <div className="profile-field">
@@ -82,16 +97,23 @@ export default function Profile() {
                       Change Password
                     </button>
                   </div>
-                  <input id="profile-password" type="password" className="profile-field__input" />
+                  <div className="profile-field__passwordWrap">
+                    <input
+                      id="profile-password"
+                      type="password"
+                      className="profile-field__input profile-field__input--password"
+                      defaultValue="password1234"
+                      readOnly
+                    />
+                    <button type="button" className="profile-field__eye" aria-label="Toggle password visibility">
+                      <EyeOff aria-hidden />
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div className="profile-logout">
-                <button
-                  type="button"
-                  className="profile-logout__link"
-                  onClick={() => navigate("/login")}
-                >
+                <button type="button" onClick={handleLogout} className="profile-logout__link">
                   LOG OUT
                 </button>
               </div>
@@ -99,175 +121,6 @@ export default function Profile() {
           </aside>
         </div>
       </main>
-
-      <footer className="profile-footer">
-        <div className="profile-footer__inner">
-          <div className="profile-footer__brand">
-            <div className="profile-footer__titles">
-              <div className="profile-footer__line">AUTOMATED GEOSPATIAL</div>
-              <div className="profile-footer__line">ALERT PLATFORM</div>
-            </div>
-          </div>
-
-          <div className="profile-footer__contact">
-            <p>
-              <span className="profile-footer__label">Email:</span> agap.system@gmail.com
-            </p>
-            <p>
-              <span className="profile-footer__label">Phone:</span> +63 912 345 6789
-            </p>
-            <p>
-              <span className="profile-footer__label">Location:</span> Malolos, Bulacan, Philippines
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-import { Plus, Minus, Compass, Map, Search, User } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import backgroundImage from "../../assets/philippines-map-bg.svg";
-import logoImage from "../../assets/logo.svg";
-import { clearSession } from "../../auth/session";
-import "./profile.css";
-
-export default function Profile() {
-  const navigate = useNavigate();
-
-  const handleLogout = (e) => {
-    e.preventDefault();
-    clearSession();
-    navigate("/login");
-  };
-
-  return (
-    <div className="profile-page">
-      {/* Background */}
-      <div className="profile-bg" style={{ backgroundImage: `url(${backgroundImage})` }} />
-
-      {/* Header */}
-      <header className="profile-header">
-        <Link to="/" className="profile-brand">
-          <img src={logoImage} alt="AGAP Logo" className="profile-brand__logo" />
-          <div className="profile-brand__titles">
-            <div className="profile-brand__line">AUTOMATED GEOSPATIAL</div>
-            <div className="profile-brand__line">ALERT PLATFORM</div>
-          </div>
-        </Link>
-
-        <div className="profile-nav">
-          <Link to="/" className="profile-nav__link">
-            Home
-          </Link>
-          <Link to="/about" className="profile-nav__link">
-            About Us
-          </Link>
-          <Link to="/about#contact" className="profile-nav__link">
-            Contact
-          </Link>
-          <Link
-            to="/profile"
-            aria-label="Profile"
-            className="profile-nav__icon"
-          >
-            <User aria-hidden />
-          </Link>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="profile-main">
-        <div className="profile-main__inner">
-          {/* Left side - Map with controls */}
-          <div className="profile-map">
-            <div className="profile-map__controls">
-              <button type="button" className="profile-map__btn" aria-label="Zoom in">
-                <Plus className="profile-map__icon-lg" strokeWidth={3} aria-hidden />
-              </button>
-              <button type="button" className="profile-map__btn" aria-label="Zoom out">
-                <Minus className="profile-map__icon-lg" strokeWidth={3} aria-hidden />
-              </button>
-              <button type="button" className="profile-map__btn profile-map__btn--outlined" aria-label="Compass">
-                <Compass className="profile-map__icon-sm" aria-hidden />
-              </button>
-              <button type="button" className="profile-map__btn" aria-label="Map layers">
-                <Map className="profile-map__icon-sm" aria-hidden />
-              </button>
-              <button type="button" className="profile-map__btn" aria-label="Search">
-                <Search className="profile-map__icon-sm" aria-hidden />
-              </button>
-            </div>
-          </div>
-
-          {/* Right side - Account Settings Panel */}
-          <aside className="profile-panel">
-            <div className="profile-panel__inner">
-              <h1 className="profile-panel__title">ACCOUNT SETTINGS</h1>
-
-              <div className="profile-form">
-                <div className="profile-field">
-                  <div className="profile-field__row">
-                    <label className="profile-field__label">Email</label>
-                    <button type="button" className="profile-field__action">
-                      Change Email
-                    </button>
-                  </div>
-                  <input
-                    type="email"
-                    className="profile-field__input"
-                  />
-                </div>
-
-                <div className="profile-field">
-                  <div className="profile-field__row">
-                    <label className="profile-field__label">Password</label>
-                    <button type="button" className="profile-field__action">
-                      Change Password
-                    </button>
-                  </div>
-                  <input
-                    type="password"
-                    className="profile-field__input"
-                  />
-                </div>
-              </div>
-
-              <div className="profile-logout">
-                <a href="/login" onClick={handleLogout} className="profile-logout__link">
-                  LOG OUT
-                </a>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="profile-footer">
-        <div className="profile-footer__inner">
-          <div className="profile-footer__brand">
-            <img src={logoImage} alt="AGAP Logo" className="profile-footer__logo" />
-            <div className="profile-footer__titles">
-              <div className="profile-footer__line">AUTOMATED GEOSPATIAL</div>
-              <div className="profile-footer__line">ALERT PLATFORM</div>
-            </div>
-          </div>
-
-          <div className="profile-footer__contact">
-            <p>
-              <span className="profile-footer__label">Email:</span> agap.system@gmail.com
-            </p>
-            <p>
-              <span className="profile-footer__label">Phone:</span> +63 912 345 6789
-            </p>
-            <p>
-              <span className="profile-footer__label">Location:</span> Malolos, Bulacan, Philippines
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

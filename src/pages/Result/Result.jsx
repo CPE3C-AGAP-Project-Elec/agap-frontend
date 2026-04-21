@@ -7,22 +7,17 @@ import {
   X,
   ChevronDown,
   ChevronUp,
-  Plus,
-  Minus,
-  Edit3,
-  Map as MapIcon,
-  Search as SearchIcon,
   Sun,
   Cloud,
   CloudRain,
 } from 'lucide-react';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import GoogleMapView from '../../../agap-backend/GoogleMapView/GoogleMapView.js';
+import { getWeatherAndFloodData } from '../../../agap-backend/utils/weatherUtils.js';
 import logoImage from '../../assets/logo.png';
 import './Result.css';
 
 const ERROR_IMG_SRC =
-  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhlaWdodD0iODgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBvcGFjaXR5PSIuMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIzLjciPjxyZWN0IHg9IjE2IiB5PSIxNiIgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiByeD0iNiIvPjxwYXRoIGQ9Im0xNiA1OCAxNi0xOCAzMiAzMiIvPjxjaXJjbGUgY3g9IjUzIiBjeT0iMzUiIHI9IjciLz48L3N2Zz4KCg==';
+  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhlaWdodD0iODgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyBzdHJva2U9IiMwMDAiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIG9wYWNpdHk9Ii4zIiBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjMuNyI+PHJlY3QgeD0iMTYiIHk9IjE2IiB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHJ4PSI2Ii8+PHBhdGggZD0ibTE2IDU4IDE2LTE4IDMyIDMyIi8+PGNpcmNsZSBjeD0iNTMiIGN5PSIzNSIgcj0iNyIvPjwvc3ZnPgoKCg==';
 
 function ImageWithFallback(props) {
   const [didError, setDidError] = useState(false);
@@ -43,14 +38,6 @@ function ImageWithFallback(props) {
     <img src={src} alt={alt} className={className} style={style} {...rest} onError={handleError} />
   );
 }
-
-// Fix for default marker icons in Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -200,21 +187,39 @@ function FloodHazardLevel({ level }) {
   );
 }
 
-function FloodHistory({ data }) {
+function FloodForecast({ data, loading, error }) {
   const floodLevelMeta = {
     low: { label: 'Low', value: 1, colorVar: '--result-hazard-low' },
     medium: { label: 'Medium', value: 2, colorVar: '--result-hazard-medium' },
     high: { label: 'High', value: 3, colorVar: '--result-hazard-high' },
   };
 
-  if (!data?.length) {
+  if (loading) {
     return (
       <div className="result-placeholder">
         <div className="result-placeholder__row">
           <div className="result-placeholder__block result-placeholder__block--lg" />
           <div className="result-placeholder__block result-placeholder__block--tall" />
         </div>
-        <p className="result-placeholder__message">No data to display</p>
+        <p className="result-placeholder__message">Loading flood forecast...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="result-placeholder">
+        <p className="result-placeholder__message" style={{ color: '#dc143c' }}>
+          Error loading flood forecast: {error}
+        </p>
+      </div>
+    );
+  }
+
+  if (!data?.length) {
+    return (
+      <div className="result-placeholder">
+        <p className="result-placeholder__message">No flood forecast data available for this location.</p>
         <div className="result-placeholder__row">
           <div className="result-placeholder__block result-placeholder__block--sm" />
           <div className="result-placeholder__block result-placeholder__block--sm" />
@@ -245,7 +250,7 @@ function FloodHistory({ data }) {
                     className="result-weather-chart__bar"
                     style={{ height: barHeight, backgroundColor: `var(${levelMeta.colorVar})` }}
                     title={`${item.date} - ${levelMeta.label}`}
-                    aria-label={`${item.date} flood level ${levelMeta.label}`}
+                    aria-label={`${item.date} flood forecast ${levelMeta.label}`}
                   >
                     <span
                       className={`result-warning-triangle result-warning-triangle--${item.level}`}
@@ -256,6 +261,11 @@ function FloodHistory({ data }) {
                   </div>
                 </div>
                 <span className="result-weather-chart__date">{item.date}</span>
+                {item.rainfall && (
+                  <span style={{ fontSize: '0.7rem', color: '#6b7280' }}>
+                    {item.rainfall}mm
+                  </span>
+                )}
               </div>
             );
           })}
@@ -277,24 +287,63 @@ function FloodHistory({ data }) {
   );
 }
 
-function WeatherHistory({ data }) {
-  const getWeatherIcon = (condition) => {
-    switch (condition) {
-      case 'Sunny':
-        return <Sun className="result-weather__icon result-weather__icon--sun" aria-hidden />;
-      case 'Cloudy':
-        return <Cloud className="result-weather__icon result-weather__icon--cloud" aria-hidden />;
-      case 'Rainy':
-        return <CloudRain className="result-weather__icon result-weather__icon--rain" aria-hidden />;
-      default:
-        return <Sun className="result-weather__icon result-weather__icon--sun" aria-hidden />;
+function WeatherForecast({ data, loading, error }) {
+  const getWeatherIcon = (weatherMain, iconCode, description) => {
+    if (iconCode) {
+      return (
+        <img
+          src={`https://openweathermap.org/img/w/${iconCode}.png`}
+          alt={description || weatherMain}
+          className="result-weather__icon"
+          title={description || weatherMain}
+        />
+      );
     }
+
+    const condition = (weatherMain + ' ' + (description || '')).toLowerCase();
+
+    if (condition.includes('clear')) {
+      return <Sun className="result-weather__icon result-weather__icon--sun" aria-hidden />;
+    }
+    if (condition.includes('few clouds') || condition.includes('scattered clouds')) {
+      return <Cloud className="result-weather__icon result-weather__icon--cloud" aria-hidden />;
+    }
+    if (condition.includes('broken clouds') || condition.includes('overcast')) {
+      return <Cloud className="result-weather__icon result-weather__icon--cloud" style={{ opacity: 0.8 }} aria-hidden />;
+    }
+    if (condition.includes('light rain') || condition.includes('moderate rain') || 
+        condition.includes('heavy rain') || condition.includes('rain') || condition.includes('drizzle')) {
+      return <CloudRain className="result-weather__icon result-weather__icon--rain" aria-hidden />;
+    }
+    if (condition.includes('thunderstorm')) {
+      return <CloudRain className="result-weather__icon result-weather__icon--rain" style={{ color: '#fbbf24' }} aria-hidden />;
+    }
+
+    return <Sun className="result-weather__icon result-weather__icon--sun" aria-hidden />;
   };
+
+  if (loading) {
+    return (
+      <div className="result-placeholder">
+        <p className="result-weather__empty">Loading weather forecast...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="result-placeholder">
+        <p className="result-weather__empty" style={{ color: '#dc143c' }}>
+          Error loading weather forecast: {error}
+        </p>
+      </div>
+    );
+  }
 
   if (!data?.length) {
     return (
       <div className="result-placeholder">
-        <p className="result-weather__empty">No weather history to display.</p>
+        <p className="result-weather__empty">No weather forecast available for this location.</p>
       </div>
     );
   }
@@ -303,10 +352,17 @@ function WeatherHistory({ data }) {
     <div className="result-weather">
       {data.map((weather, index) => (
         <div key={index} className="result-weather__card">
-          <span className="result-weather__date">{weather.date}</span>
+          <div className="result-weather__date">
+            <strong>{weather.date}</strong>
+          </div>
           <div className="result-weather__meta">
-            <span className="result-weather__condition">{weather.condition}</span>
-            {getWeatherIcon(weather.condition)}
+            <div style={{ textAlign: 'right' }}>
+              <div>{weather.temp}°C</div>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>
+                {weather.description || weather.condition}
+              </div>
+            </div>
+            {getWeatherIcon(weather.condition, weather.icon, weather.description)}
           </div>
         </div>
       ))}
@@ -314,101 +370,20 @@ function WeatherHistory({ data }) {
   );
 }
 
-function MapView({ latitude, longitude, locationName }) {
-  const mapContainerRef = useRef(null);
-  const mapRef = useRef(null);
-  const markerRef = useRef(null);
-
-  useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
-
-    const philippinesBounds = [
-      [4.5, 116.0],
-      [21.0, 127.0],
-    ];
-
-    const map = L.map(mapContainerRef.current, {
-      center: [12.8797, 121.774],
-      zoom: 6,
-      minZoom: 6,
-      maxZoom: 18,
-      maxBounds: philippinesBounds,
-      maxBoundsViscosity: 1.0,
-    });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
-
-    mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-      markerRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    if (markerRef.current) {
-      markerRef.current.remove();
-      markerRef.current = null;
-    }
-
-    if (latitude !== undefined && longitude !== undefined) {
-      const newLatLng = [latitude, longitude];
-      mapRef.current.setView(newLatLng, 12);
-
-      const marker = L.marker(newLatLng).addTo(mapRef.current);
-      if (locationName) {
-        marker.bindPopup(locationName);
-      }
-      markerRef.current = marker;
-    }
-  }, [latitude, longitude, locationName]);
-
-  const handleZoomIn = () => {
-    if (mapRef.current) {
-      mapRef.current.zoomIn();
-    }
-  };
-
-  const handleZoomOut = () => {
-    if (mapRef.current) {
-      mapRef.current.zoomOut();
-    }
-  };
-
+function MapView({ latitude, longitude, locationName, floodRiskLevel }) {
   return (
     <div className="result-map">
-      <div ref={mapContainerRef} className="result-map__canvas" />
-
-      <div className="result-map__controls result-map__controls--side">
-        <button type="button" onClick={handleZoomIn} className="result-map__tool" aria-label="Zoom in">
-          <Plus className="result-map__icon-lg" aria-hidden />
-        </button>
-        <button type="button" onClick={handleZoomOut} className="result-map__tool" aria-label="Zoom out">
-          <Minus className="result-map__icon-lg" aria-hidden />
-        </button>
-      </div>
-
-      <div className="result-map__controls result-map__controls--bottom">
-        <button type="button" className="result-map__tool" aria-label="Edit">
-          <Edit3 className="result-map__icon-sm" aria-hidden />
-        </button>
-        <button type="button" className="result-map__tool" aria-label="Map layers">
-          <MapIcon className="result-map__icon-sm" aria-hidden />
-        </button>
-        <button type="button" className="result-map__tool" aria-label="Search on map">
-          <SearchIcon className="result-map__icon-sm" aria-hidden />
-        </button>
-      </div>
+      <GoogleMapView
+        latitude={latitude}
+        longitude={longitude}
+        locationName={locationName}
+        floodRiskLevel={floodRiskLevel}
+      />
     </div>
   );
 }
+
+const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || false;
 
 export default function Result() {
   const location = useLocation();
@@ -416,60 +391,86 @@ export default function Result() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showFloodHazardOpen, setShowFloodHazardOpen] = useState(true);
-  const [showFloodHistory, setShowFloodHistory] = useState(false);
-  const [showWeatherHistory, setShowWeatherHistory] = useState(false);
+  const [showFloodForecast, setShowFloodForecast] = useState(false);
+  const [showWeatherForecast, setShowWeatherForecast] = useState(false);
+
+  const [floodLevel, setFloodLevel] = useState(null);
+  const [weatherData, setWeatherData] = useState([]);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState(null);
+
+  const [floodForecastData, setFloodForecastData] = useState([]);
+  const [floodForecastLoading, setFloodForecastLoading] = useState(false);
+  const [floodForecastError, setFloodForecastError] = useState(null);
+
+  const [coordinates, setCoordinates] = useState(null);
 
   const toggleFloodHazard = () => {
-    setShowFloodHistory(false);
-    setShowWeatherHistory(false);
+    setShowFloodForecast(false);
+    setShowWeatherForecast(false);
     setShowFloodHazardOpen((prev) => !prev);
   };
 
-  const toggleFloodHistory = () => {
+  const toggleFloodForecast = () => {
     setShowFloodHazardOpen(false);
-    setShowWeatherHistory(false);
-    setShowFloodHistory((prev) => !prev);
+    setShowWeatherForecast(false);
+    setShowFloodForecast((prev) => !prev);
   };
 
-  const toggleWeatherHistory = () => {
+  const toggleWeatherForecast = () => {
     setShowFloodHazardOpen(false);
-    setShowFloodHistory(false);
-    setShowWeatherHistory((prev) => !prev);
+    setShowFloodForecast(false);
+    setShowWeatherForecast((prev) => !prev);
   };
 
-  const [floodLevel, setFloodLevel] = useState(null);
+  const fetchWeatherAndFloodData = useCallback(async (lat, lon) => {
+    setWeatherLoading(true);
+    setWeatherError(null);
+    setFloodForecastLoading(true);
+    setFloodForecastError(null);
 
-  const historyLevels = ['low', 'medium', 'high', floodLevel ?? 'medium'];
-  const floodHistoryData = Array.from({ length: 4 }, (_, index) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (3 - index));
-    return {
-      date: date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
-      level: historyLevels[index],
-    };
-  });
-
-  const weatherData = [
-    { date: 'Mar. 30', condition: 'Sunny' },
-    { date: 'Mar. 31', condition: 'Cloudy' },
-    { date: 'Apr. 01', condition: 'Rainy' },
-    { date: 'Apr. 02', condition: 'Sunny' },
-  ];
-
-  const [coordinates, setCoordinates] = useState(null);
+    try {
+      const data = await getWeatherAndFloodData(lat, lon, USE_MOCK_DATA);
+      
+      setWeatherData(data.weather);
+      setFloodForecastData(data.floodHistory); // The API returns forecast data
+      setFloodLevel(data.floodRisk);
+      
+      if (data.isMock) {
+        console.log('Using mock weather data (development mode)');
+      } else {
+        console.log('Using live weather data from OpenWeatherMap');
+      }
+      
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+      setWeatherError(error.message);
+      setFloodForecastError(error.message);
+      
+      // Fallback to mock data if real API fails
+      console.log('Falling back to mock data...');
+      try {
+        const mockData = await getWeatherAndFloodData(lat, lon, true);
+        setWeatherData(mockData.weather);
+        setFloodForecastData(mockData.floodHistory);
+        setFloodLevel(mockData.floodRisk);
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError);
+      }
+    } finally {
+      setWeatherLoading(false);
+      setFloodForecastLoading(false);
+    }
+  }, []);
 
   const performSearch = useCallback(async (rawQuery) => {
     const q = String(rawQuery ?? '').trim();
     if (!q) return;
 
     setSearchQuery(q);
-
-    const levels = ['low', 'medium', 'high'];
-    const randomLevel = levels[Math.floor(Math.random() * levels.length)];
-    setFloodLevel(randomLevel);
     setShowFloodHazardOpen(true);
-    setShowFloodHistory(false);
-    setShowWeatherHistory(false);
+    setShowFloodForecast(false);
+    setShowWeatherForecast(false);
 
     try {
       const response = await fetch(
@@ -479,10 +480,12 @@ export default function Result() {
 
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
-        setCoordinates({
+        const coords = {
           latitude: parseFloat(lat),
           longitude: parseFloat(lon),
-        });
+        };
+        setCoordinates(coords);
+        await fetchWeatherAndFloodData(coords.latitude, coords.longitude);
       } else {
         alert('Location not found in the Philippines. Please try a different search term.');
       }
@@ -490,7 +493,7 @@ export default function Result() {
       console.error('Geocoding error:', error);
       alert('Error searching for location. Please try again.');
     }
-  }, []);
+  }, [fetchWeatherAndFloodData]);
 
   useEffect(() => {
     const q = location.state?.welcomeSearchQuery;
@@ -529,24 +532,36 @@ export default function Result() {
               <button
                 type="button"
                 className="result-section__toggle"
-                onClick={toggleFloodHistory}
+                onClick={toggleFloodForecast}
               >
                 <span>FLOOD FORECAST</span>
-                {showFloodHistory ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
+                {showFloodForecast ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
-              {showFloodHistory && <FloodHistory data={floodHistoryData} />}
+              {showFloodForecast && (
+                <FloodForecast
+                  data={floodForecastData}
+                  loading={floodForecastLoading}
+                  error={floodForecastError}
+                />
+              )}
             </section>
 
             <section className="result-section">
               <button
                 type="button"
                 className="result-section__toggle"
-                onClick={toggleWeatherHistory}
+                onClick={toggleWeatherForecast}
               >
                 <span>WEATHER FORECAST</span>
-                {showWeatherHistory ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
+                {showWeatherForecast ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
-              {showWeatherHistory && <WeatherHistory data={weatherData} />}
+              {showWeatherForecast && (
+                <WeatherForecast
+                  data={weatherData}
+                  loading={weatherLoading}
+                  error={weatherError}
+                />
+              )}
             </section>
           </div>
         </aside>
@@ -556,6 +571,7 @@ export default function Result() {
             latitude={coordinates?.latitude}
             longitude={coordinates?.longitude}
             locationName={searchQuery}
+            floodRiskLevel={floodLevel}
           />
         </main>
       </div>

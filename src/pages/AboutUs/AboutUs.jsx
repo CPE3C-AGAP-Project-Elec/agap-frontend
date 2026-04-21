@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, User, X } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
-import philippinesMapBg from '../../assets/philippines-hero-relief.png';
+import heroImage from '../../assets/hero-img.svg';
+import SiteFooter from '../../components/SiteFooter/SiteFooter';
+import leanaImage from '../../assets/team/leana.png';
+import abigailImage from '../../assets/team/abigail.png';
+import alleahImage from '../../assets/team/alleah.png';
+import fionaImage from '../../assets/team/fiona.png';
+import ryzaImage from '../../assets/team/ryza.png';
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -17,16 +23,20 @@ function ImageWithFallback(props) {
 
   const { src, alt, style, className, ...rest } = props;
 
-  return didError ? (
-    <div
-      className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
-      style={style}
-    >
-      <div className="flex items-center justify-center w-full h-full">
-        <img src={ERROR_IMG_SRC} alt="Error loading image" {...rest} data-original-url={src} />
+  if (didError) {
+    return (
+      <div
+        className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
+        style={style}
+      >
+        <div className="flex items-center justify-center w-full h-full">
+          <img src={ERROR_IMG_SRC} alt="Error loading image" {...rest} data-original-url={src} />
+        </div>
       </div>
-    </div>
-  ) : (
+    );
+  }
+
+  return (
     <img src={src} alt={alt} className={className} style={style} {...rest} onError={handleError} />
   );
 }
@@ -34,104 +44,92 @@ function ImageWithFallback(props) {
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMenuOpen(false);
-    }
+  const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
+  const profileRoute = isLoggedIn ? '/welcome' : '/login';
+  const closeMenu = () => setIsMenuOpen(false);
+  const handleExploreMap = () => {
+    closeMenu();
+    navigate(isLoggedIn ? '/result' : '/login');
   };
 
   return (
-    <nav className="bg-[#2B5F8E] text-white sticky top-0 z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5">
-              <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={48} height={48} />
-            </div>
-            <div className="hidden lg:block">
-              <span className="text-xs font-semibold tracking-wider leading-tight">
-                AUTOMATED GEOSPATIAL<br />ALERT PLATFORM
-              </span>
-            </div>
+    <nav className="about-nav bg-[#2B5F8E] text-white shadow-md sticky top-0 z-50">
+      <div className="about-nav__inner app-nav-inner">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="app-nav-logo-box shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5"
+            onClick={closeMenu}
+          >
+            <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={56} height={56} />
+          </Link>
+          <div className="hidden lg:grid app-nav-brand text-white">
+            <p>AUTOMATED GEOSPATIAL</p>
+            <p>ALERT PLATFORM</p>
           </div>
+        </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-10">
-            <button
-              onClick={() => navigate('/')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
+        <div className="flex items-center gap-6 md:gap-12">
+          <div className="hidden md:flex items-center gap-8 lg:gap-12">
+            <Link to="/" className="app-nav-link text-white px-3 py-2">
               Home
+            </Link>
+            <Link to="/about-us#about" className="app-nav-link text-white px-3 py-2">
+              About Us
+            </Link>
+            <button type="button" className="app-nav-link text-white px-3 py-2" onClick={handleExploreMap}>
+              Explore Map
             </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection('donate')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
-              Donate
-            </button>
-            <button
-              onClick={() => scrollToSection('contact')}
-              className="text-sm hover:text-gray-200 transition-colors"
-            >
+            <Link to="/about-us#contact" className="app-nav-link text-white px-3 py-2">
               Contact
-            </button>
-            <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
-              <Search size={20} />
-            </button>
+            </Link>
           </div>
- 
-          {/* Mobile menu button */}
+          <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
+            <User size={20} className="md:scale-110" />
+          </Link>
           <button
-            className="md:hidden p-2"
+            type="button"
+            className="md:hidden p-2.5"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden bg-[#234d73] border-t border-white/20">
-          <div className="px-4 py-3 space-y-3">
-            <button
-              onClick={() => {
-                navigate('/');
-                setIsMenuOpen(false);
-              }}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+          <div className="px-6 py-4 space-y-2">
+            <Link
+              to="/"
+              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              onClick={closeMenu}
             >
               Home
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+            </Link>
+            <Link
+              to="/about-us#about"
+              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              onClick={closeMenu}
             >
-              About
-            </button>
+              About Us
+            </Link>
             <button
-              onClick={() => scrollToSection('donate')}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+              type="button"
+              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              onClick={handleExploreMap}
             >
-              Donate
+              Explore Map
             </button>
-            <button
-              onClick={() => scrollToSection('contact')}
-              className="block w-full text-left py-2 text-sm hover:text-gray-200 transition-colors"
+            <Link
+              to="/about-us#contact"
+              className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              onClick={closeMenu}
             >
               Contact
-            </button>
-          </div> 
+            </Link>
+          </div>
         </div>
       )}
     </nav>
@@ -140,26 +138,26 @@ function Navigation() {
 
 function HeroSection() {
   return (
-    <section id="home" className="relative h-[350px] md:h-[450px] overflow-hidden">
+    <section id="home" className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] overflow-hidden">
       <div className="absolute inset-0">
         <ImageWithFallback
-          src={philippinesMapBg}
-          alt="Topographic map of the Philippines"
+          src={heroImage}
+          alt="Topographic map of Philippines"
           className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
       </div>
 
-      <div className="relative h-full flex items-center justify-center">
-        <div className="text-center text-white px-4 flex flex-col items-center gap-5 md:gap-6">
+      <div className="relative h-full flex items-center justify-center px-4">
+        <div className="text-center text-white flex flex-col items-center gap-4 sm:gap-5 md:gap-6">
           <img
             src={logoImage}
             alt="AGAP logo"
-            className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_4px_28px_rgba(0,0,0,0.5)]"
+            className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_4px_28px_rgba(0,0,0,0.5)]"
             width={128}
             height={128}
           />
-          <h1 className="text-5xl md:text-7xl tracking-wide drop-shadow-md">About Us</h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-wide drop-shadow-md">About Us</h1>
         </div>
       </div>
     </section>
@@ -168,26 +166,26 @@ function HeroSection() {
 
 function AboutContent() {
   return (
-    <section id="about" className="py-16 md:py-20 bg-[#F5F5F5]">
-      <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
+    <section id="about" className="py-12 sm:py-16 md:py-20 bg-[#F5F5F5]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-12">
         <div className="space-y-6 text-gray-800">
-          <p className="leading-relaxed text-base">
+          <p className="leading-relaxed text-sm sm:text-base">
             AGAP (Automated Geospatial Alert Platform) is a web-based tool that was
             developed for communities and government agencies. These institutions can
-            significantly improve operations with the help of geospatial technology.
+            significantly improve operations with help of geospatial technology.
             We provide real-time monitoring of changes in land use, forests, and
             vegetation with our alerts, location-based mapping, and risk analysis; thus
             allows users to respond swiftly to environment shifts and help enhance
             decision-making and operations.
           </p>
 
-          <p className="leading-relaxed text-base">
+          <p className="leading-relaxed text-sm sm:text-base">
             Our platform integrates with satellite data and geographic Information
             systems, and data visualization to original unify widespread data. Besides,
             AGAP supports organizations in risk assessment and resource management.
           </p>
 
-          <p className="leading-relaxed text-base">
+          <p className="leading-relaxed text-sm sm:text-base">
             We decided to make and were prompted community by empowering
             governments and organizations to use geo-technology in their operations,
             enabling immediate responses and informed decisions.
@@ -199,32 +197,13 @@ function AboutContent() {
 }
 
 function TeamMembers() {
+  // Alphabetical by first name; each image matches the person from your uploads.
   const teamMembers = [
-    {
-      id: 1,
-      name: 'MEMBER 1',
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop'
-    },
-    {
-      id: 2,
-      name: 'MEMBER 1',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'
-    },
-    {
-      id: 3,
-      name: 'MEMBER 1',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop'
-    },
-    {
-      id: 4,
-      name: 'MEMBER 1',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop'
-    },
-    {
-      id: 5,
-      name: 'MEMBER 1',
-      image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop'
-    }
+    { id: 1, name: 'Abigail B. Nicolas', image: abigailImage },
+    { id: 2, name: 'Alleah Joy M. Balbin', image: alleahImage },
+    { id: 3, name: 'Fiona Rose A. Balala', image: fionaImage },
+    { id: 4, name: 'Leana Rose S. Santos', image: leanaImage },
+    { id: 5, name: 'Ryza Gwen P. Villafranca', image: ryzaImage }
   ];
 
   const handleMeetOurTeam = () => {
@@ -243,7 +222,7 @@ function TeamMembers() {
           >
             MEET OUR
           </button>
-          <h2 className="text-4xl md:text-5xl text-[#8B1C1C] tracking-wide">
+          <h2 className="text-4xl md:text-5xl text-[#0c2d48] tracking-wide">
             Team Members
           </h2>
         </div>
@@ -254,17 +233,20 @@ function TeamMembers() {
             {teamMembers.slice(0, 3).map((member) => (
               <div
                 key={member.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow w-64"
+                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow w-full max-w-xs"
               >
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-square overflow-hidden p-4">
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#1E73BE] text-sm tracking-wider">{member.name}</h3>
+                  <h3 className="text-[#0c2d48] text-sm sm:text-base font-semibold tracking-wide leading-snug">
+                    {member.name}
+                  </h3>
+                  <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>
             ))}
@@ -272,21 +254,24 @@ function TeamMembers() {
         </div>
 
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-[580px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl">
             {teamMembers.slice(3, 5).map((member) => (
               <div
                 key={member.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow w-64 mx-auto"
+                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow w-full max-w-xs mx-auto"
               >
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-square overflow-hidden p-4">
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
                   />
                 </div>
                 <div className="p-5 text-center">
-                  <h3 className="text-[#1E73BE] text-sm tracking-wider">{member.name}</h3>
+                  <h3 className="text-[#0c2d48] text-sm sm:text-base font-semibold tracking-wide leading-snug">
+                    {member.name}
+                  </h3>
+                  <p className="text-[#1E73BE] text-xs tracking-wider mt-1">MEMBER {member.id}</p>
                 </div>
               </div>
             ))}
@@ -294,61 +279,6 @@ function TeamMembers() {
         </div>
       </div>
     </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer id="contact" className="bg-[#2B5F8E] text-white py-12">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
-          {/* Logo and Platform Name */}
-          <div className="flex items-start gap-4">
-            <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
-              <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={80} height={80} />
-            </div>
-            <div className="pt-2">
-              <h3 className="text-xs tracking-wider leading-tight">
-                AUTOMATED GEOSPATIAL<br />ALERT PLATFORM
-              </h3>
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div>
-            <h3 className="text-2xl mb-4 tracking-wide">Contact Us</h3>
-            <div className="space-y-2 text-sm">
-              <p>
-                <span className="font-semibold">Email:</span>{' '}
-                <a
-                  href="mailto:agap.systemtoolkit@gmail.com"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  agap.systemtoolkit@gmail.com
-                </a>
-              </p>
-              <p>
-                <span className="font-semibold">Phone:</span>{' '}
-                <a
-                  href="tel:+639XXXXXXXXX"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  +63 9XX XXX XXXX (optional)
-                </a>
-              </p>
-              <p>
-                <span className="font-semibold">Location:</span> Butuan City, Agusan del Norte
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Copyright */}
-        <div className="border-t border-white/20 pt-6 text-center">
-          <p className="text-xs">Copyright © 2025 AGAP All Rights Reserved</p>
-        </div>
-      </div>
-    </footer>
   );
 }
 
@@ -368,7 +298,7 @@ export default function AboutUs() {
       <HeroSection />
       <AboutContent />
       <TeamMembers />
-      <Footer />
+      <SiteFooter />
     </div>
   );
 }

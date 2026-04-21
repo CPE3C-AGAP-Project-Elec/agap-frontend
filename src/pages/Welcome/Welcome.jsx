@@ -1,91 +1,170 @@
-import { Link } from "react-router-dom";
-import { User } from "lucide-react";
-import backgroundImage from "../../assets/philippines-map-bg.svg";
+import { useEffect, useState } from "react";
+import { MapPin, Search, Menu, User, X } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import logoImage from "../../assets/logo.png";
+import SiteFooter from "../../components/SiteFooter/SiteFooter";
+import "./Welcome.css";
+
+const NOMINATIM_HEADERS = {
+  Accept: "application/json",
+  "Accept-Language": "en",
+};
+
+async function searchPhilippinesLocation(query) {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(trimmed)}&countrycodes=ph&format=json&limit=1`;
+  const response = await fetch(url, { headers: NOMINATIM_HEADERS });
+  if (!response.ok) throw new Error("Geocoding request failed");
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
+}
 
 export default function Welcome() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [locationQuery, setLocationQuery] = useState("");
+  const [searchError, setSearchError] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isLoggedIn = localStorage.getItem("agapIsLoggedIn") === "true";
+  const profileRoute = isLoggedIn ? "/profile" : "/login";
+
+  const closeMenu = () => setIsMenuOpen(false);
+
+  useEffect(() => {
+    if (location.hash !== "#contact") return;
+    const contactSection = document.getElementById("contact");
+    if (contactSection) {
+      requestAnimationFrame(() => {
+        contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [location.pathname, location.hash]);
+
+  const handleSearchSubmit = async (event) => {
+    event.preventDefault();
+    setSearchError("");
+    const trimmed = locationQuery.trim();
+    if (!trimmed) {
+      setSearchError("Invalid location. Try another place.");
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const results = await searchPhilippinesLocation(trimmed);
+      if (!results.length) {
+        setSearchError("Invalid location. Try another place.");
+        return;
+      }
+      navigate("/result", { state: { welcomeSearchQuery: trimmed } });
+    } catch {
+      setSearchError("Invalid location. Try another place.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <header
-        style={{
-          background: "#2565A8",
-          color: "#fff",
-          padding: "14px 32px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <div style={{ lineHeight: 1.1, fontWeight: 700, letterSpacing: "0.06em" }}>
-          <div>AUTOMATED GEOSPATIAL</div>
-          <div>ALERT PLATFORM</div>
+    <div className="welcome-page">
+      <header className="welcome-header">
+        <div className="welcome-header-inner app-nav-inner">
+          <div className="flex items-center gap-3">
+            <div className="welcome-brand-logo app-nav-logo-box">
+              <img src={logoImage} alt="AGAP logo" className="welcome-brand-logo-img" />
+            </div>
+            <div className="welcome-brand-text app-nav-brand welcome-brand-text--light">
+              <p>AUTOMATED GEOSPATIAL</p>
+              <p>ALERT PLATFORM</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6 md:gap-12">
+            <div className="hidden md:flex items-center gap-8 lg:gap-12">
+              <Link to="/" className="app-nav-link welcome-nav__link text-white px-3 py-2">
+                Home
+              </Link>
+              <Link to="/about-us" className="app-nav-link welcome-nav__link text-white px-3 py-2">
+                About Us
+              </Link>
+              <Link to="/welcome#contact" className="app-nav-link welcome-nav__link text-white px-3 py-2">
+                Contact
+              </Link>
+            </div>
+            <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
+              <User size={20} className="md:scale-110" />
+            </Link>
+            <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
-        <nav style={{ display: "flex", alignItems: "center", gap: 40 }}>
-          <Link to="/welcome" style={{ color: "#fff", textDecoration: "none", fontWeight: 600 }}>
-            Home
-          </Link>
-          <Link to="/about" style={{ color: "#fff", textDecoration: "none", fontWeight: 600 }}>
-            About Us
-          </Link>
-          <Link to="/about#contact" style={{ color: "#fff", textDecoration: "none", fontWeight: 600 }}>
-            Contact
-          </Link>
-          <Link
-            to="/profile"
-            aria-label="Profile"
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 999,
-              border: "2px solid #fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#fff",
-            }}
-          >
-            <User aria-hidden />
-          </Link>
-        </nav>
+        {isMenuOpen && (
+          <div className="md:hidden bg-[#234d73] border-t border-white/20">
+            <div className="px-6 py-4 space-y-2">
+              <Link
+                to="/"
+                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                onClick={closeMenu}
+              >
+                Home
+              </Link>
+              <Link
+                to="/about-us"
+                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                onClick={closeMenu}
+              >
+                About Us
+              </Link>
+              <Link
+                to="/welcome#contact"
+                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                onClick={closeMenu}
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
-      <main
-        style={{
-          flex: 1,
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          position: "relative",
-        }}
-      >
-        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
-        <div style={{ position: "relative", padding: "64px 32px", color: "#fff" }}>
-          <h1 style={{ margin: 0, fontSize: 44, fontWeight: 800 }}>WELCOME</h1>
-          <p style={{ marginTop: 12, maxWidth: 520, opacity: 0.95 }}>
-            Click the profile icon to open Account Settings.
-          </p>
-        </div>
+      <main className="welcome-main">
+        <section className="welcome-search-card">
+          <h1>Find Your Location</h1>
+          <p>Get real-time flood risk updates based on your location.</p>
+
+          <form className="welcome-search-row" onSubmit={handleSearchSubmit}>
+            <MapPin size={18} className="welcome-input-icon-left" aria-hidden />
+            <input
+              type="text"
+              value={locationQuery}
+              onChange={(e) => {
+                setLocationQuery(e.target.value);
+                if (searchError) setSearchError("");
+              }}
+              placeholder="Search Location"
+              aria-label="Search location"
+              aria-invalid={Boolean(searchError)}
+              aria-describedby={searchError ? "welcome-search-error" : undefined}
+              disabled={isSearching}
+            />
+            <button type="submit" aria-label="Search location" disabled={isSearching}>
+              <Search size={18} />
+            </button>
+          </form>
+          {searchError ? (
+            <p id="welcome-search-error" className="welcome-search-error" role="alert">
+              {searchError}
+            </p>
+          ) : null}
+        </section>
       </main>
 
-      <footer style={{ background: "#2565A8", color: "#fff", padding: "12px 32px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
-          <div style={{ lineHeight: 1.1, letterSpacing: "0.06em", fontWeight: 700 }}>
-            <div style={{ fontSize: 14 }}>AUTOMATED GEOSPATIAL</div>
-            <div style={{ fontSize: 14 }}>ALERT PLATFORM</div>
-          </div>
-          <div style={{ textAlign: "right", fontSize: 14 }}>
-            <p style={{ margin: "0 0 6px" }}>
-              <strong>Email:</strong> agap.system@gmail.com
-            </p>
-            <p style={{ margin: "0 0 6px" }}>
-              <strong>Phone:</strong> +63 912 345 6789
-            </p>
-            <p style={{ margin: 0 }}>
-              <strong>Location:</strong> Malolos, Bulacan, Philippines
-            </p>
-          </div>
-        </div>
-      </footer>
+      <div className="welcome-spacer" />
+
+      <SiteFooter />
     </div>
   );
 }

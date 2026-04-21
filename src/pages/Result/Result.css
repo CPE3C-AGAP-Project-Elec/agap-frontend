@@ -20,8 +20,9 @@
   --result-primary-dark: #3a6a8f;
   --result-primary-deep: #2c5282;
   /* Header / nav bar — darker blue, same family as primary */
-  --result-header-bg: #2c5282;
-  --result-header-border: #1e3f5c;
+  /* Match About Us nav bar */
+  --result-header-bg: #2b5f8e;
+  --result-header-border: #234d73;
   --result-heading: #2c5f8d;
   --result-surface: #ffffff;
   --result-canvas: #f9fafb;
@@ -52,84 +53,16 @@
 /* ----- Header ----- */
 
 .result-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.5rem;
+  padding: 0;
   background: var(--result-header-bg);
-  border-bottom: 4px solid var(--result-header-border);
-}
-
-.result-header__brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-  color: inherit;
-  border-radius: 0.375rem;
-}
-
-.result-header__brand:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
+  border-bottom: 1px solid var(--result-header-border);
 }
 
 .result-header__logo {
-  width: 3rem;
-  height: 3rem;
-  object-fit: contain;
   display: block;
-}
-
-.result-header__titles {
-  color: #fff;
-}
-
-.result-header__titles h1,
-.result-header__titles h2 {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.result-header__nav {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.result-header__nav a {
-  color: rgb(255 255 255 / 0.92);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.result-header__nav a:hover {
-  color: #fff;
-}
-
-.result-header__account {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: none;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.result-header__account:hover {
-  background: #f3f4f6;
-}
-
-.result-header__account svg {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--result-header-bg);
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* ----- Sidebar ----- */
@@ -267,6 +200,10 @@
   border-radius: 4px;
 }
 
+.result-section {
+  min-width: 0;
+}
+
 /* ----- Flood hazard ----- */
 
 .result-hazard {
@@ -309,8 +246,41 @@
   width: 2rem;
   height: 2rem;
   border-radius: 0.25rem;
-  background: rgb(255 255 255 / 0.3);
+  background: transparent;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-warning-triangle {
+  width: 1.35rem;
+  height: 1.25rem;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  border: 1.5px solid #1f2937;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-warning-triangle__mark {
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #1f2937;
+  transform: translateY(1px);
+}
+
+.result-warning-triangle--low {
+  background: #fef08a;
+}
+
+.result-warning-triangle--medium {
+  background: #fdba74;
+}
+
+.result-warning-triangle--high {
+  background: #fca5a5;
 }
 
 /* ----- Flood history placeholder ----- */
@@ -351,6 +321,126 @@
   text-align: center;
   padding: 1rem 0;
   margin: 0;
+  color: var(--result-muted);
+}
+
+/* ----- Weather history chart ----- */
+
+.result-weather-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.result-weather-chart__plot {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: end;
+  min-width: 0;
+}
+
+.result-weather-chart__y-axis {
+  height: 150px;
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  align-items: center;
+  justify-items: end;
+  font-size: 0.75rem;
+  color: var(--result-muted);
+  font-weight: 600;
+}
+
+.result-weather-chart__bars {
+  height: 190px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
+  gap: 0.5rem;
+  align-items: start;
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+  border-left: 2px solid #d1d5db;
+  border-bottom: 2px solid #d1d5db;
+}
+
+.result-weather-chart__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.result-weather-chart__bar-wrap {
+  width: 100%;
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.result-weather-chart__bar {
+  width: 100%;
+  border-radius: 0.375rem 0.375rem 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.45rem;
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 3px 6px rgb(0 0 0 / 0.12);
+  overflow: hidden;
+}
+
+.result-weather-chart__bar .result-warning-triangle {
+  width: 1.2rem;
+  height: 1.1rem;
+  border-color: rgb(0 0 0 / 0.75);
+  background: #fff;
+}
+
+.result-weather-chart__date {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.result-weather-chart__legend {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.result-weather-chart__legend-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--result-radius-pill);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.result-weather-chart__legend-item--low {
+  background: var(--result-hazard-low);
+}
+
+.result-weather-chart__legend-item--medium {
+  background: var(--result-hazard-medium);
+}
+
+.result-weather-chart__legend-item--high {
+  background: var(--result-hazard-high);
+}
+
+.result-weather__empty {
+  margin: 0;
+  font-size: 0.875rem;
   color: var(--result-muted);
 }
 
@@ -403,12 +493,6 @@
 
 .result-weather__icon--rain {
   color: #60a5fa;
-}
-
-.result-weather__empty {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--result-muted);
 }
 
 /* ----- Map area ----- */
@@ -520,7 +604,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .result-hazard__row,
-  .result-header__nav a,
+  .result-header .app-nav-link,
   .result-search__submit,
   .result-section__toggle,
   .result-map__tool {

@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   User,
   Search,
+  Menu,
+  X,
   ChevronDown,
   ChevronUp,
   Plus,
@@ -51,24 +53,92 @@ L.Icon.Default.mergeOptions({
 });
 
 function Header() {
-  return (
-    <header className="result-header">
-      <Link to="/" className="result-header__brand">
-        <ImageWithFallback src={logoImage} alt="AGAP logo" className="result-header__logo" />
-        <div className="result-header__titles">
-          <h1>AUTOMATED GEOSPATIAL</h1>
-          <h2>ALERT PLATFORM</h2>
-        </div>
-      </Link>
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
+  const profileRoute = isLoggedIn ? '/welcome' : '/login';
+  const closeMenu = () => setIsMenuOpen(false);
+  const handleLogout = () => {
+    localStorage.removeItem('agapIsLoggedIn');
+    closeMenu();
+    navigate('/');
+  };
 
-      <nav className="result-header__nav">
-        <Link to="/">Home</Link>
-        <Link to="/about">About Us</Link>
-        <Link to="/about#contact">Contact</Link>
-        <button type="button" className="result-header__account">
-          <User aria-hidden />
-        </button>
-      </nav>
+  return (
+    <header className="result-header about-nav text-white shadow-md sticky top-0 z-50">
+      <div className="about-nav__inner app-nav-inner">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="app-nav-logo-box shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2B5F8E] p-1.5"
+            onClick={closeMenu}
+          >
+            <ImageWithFallback src={logoImage} alt="AGAP logo" className="result-header__logo h-full w-full object-contain" />
+          </Link>
+          <div className="hidden lg:grid app-nav-brand text-white">
+            <p>AUTOMATED GEOSPATIAL</p>
+            <p>ALERT PLATFORM</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 md:gap-10">
+          <div className="hidden md:flex items-center gap-10">
+            <Link to="/" className="app-nav-link text-white">
+              Home
+            </Link>
+            <Link to="/about-us" className="app-nav-link text-white">
+              About Us
+            </Link>
+            <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link text-white">
+              Contact
+            </Link>
+          </div>
+          <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
+            <User size={20} aria-hidden />
+          </Link>
+          <button type="button" className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {isMenuOpen && (
+        <div className="md:hidden bg-[#234d73] border-t border-white/20">
+          <div className="px-4 py-3 space-y-3">
+            <Link
+              to="/"
+              className="app-nav-link block w-full text-left py-2 text-white"
+              onClick={closeMenu}
+            >
+              Home
+            </Link>
+            <Link
+              to="/about-us"
+              className="app-nav-link block w-full text-left py-2 text-white"
+              onClick={closeMenu}
+            >
+              About Us
+            </Link>
+            <Link
+              to="/"
+              state={{ scrollToLandingContact: true }}
+              className="app-nav-link block w-full text-left py-2 text-white"
+              onClick={closeMenu}
+            >
+              Contact
+            </Link>
+            {isLoggedIn ? (
+              <button
+                type="button"
+                className="app-nav-link block w-full text-left py-2 text-white"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            ) : null}
+          </div>
+        </div>
+      )}
     </header>
   );
 }
@@ -114,7 +184,14 @@ function FloodHazardLevel({ level }) {
             key={lvl.id}
             className={`result-hazard__row result-hazard__row--${lvl.id}${isActive ? ' is-active' : ''}`}
           >
-            <div className="result-hazard__swatch" aria-hidden />
+            <div className="result-hazard__swatch" aria-label={`${lvl.id} warning symbol`}>
+              <span
+                className={`result-warning-triangle result-warning-triangle--${lvl.id}`}
+                aria-hidden
+              >
+                <span className="result-warning-triangle__mark">!</span>
+              </span>
+            </div>
             <span>{lvl.label}</span>
           </div>
         );
@@ -123,8 +200,14 @@ function FloodHazardLevel({ level }) {
   );
 }
 
-function FloodHistory({ hasData }) {
-  if (!hasData) {
+function FloodHistory({ data }) {
+  const floodLevelMeta = {
+    low: { label: 'Low', value: 1, colorVar: '--result-hazard-low' },
+    medium: { label: 'Medium', value: 2, colorVar: '--result-hazard-medium' },
+    high: { label: 'High', value: 3, colorVar: '--result-hazard-high' },
+  };
+
+  if (!data?.length) {
     return (
       <div className="result-placeholder">
         <div className="result-placeholder__row">
@@ -142,8 +225,54 @@ function FloodHistory({ hasData }) {
   }
 
   return (
-    <div className="result-placeholder">
-      <p className="result-weather__empty">Historical flood data will appear here</p>
+    <div className="result-weather-chart">
+      <div className="result-weather-chart__plot">
+        <div className="result-weather-chart__y-axis">
+          <span>High</span>
+          <span>Medium</span>
+          <span>Low</span>
+        </div>
+
+        <div className="result-weather-chart__bars">
+          {data.map((item) => {
+            const levelMeta = floodLevelMeta[item.level] ?? floodLevelMeta.low;
+            const barHeight = `${(levelMeta.value / 3) * 100}%`;
+
+            return (
+              <div key={`${item.date}-${item.level}`} className="result-weather-chart__col">
+                <div className="result-weather-chart__bar-wrap">
+                  <div
+                    className="result-weather-chart__bar"
+                    style={{ height: barHeight, backgroundColor: `var(${levelMeta.colorVar})` }}
+                    title={`${item.date} - ${levelMeta.label}`}
+                    aria-label={`${item.date} flood level ${levelMeta.label}`}
+                  >
+                    <span
+                      className={`result-warning-triangle result-warning-triangle--${item.level}`}
+                      aria-hidden
+                    >
+                      <span className="result-warning-triangle__mark">!</span>
+                    </span>
+                  </div>
+                </div>
+                <span className="result-weather-chart__date">{item.date}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="result-weather-chart__legend">
+        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--low">
+          Low
+        </span>
+        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--medium">
+          Medium
+        </span>
+        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--high">
+          High
+        </span>
+      </div>
     </div>
   );
 }
@@ -161,6 +290,14 @@ function WeatherHistory({ data }) {
         return <Sun className="result-weather__icon result-weather__icon--sun" aria-hidden />;
     }
   };
+
+  if (!data?.length) {
+    return (
+      <div className="result-placeholder">
+        <p className="result-weather__empty">No weather history to display.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="result-weather">
@@ -274,6 +411,9 @@ function MapView({ latitude, longitude, locationName }) {
 }
 
 export default function Result() {
+  const location = useLocation();
+  const welcomeSearchHandledKey = useRef(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [showFloodHazardOpen, setShowFloodHazardOpen] = useState(true);
   const [showFloodHistory, setShowFloodHistory] = useState(false);
@@ -299,6 +439,16 @@ export default function Result() {
 
   const [floodLevel, setFloodLevel] = useState(null);
 
+  const historyLevels = ['low', 'medium', 'high', floodLevel ?? 'medium'];
+  const floodHistoryData = Array.from({ length: 4 }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (3 - index));
+    return {
+      date: date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
+      level: historyLevels[index],
+    };
+  });
+
   const weatherData = [
     { date: 'Mar. 30', condition: 'Sunny' },
     { date: 'Mar. 31', condition: 'Cloudy' },
@@ -308,12 +458,22 @@ export default function Result() {
 
   const [coordinates, setCoordinates] = useState(null);
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  const performSearch = useCallback(async (rawQuery) => {
+    const q = String(rawQuery ?? '').trim();
+    if (!q) return;
+
+    setSearchQuery(q);
+
+    const levels = ['low', 'medium', 'high'];
+    const randomLevel = levels[Math.floor(Math.random() * levels.length)];
+    setFloodLevel(randomLevel);
+    setShowFloodHazardOpen(true);
+    setShowFloodHistory(false);
+    setShowWeatherHistory(false);
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&countrycodes=ph&format=json&limit=1`
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=ph&format=json&limit=1`
       );
       const data = await response.json();
 
@@ -323,10 +483,6 @@ export default function Result() {
           latitude: parseFloat(lat),
           longitude: parseFloat(lon),
         });
-
-        const levels = ['low', 'medium', 'high'];
-        const randomLevel = levels[Math.floor(Math.random() * levels.length)];
-        setFloodLevel(randomLevel);
       } else {
         alert('Location not found in the Philippines. Please try a different search term.');
       }
@@ -334,6 +490,18 @@ export default function Result() {
       console.error('Geocoding error:', error);
       alert('Error searching for location. Please try again.');
     }
+  }, []);
+
+  useEffect(() => {
+    const q = location.state?.welcomeSearchQuery;
+    if (!q || !String(q).trim()) return;
+    if (welcomeSearchHandledKey.current === location.key) return;
+    welcomeSearchHandledKey.current = location.key;
+    void performSearch(String(q).trim());
+  }, [location.key, location.state, performSearch]);
+
+  const handleSearch = async () => {
+    await performSearch(searchQuery);
   };
 
   return (
@@ -363,10 +531,10 @@ export default function Result() {
                 className="result-section__toggle"
                 onClick={toggleFloodHistory}
               >
-                <span>FLOOD HISTORY</span>
+                <span>FLOOD FORECAST</span>
                 {showFloodHistory ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
-              {showFloodHistory && <FloodHistory hasData={false} />}
+              {showFloodHistory && <FloodHistory data={floodHistoryData} />}
             </section>
 
             <section className="result-section">
@@ -375,7 +543,7 @@ export default function Result() {
                 className="result-section__toggle"
                 onClick={toggleWeatherHistory}
               >
-                <span>WEATHER HISTORY</span>
+                <span>WEATHER FORECAST</span>
                 {showWeatherHistory ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
               {showWeatherHistory && <WeatherHistory data={weatherData} />}

@@ -118,6 +118,66 @@
   color: #1f5388;
 }
 
+/* ===== PASSWORD TOGGLE BUTTON STYLES ===== */
+.signup-page .password-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.signup-page .password-input-wrap input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+.signup-page .password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.signup-page .password-toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #374151;
+}
+
+.signup-page .password-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(45, 108, 174, 0.3);
+}
+
+.signup-page .password-toggle svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* Remove default browser password reveal button */
+.signup-page input[type="password"]::-ms-reveal,
+.signup-page input[type="password"]::-ms-clear {
+  display: none;
+}
+
+.signup-page input[type="password"]::-webkit-contacts-auto-fill-button,
+.signup-page input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
 /* Tablets & large phones */
 @media (max-width: 1024px) {
   .signup-page .login-card h2 {
@@ -163,6 +223,17 @@
     font-size: 16px;
   }
 
+  .signup-page .password-toggle {
+    width: 28px;
+    height: 28px;
+    right: 6px;
+  }
+
+  .signup-page .password-toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .signup-page .google-btn {
     height: auto;
     min-height: 48px;
@@ -198,6 +269,17 @@
 
   .signup-page .login-card h2 {
     font-size: clamp(24px, 7.5vw, 32px);
+  }
+
+  .signup-page .password-toggle {
+    width: 26px;
+    height: 26px;
+    right: 4px;
+  }
+
+  .signup-page .password-toggle svg {
+    width: 14px;
+    height: 14px;
   }
 }
 

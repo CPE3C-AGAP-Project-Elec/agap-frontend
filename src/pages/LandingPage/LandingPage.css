@@ -22,6 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
 
 .landing-header-left {
@@ -31,8 +32,6 @@
 }
 
 .landing-logo-icon {
-  width: 70px;
-  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,7 +49,58 @@
   gap: 40px;
 }
 
-.landing-nav a {
+.landing-nav--open {
+  display: flex;
+}
+
+.landing-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.landing-mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 30;
+}
+
+.landing-mobile-menu-btn span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #1f5b9f;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.landing-mobile-menu-btn:hover span {
+  background: #12487f;
+}
+
+.landing-nav-auth {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(31, 91, 159, 0.2);
+}
+
+.landing-nav-auth-btn {
+  width: 100%;
+  text-align: center;
+  padding: 12px 20px;
+}
+
+.landing-nav-link {
   color: #1f5b9f;
   text-decoration: none;
   font-size: 18px;
@@ -60,7 +110,7 @@
   transition: color 0.25s ease, transform 0.25s ease;
 }
 
-.landing-nav a::after {
+.landing-nav-link::after {
   content: "";
   position: absolute;
   left: 0;
@@ -74,12 +124,12 @@
   transition: transform 0.25s ease;
 }
 
-.landing-nav a:hover {
+.landing-nav-link:hover {
   color: #12487f;
   transform: translateY(-1px);
 }
 
-.landing-nav a:hover::after {
+.landing-nav-link:hover::after {
   transform: scaleX(1);
 }
 
@@ -87,6 +137,31 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.landing-profile-btn {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(31, 91, 159, 0.35);
+  border-radius: 999px;
+  background: rgba(31, 91, 159, 0.08);
+  color: #1f5b9f;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.landing-profile-btn:hover {
+  background: rgba(31, 91, 159, 0.14);
+  border-color: rgba(31, 91, 159, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(31, 91, 159, 0.18);
+}
+
+.landing-profile-btn:active {
+  transform: translateY(0);
 }
 
 .landing-login-btn,
@@ -140,6 +215,8 @@
   text-align: center;
   padding: 42px 20px 18px;
   animation: fadeUp 0.7s ease both;
+  position: relative;
+  z-index: 2;
 }
 
 .landing-hero-copy h1 {
@@ -197,6 +274,8 @@
   height: auto;
   margin-top: -220px;
   overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
 @media (min-width: 1200px) {
@@ -212,6 +291,7 @@
   transform-origin: center bottom;
   animation: heroWaveMotion 10s ease-in-out infinite;
   filter: drop-shadow(0 10px 20px rgba(25, 74, 122, 0.15));
+  pointer-events: none;
 }
 
 @keyframes heroWaveMotion {
@@ -262,91 +342,6 @@
     animation: none;
   }
 
-  .landing-footer::before {
-    animation: none;
-  }
-}
-
-.landing-footer {
-  background: #1f5b9f;
-  color: #fff;
-  padding: 34px 0 12px;
-  position: relative;
-  overflow: hidden;
-}
-
-.landing-footer::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -20%;
-  width: 140%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
-  animation: footerShine 5.5s linear infinite;
-}
-
-.landing-footer-inner {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.landing-footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.landing-footer-brand-icon {
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.landing-footer-logo-image {
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
-  display: block;
-}
-
-.landing-footer-brand-text div:first-child {
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-.landing-footer-brand-text div:nth-child(2),
-.landing-footer-brand-text div:nth-child(3) {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.landing-footer-contact h3 {
-  margin: 0 0 14px;
-  font-size: clamp(26px, 2.6vw, 36px);
-  line-height: 1;
-  font-weight: 700;
-}
-
-.landing-footer-contact p {
-  margin: 0 0 4px;
-  font-size: clamp(15px, 1.15vw, 18px);
-  line-height: 1.3;
-  font-weight: 500;
-}
-
-.landing-copyright {
-  text-align: center;
-  font-size: 13px;
-  margin-top: 28px;
-  opacity: 0.9;
 }
 
 @media (max-width: 900px) {
@@ -360,19 +355,50 @@
 
   .landing-header-left {
     gap: 12px;
+    flex: 1;
   }
 
   .landing-nav {
     display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #f3f4fa;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 20;
   }
 
-  .landing-logo-icon {
-    width: 44px;
-    height: 44px;
+  .landing-nav--open {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .landing-nav-auth {
+    display: none;
+  }
+
+  .landing-mobile-menu-btn {
+    display: flex;
   }
 
   .landing-auth {
+    display: flex;
     gap: 6px;
+  }
+
+  .landing-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
   .landing-main {
@@ -401,28 +427,15 @@
     margin-top: -56px;
   }
 
-  .landing-footer-inner {
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  .landing-nav a,
+  .landing-nav-link,
   .landing-login-btn,
   .landing-signup-btn {
     font-size: 16px;
     padding: 6px 10px;
   }
-
-  .landing-footer-contact p {
-    font-size: 16px;
-  }
 }
 
 @media (max-width: 640px) {
-  .landing-logo-icon {
-    width: 38px;
-    height: 38px;
-  }
 
   .landing-login-btn,
   .landing-signup-btn {
@@ -436,9 +449,5 @@
 
   .landing-hero-image-wrap {
     margin-top: -24px;
-  }
-
-  .landing-footer {
-    padding-top: 22px;
   }
 }

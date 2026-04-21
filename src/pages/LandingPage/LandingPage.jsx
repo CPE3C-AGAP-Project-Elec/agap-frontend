@@ -1,10 +1,41 @@
+import { useState } from "react";
 import heroImage from "../../assets/hero-img.svg";
 import logoImage from "../../assets/logo.png";
-import { Link, useNavigate } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { User } from "lucide-react";
+import SiteFooter from "../../components/SiteFooter/SiteFooter";
 import "./LandingPage.css";
 
 export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const scrollFromResult = location.state?.scrollToLandingContact === true;
+  const isLoggedIn = localStorage.getItem("agapIsLoggedIn") === "true";
+
+  const handleExploreMap = () => {
+    navigate(isLoggedIn ? "/result" : "/login");
+  };
+
+  const handleProfile = () => {
+    navigate("/welcome");
+  };
+
+  useLayoutEffect(() => {
+    const hashContact = location.hash === "#contact";
+    if (!hashContact && !scrollFromResult) return;
+
+    const scroll = () =>
+      document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    scroll();
+    requestAnimationFrame(scroll);
+
+    if (scrollFromResult) {
+      navigate({ pathname: "/", hash: "contact" }, { replace: true, state: {} });
+    }
+  }, [location.hash, location.pathname, scrollFromResult, navigate]);
 
   return (
     <div className="landing-page">
@@ -12,23 +43,94 @@ export default function LandingPage() {
         <div className="landing-container landing-header-inner">
           <div className="landing-header-left">
             <div className="landing-logo">
-              <div className="landing-logo-icon">
+              <div className="landing-logo-icon app-nav-logo-box">
                 <img src={logoImage} alt="AGAP logo" className="landing-logo-image" />
               </div>
             </div>
-            <nav className="landing-nav">
-              <Link to="/">Home</Link>
-              <Link to="/about">About Us</Link>
-              <Link to="/result">Flood map</Link>
-              <Link to="/about#contact">Contact</Link>
+            <nav className={`landing-nav ${mobileMenuOpen ? 'landing-nav--open' : ''}`}>
+              <Link to="/" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
+                Home
+              </Link>
+              <Link to="/about-us" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
+                About Us
+              </Link>
+              <Link
+                to="/#contact"
+                className="landing-nav-link"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  requestAnimationFrame(() => {
+                    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  });
+                }}
+              >
+                Contact
+              </Link>
+              <div className="landing-nav-auth">
+                {isLoggedIn ? (
+                  <button
+                    type="button"
+                    className="landing-profile-btn landing-nav-auth-btn"
+                    aria-label="Profile"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleProfile();
+                    }}
+                  >
+                    <User size={20} aria-hidden />
+                  </button>
+                ) : (
+                  <>
+                    <button 
+                      type="button" 
+                      className="landing-login-btn landing-nav-auth-btn" 
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/login");
+                      }}
+                    >
+                      Login
+                    </button>
+                    <button 
+                      type="button" 
+                      className="landing-signup-btn landing-nav-auth-btn" 
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/signup");
+                      }}
+                    >
+                      Sign up
+                    </button>
+                  </>
+                )}
+              </div>
             </nav>
           </div>
-          <div className="landing-auth">
-            <button type="button" className="landing-login-btn" onClick={() => navigate("/login")}>
-              Login
-            </button>
-            <button type="button" className="landing-signup-btn" onClick={() => navigate("/signup")}>
-              Sign up
+          <div className="landing-header-right">
+            <div className="landing-auth">
+              {isLoggedIn ? (
+                <button type="button" className="landing-profile-btn" aria-label="Profile" onClick={handleProfile}>
+                  <User size={20} aria-hidden />
+                </button>
+              ) : (
+                <>
+                  <button type="button" className="landing-login-btn" onClick={() => navigate("/login")}>
+                    Login
+                  </button>
+                  <button type="button" className="landing-signup-btn" onClick={() => navigate("/signup")}>
+                    Sign up
+                  </button>
+                </>
+              )}
+            </div>
+            <button 
+              className="landing-mobile-menu-btn" 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
             </button>
           </div>
         </div>
@@ -49,12 +151,8 @@ export default function LandingPage() {
             <span className="landing-highlight">make smarter decisions</span> for your safety.
           </p>
           <div className="landing-hero-cta-wrap">
-            <button
-              type="button"
-              className="landing-hero-cta"
-              onClick={() => navigate("/result")}
-            >
-              Explore flood map
+            <button type="button" className="landing-hero-cta" onClick={handleExploreMap}>
+              Explore Map
             </button>
           </div>
         </div>
@@ -64,34 +162,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <footer className="landing-footer">
-        <div className="landing-container">
-          <div className="landing-footer-inner">
-            <div className="landing-footer-brand">
-              <div className="landing-footer-brand-icon">
-                <img src={logoImage} alt="AGAP logo" className="landing-footer-logo-image" />
-              </div>
-              <div className="landing-footer-brand-text">
-                <div>AGAP</div>
-                <div>AUTOMATED GEOSPATIAL</div>
-                <div>ALERT PLATFORM</div>
-              </div>
-            </div>
-            <div className="landing-footer-contact">
-              <h3>Contact Us</h3>
-              <div>
-                <p>Email: agap.system@gmail.com</p>
-                <p>Phone: +63 912 345 6789</p>
-                <p>Location: Malolos, Bulacan, Philippines</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="landing-copyright">
-            Copyright © 2026 AGAP All Rights Reserved
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

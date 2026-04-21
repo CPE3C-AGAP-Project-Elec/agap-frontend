@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logoWithText from "../../assets/logoWithText.png";
 import googleIcon from "../../assets/icons/google.svg";
+import { register } from "../../services/auth";
 import "./SignUp.css";
 
 export function SignUp() {
@@ -22,6 +23,8 @@ export function SignUp() {
   const [errors, setErrors] = useState({ email: "", password: "", confirmPassword: "" });
   const [verificationSent, setVerificationSent] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [backendError, setBackendError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -41,9 +44,11 @@ export function SignUp() {
     return () => clearInterval(interval);
   }, [welcomeLines.length]);
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-
+    
+    setBackendError("");
+    
     const newErrors = { email: "", password: "", confirmPassword: "" };
     let hasError = false;
 
@@ -74,11 +79,30 @@ export function SignUp() {
     setErrors(newErrors);
 
     if (!hasError) {
-      console.log("Sign up:", { email, password, confirmPassword });
-      localStorage.setItem("agapIsLoggedIn", "true");
-      setVerificationSent(true);
-      setResendCooldown(0);
-      navigate("/welcome");
+      setLoading(true);
+      
+      try {
+        await register({
+          name: email.split('@')[0],
+          email: email,
+          password: password
+        });
+        
+        console.log("Registration successful");
+        setVerificationSent(true);
+        
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+        
+      } catch (err) {
+        console.error("Registration error:", err);
+        setBackendError(err.message || "Registration failed. Please try again.");
+        setPassword("");
+        setConfirmPassword("");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -97,37 +121,12 @@ export function SignUp() {
     setShowPassword(false);
     setShowConfirmPassword(false);
     setErrors({ email: "", password: "", confirmPassword: "" });
+    setBackendError("");
   };
 
   const handleGoogleAuth = () => {
     console.log("Google signup");
   };
-
-  const passwordToggleIcon = (visible) =>
-    visible ? (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          d="M3 3L21 21M10.58 10.59A2 2 0 0 0 13.41 13.4M9.88 5.09A10.94 10.94 0 0 1 12 5C17 5 21.27 8.11 23 12C22.18 13.84 20.79 15.43 19 16.54M14.12 18.88A10.78 10.78 0 0 1 12 19C7 19 2.73 15.89 1 12C1.95 9.86 3.58 8.07 5.66 6.79"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ) : (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          d="M1 12C2.73 8.11 7 5 12 5S21.27 8.11 23 12C21.27 15.89 17 19 12 19S2.73 15.89 1 12Z"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      </svg>
-    );
 
   return (
     <div className="login-page signup-page">
@@ -144,30 +143,17 @@ export function SignUp() {
 
       <section className="login-right-panel">
         <div className="login-card">
-          <h2>{verificationSent ? "Check your email" : "Sign Up"}</h2>
+          <h2>{verificationSent ? "Account Created!" : "Sign Up"}</h2>
 
           {verificationSent ? (
             <>
               <div className="signup-verification-box" role="status" aria-live="polite">
                 <p className="signup-verification-lead">
-                  We sent a verification link to <strong>{email}</strong>. Please check your inbox to complete your signup.
+                  Account created successfully! 🎉
                 </p>
                 <p className="signup-verification-hint">
-                  Didn&apos;t get the email? Check your spam folder, or resend below.
+                  You will be redirected to the login page shortly. Please log in with your credentials.
                 </p>
-                <button
-                  type="button"
-                  className="signup-verification-resend"
-                  onClick={handleResendVerification}
-                  disabled={resendCooldown > 0}
-                >
-                  {resendCooldown > 0
-                    ? `Resend available in ${resendCooldown}s`
-                    : "Resend verification email"}
-                </button>
-                <button type="button" className="signup-verification-back" onClick={handleUseDifferentEmail}>
-                  Use a different email
-                </button>
               </div>
               <p className="login-signup-text">
                 Already have an account? <Link to="/login">Login</Link>
@@ -178,6 +164,18 @@ export function SignUp() {
             </>
           ) : (
             <form onSubmit={handleSignup} noValidate autoComplete="off">
+              {backendError && (
+                <div className="field-error" style={{ 
+                  marginBottom: "16px", 
+                  padding: "10px", 
+                  background: "#fee2e2", 
+                  borderRadius: "6px",
+                  textAlign: "center"
+                }}>
+                  {backendError}
+                </div>
+              )}
+              
               <div className="field-wrap">
                 <label htmlFor="signup-email">Email</label>
                 <input
@@ -190,6 +188,7 @@ export function SignUp() {
                   onChange={(e) => {
                     setEmail(e.target.value);
                     setErrors((prev) => ({ ...prev, email: "" }));
+                    setBackendError("");
                   }}
                 />
                 {errors.email ? <p className="field-error">{errors.email}</p> : null}
@@ -208,6 +207,7 @@ export function SignUp() {
                     onChange={(e) => {
                       setPassword(e.target.value);
                       setErrors((prev) => ({ ...prev, password: "" }));
+                      setBackendError("");
                     }}
                   />
                   <button
@@ -215,9 +215,17 @@ export function SignUp() {
                     className="password-toggle"
                     onClick={() => setShowPassword((prev) => !prev)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
-                    title={showPassword ? "Hide password" : "Show password"}
                   >
-                    {passwordToggleIcon(showPassword)}
+                    {showPassword ? (
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M3 3L21 21M10.58 10.59A2 2 0 0 0 13.41 13.4M9.88 5.09A10.94 10.94 0 0 1 12 5C17 5 21.27 8.11 23 12C22.18 13.84 20.79 15.43 19 16.54M14.12 18.88A10.78 10.78 0 0 1 12 19C7 19 2.73 15.89 1 12C1.95 9.86 3.58 8.07 5.66 6.79" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M1 12C2.73 8.11 7 5 12 5S21.27 8.11 23 12C21.27 15.89 17 19 12 19S2.73 15.89 1 12Z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
                   </button>
                 </div>
                 {errors.password ? <p className="field-error">{errors.password}</p> : null}
@@ -236,6 +244,7 @@ export function SignUp() {
                     onChange={(e) => {
                       setConfirmPassword(e.target.value);
                       setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+                      setBackendError("");
                     }}
                   />
                   <button
@@ -243,9 +252,17 @@ export function SignUp() {
                     className="password-toggle"
                     onClick={() => setShowConfirmPassword((prev) => !prev)}
                     aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                    title={showConfirmPassword ? "Hide password" : "Show password"}
                   >
-                    {passwordToggleIcon(showConfirmPassword)}
+                    {showConfirmPassword ? (
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M3 3L21 21M10.58 10.59A2 2 0 0 0 13.41 13.4M9.88 5.09A10.94 10.94 0 0 1 12 5C17 5 21.27 8.11 23 12C22.18 13.84 20.79 15.43 19 16.54M14.12 18.88A10.78 10.78 0 0 1 12 19C7 19 2.73 15.89 1 12C1.95 9.86 3.58 8.07 5.66 6.79" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M1 12C2.73 8.11 7 5 12 5S21.27 8.11 23 12C21.27 15.89 17 19 12 19S2.73 15.89 1 12Z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
                   </button>
                 </div>
                 {errors.confirmPassword ? <p className="field-error">{errors.confirmPassword}</p> : null}
@@ -260,8 +277,8 @@ export function SignUp() {
                 <span>Sign Up with Google</span>
               </button>
 
-              <button type="submit" className="login-submit-btn">
-                Sign Up
+              <button type="submit" className="login-submit-btn" disabled={loading}>
+                {loading ? "Creating Account..." : "Sign Up"}
               </button>
 
               <p className="login-signup-text">

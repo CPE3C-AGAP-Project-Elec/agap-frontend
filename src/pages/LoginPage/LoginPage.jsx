@@ -54,7 +54,23 @@ export default function LoginPage() {
 
     if (!hasError) {
       console.log("Login:", { email, password, rememberMe });
+      const normalizedEmail = email.trim();
+      const nameFromEmail = normalizedEmail.split("@")[0] || "User";
+      const formattedName = nameFromEmail
+        .replace(/[._-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+
       localStorage.setItem("agapIsLoggedIn", "true");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          name: formattedName || "User",
+          email: normalizedEmail,
+          password,
+        })
+      );
       navigate("/welcome");
     }
   };

@@ -75,7 +75,23 @@ export function SignUp() {
 
     if (!hasError) {
       console.log("Sign up:", { email, password, confirmPassword });
+      const normalizedEmail = email.trim();
+      const nameFromEmail = normalizedEmail.split("@")[0] || "User";
+      const formattedName = nameFromEmail
+        .replace(/[._-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+
       localStorage.setItem("agapIsLoggedIn", "true");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          name: formattedName || "User",
+          email: normalizedEmail,
+          password,
+        })
+      );
       setVerificationSent(true);
       setResendCooldown(0);
       navigate("/welcome");

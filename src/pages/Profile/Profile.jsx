@@ -1,5 +1,5 @@
 import { Plus, Minus, Compass, Map, User, EyeOff, Eye, Menu, X } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import backgroundImage from "../../assets/profile-bg.svg";
 import heroBackgroundImage from "../../assets/philippines-map-bg.svg";
@@ -13,7 +13,12 @@ export default function Profile() {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   
   // Get user data from localStorage
-  const userData = JSON.parse(localStorage.getItem('user') || '{}');
+  let userData = {};
+  try {
+    userData = JSON.parse(localStorage.getItem("user") || "{}");
+  } catch {
+    userData = {};
+  }
   const userEmail = userData.email || 'user@example.com';
   const userName = userData.name || 'User';
 
@@ -36,9 +41,10 @@ export default function Profile() {
 
   const handleLogout = (e) => {
     e.preventDefault();
+    localStorage.removeItem("agapIsLoggedIn");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/login");
+    navigate("/", { replace: true });
   };
 
   return (
@@ -63,22 +69,48 @@ export default function Profile() {
 
           <div className="flex items-center gap-6 md:gap-12">
             <div className="hidden md:flex items-center gap-8 lg:gap-12">
-              <Link to="/" className="app-nav-link text-white px-3 py-2">
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) =>
+                  `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
+              >
                 Home
-              </Link>
-              <Link to="/about-us" className="app-nav-link text-white px-3 py-2">
+              </NavLink>
+              <NavLink
+                to="/about-us"
+                className={({ isActive }) =>
+                  `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
+              >
                 About Us
-              </Link>
-              <Link to="/landing" className="app-nav-link text-white px-3 py-2">
+              </NavLink>
+              <NavLink
+                to="/result"
+                className={({ isActive }) =>
+                  `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
+              >
                 Explore Map
-              </Link>
-              <Link to="/welcome#contact" className="app-nav-link text-white px-3 py-2">
+              </NavLink>
+              <Link
+                to="/"
+                state={{ scrollToLandingContact: true }}
+                className="app-nav-link text-white px-3 py-2"
+              >
                 Contact
               </Link>
             </div>
-            <Link to="/profile" className="app-profile-link app-profile-link--on-dark app-profile-link--active p-2 md:p-3" aria-label="Go to profile">
+            <NavLink
+              to="/profile"
+              className={({ isActive }) =>
+                `app-profile-link app-profile-link--on-dark p-2 md:p-3${isActive ? " app-profile-link--active" : ""}`
+              }
+              aria-label="Go to profile"
+            >
               <User size={20} className="md:scale-110" />
-            </Link>
+            </NavLink>
             <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -88,29 +120,37 @@ export default function Profile() {
         {isMenuOpen && (
           <div className="md:hidden bg-[#234d73] border-t border-white/20">
             <div className="px-6 py-4 space-y-2">
-              <Link
+              <NavLink
                 to="/"
-                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                end
+                className={({ isActive }) =>
+                  `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
                 onClick={closeMenu}
               >
                 Home
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 to="/about-us"
-                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                className={({ isActive }) =>
+                  `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
                 onClick={closeMenu}
               >
                 About Us
-              </Link>
-              <Link
-                to="/landing"
-                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+              </NavLink>
+              <NavLink
+                to="/result"
+                className={({ isActive }) =>
+                  `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
                 onClick={closeMenu}
               >
                 Explore Map
-              </Link>
+              </NavLink>
               <Link
-                to="/welcome#contact"
+                to="/"
+                state={{ scrollToLandingContact: true }}
                 className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
                 onClick={closeMenu}
               >

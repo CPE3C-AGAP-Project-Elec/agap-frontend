@@ -3,6 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getUser, logout, isAuthenticated, getCurrentUser } from "../../services/auth";
 import backgroundImage from "../../assets/philippines-map-bg.svg";
+import { Plus, Minus, Compass, Map, User, EyeOff, Eye, Menu, X } from "lucide-react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import backgroundImage from "../../assets/profile-bg.svg";
+import heroBackgroundImage from "../../assets/philippines-map-bg.svg";
+import logoImage from "../../assets/logo.png";
 import "./profile.css";
 
 export default function Profile() {
@@ -18,6 +24,36 @@ export default function Profile() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  
+  // Get user data from localStorage
+  let userData = {};
+  try {
+    userData = JSON.parse(localStorage.getItem("user") || "{}");
+  } catch {
+    userData = {};
+  }
+  const userEmail = userData.email || 'user@example.com';
+  const userName = userData.name || 'User';
+
+  const closeMenu = () => setIsMenuOpen(false);
+
+  // Check screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth <= 960);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Determine which background to use
+  const currentBackground = isSmallScreen ? heroBackgroundImage : backgroundImage;
 
   // Check authentication and load user data
   useEffect(() => {
@@ -189,53 +225,121 @@ export default function Profile() {
 
   return (
     <div className="profile-page">
-      <div className="profile-bg" style={{ backgroundImage: `url(${backgroundImage})` }} />
+      <div className="profile-bg" style={{ backgroundImage: `url(${currentBackground})` }} />
 
-      <header className="profile-header">
-        <Link to="/welcome" className="profile-brand" aria-label="AGAP home">
-          <div className="profile-brand__titles">
-            <div className="profile-brand__line">AUTOMATED GEOSPATIAL</div>
-            <div className="profile-brand__line">ALERT PLATFORM</div>
+      <header className="about-nav bg-[#2565a8] text-white sticky top-0 z-50 shadow-md">
+        <div className="about-nav__inner app-nav-inner">
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="app-nav-logo-box shrink-0 flex items-center justify-center overflow-hidden rounded-full bg-[#2565a8] p-1.5"
+              onClick={closeMenu}
+            >
+              <img src={logoImage} alt="AGAP" className="w-full h-full object-contain" width={56} height={56} />
+            </Link>
+            <div className="hidden lg:grid app-nav-brand text-white">
+              <p>AUTOMATED GEOSPATIAL</p>
+              <p>ALERT PLATFORM</p>
+            </div>
           </div>
-        </Link>
 
-        <nav className="profile-nav" aria-label="Primary">
-          <Link to="/welcome" className="profile-nav__link">
-            Home
-          </Link>
-          <Link to="/about-us" className="profile-nav__link">
-            About Us
-          </Link>
-          <Link to="/welcome#contact" className="profile-nav__link">
-            Contact
-          </Link>
-          <Link
-            to="/profile"
-            aria-label="Profile"
-            className="profile-nav__icon profile-nav__icon--active"
-          >
-            <User aria-hidden />
-          </Link>
-        </nav>
+          <div className="flex items-center gap-6 md:gap-12">
+            <div className="hidden md:flex items-center gap-8 lg:gap-12">
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) =>
+                  `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/about-us"
+                className={({ isActive }) =>
+                  `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
+              >
+                About Us
+              </NavLink>
+              <NavLink
+                to="/result"
+                className={({ isActive }) =>
+                  `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
+              >
+                Explore Map
+              </NavLink>
+              <Link
+                to="/"
+                state={{ scrollToLandingContact: true }}
+                className="app-nav-link text-white px-3 py-2"
+              >
+                Contact
+              </Link>
+            </div>
+            <NavLink
+              to="/profile"
+              className={({ isActive }) =>
+                `app-profile-link app-profile-link--on-dark p-2 md:p-3${isActive ? " app-profile-link--active" : ""}`
+              }
+              aria-label="Go to profile"
+            >
+              <User size={20} className="md:scale-110" />
+            </NavLink>
+            <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+
+        {isMenuOpen && (
+          <div className="md:hidden bg-[#234d73] border-t border-white/20">
+            <div className="px-6 py-4 space-y-2">
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) =>
+                  `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
+                onClick={closeMenu}
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/about-us"
+                className={({ isActive }) =>
+                  `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
+                onClick={closeMenu}
+              >
+                About Us
+              </NavLink>
+              <NavLink
+                to="/result"
+                className={({ isActive }) =>
+                  `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`
+                }
+                onClick={closeMenu}
+              >
+                Explore Map
+              </NavLink>
+              <Link
+                to="/"
+                state={{ scrollToLandingContact: true }}
+                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
+                onClick={closeMenu}
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       <main className="profile-main">
         <div className="profile-main__inner">
           <section className="profile-map" aria-label="Map">
-            <div className="profile-map__controls">
-              <button type="button" className="profile-map__btn" aria-label="Zoom in">
-                <Plus className="profile-map__icon-lg" strokeWidth={3} aria-hidden />
-              </button>
-              <button type="button" className="profile-map__btn" aria-label="Zoom out">
-                <Minus className="profile-map__icon-lg" strokeWidth={3} aria-hidden />
-              </button>
-              <button type="button" className="profile-map__btn profile-map__btn--outlined" aria-label="Compass">
-                <Compass className="profile-map__icon-sm" aria-hidden />
-              </button>
-              <button type="button" className="profile-map__btn" aria-label="Map layers">
-                <Map className="profile-map__icon-sm" aria-hidden />
-              </button>
-            </div>
           </section>
 
           <aside className="profile-panel" aria-label="Account settings">
@@ -383,6 +487,20 @@ export default function Profile() {
                         </button>
                       </div>
                     )}
+                      id="profile-password"
+                      type={showPassword ? "text" : "password"}
+                      className="profile-field__input profile-field__input--password"
+                      value={userData.password || "password1234"}
+                      readOnly
+                    />
+                    <button 
+                      type="button" 
+                      className="profile-field__eye" 
+                      aria-label="Toggle password visibility"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <Eye aria-hidden /> : <EyeOff aria-hidden />}
+                    </button>
                   </div>
                   
                   {!isEditingPassword ? (
@@ -439,7 +557,7 @@ export default function Profile() {
 
               <div className="profile-logout">
                 <button type="button" onClick={handleLogout} className="profile-logout__link">
-                  LOG OUT
+                  Log Out
                 </button>
               </div>
             </div>

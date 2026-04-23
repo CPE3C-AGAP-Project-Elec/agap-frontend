@@ -128,6 +128,32 @@ export function SignUp() {
     console.log("Google signup");
   };
 
+  const passwordToggleIcon = (visible) =>
+    visible ? (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M1 12C2.73 8.11 7 5 12 5S21.27 8.11 23 12C21.27 15.89 17 19 12 19S2.73 15.89 1 12Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
+    ) : (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M3 3L21 21M10.58 10.59A2 2 0 0 0 13.41 13.4M9.88 5.09A10.94 10.94 0 0 1 12 5C17 5 21.27 8.11 23 12C22.18 13.84 20.79 15.43 19 16.54M14.12 18.88A10.78 10.78 0 0 1 12 19C7 19 2.73 15.89 1 12C1.95 9.86 3.58 8.07 5.66 6.79"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+
   return (
     <div className="login-page signup-page">
       <section className="login-left-panel">

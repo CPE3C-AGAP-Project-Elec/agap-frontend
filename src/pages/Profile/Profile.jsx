@@ -119,15 +119,22 @@ export default function Profile() {
   const confirmDeleteAccount = async () => {
     setLoading(true);
     try {
+      console.log('Attempting to delete account...');
       const response = await deleteAccount();
+      console.log('Delete account response:', response);
       if (response.success) {
         setMessage({ type: "success", text: "Account deleted successfully!" });
         setTimeout(() => {
           logout(); // This will redirect to landing page
         }, 2000);
+      } else {
+        setMessage({ type: "error", text: response.message || "Failed to delete account" });
       }
     } catch (error) {
-      setMessage({ type: "error", text: error.message || "Failed to delete account" });
+      console.error('Delete account error:', error);
+      console.error('Error response:', error.response);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to delete account";
+      setMessage({ type: "error", text: errorMessage });
     } finally {
       setLoading(false);
       setShowDeleteModal(false);

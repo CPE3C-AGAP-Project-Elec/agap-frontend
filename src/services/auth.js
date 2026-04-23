@@ -118,10 +118,14 @@ export const resetPassword = async (email, code, newPassword) => {
 
 export const deleteAccount = async () => {
   try {
+    console.log('Making DELETE request to /auth/delete-account');
     const response = await api.delete('/auth/delete-account');
+    console.log('Delete account API response:', response);
     return response.data;
   } catch (error) {
     console.error("Delete account error:", error);
+    console.error("Error status:", error.response?.status);
+    console.error("Error data:", error.response?.data);
     throw error.response?.data || { message: 'Failed to delete account' };
   }
 };

@@ -289,7 +289,6 @@ export default function Result() {
   };
 
   const confirmLogout = () => {
-    console.log('Logout confirmed - clearing storage');
     logout();
     setShowLogoutModal(false);
     navigate('/login');
@@ -448,61 +447,13 @@ export default function Result() {
         
         {/* Logout Confirmation Modal */}
         {showLogoutModal && (
-          <div style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-          }}>
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "16px",
-              padding: "24px",
-              maxWidth: "400px",
-              width: "90%",
-              textAlign: "center",
-            }}>
-              <h3 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px", color: "#1e293b" }}>
-                Confirm Logout
-              </h3>
-              <p style={{ color: "#64748b", marginBottom: "24px" }}>
-                Are you sure you want to log out?
-              </p>
-              <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                <button
-                  onClick={cancelLogout}
-                  style={{
-                    padding: "10px 24px",
-                    backgroundColor: "#e2e8f0",
-                    color: "#334155",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontWeight: "500",
-                  }}
-                >
-                  No
-                </button>
-                <button
-                  onClick={confirmLogout}
-                  style={{
-                    padding: "10px 24px",
-                    backgroundColor: "#dc2626",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontWeight: "500",
-                  }}
-                >
-                  Yes
-                </button>
+          <div className="logout-modal-overlay">
+            <div className="logout-modal">
+              <h3>Confirm Logout</h3>
+              <p>Are you sure you want to log out?</p>
+              <div className="logout-modal-buttons">
+                <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
+                <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
               </div>
             </div>
           </div>
@@ -529,61 +480,13 @@ export default function Result() {
         
         {/* Logout Confirmation Modal */}
         {showLogoutModal && (
-          <div style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-          }}>
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "16px",
-              padding: "24px",
-              maxWidth: "400px",
-              width: "90%",
-              textAlign: "center",
-            }}>
-              <h3 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px", color: "#1e293b" }}>
-                Confirm Logout
-              </h3>
-              <p style={{ color: "#64748b", marginBottom: "24px" }}>
-                Are you sure you want to log out?
-              </p>
-              <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                <button
-                  onClick={cancelLogout}
-                  style={{
-                    padding: "10px 24px",
-                    backgroundColor: "#e2e8f0",
-                    color: "#334155",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontWeight: "500",
-                  }}
-                >
-                  No
-                </button>
-                <button
-                  onClick={confirmLogout}
-                  style={{
-                    padding: "10px 24px",
-                    backgroundColor: "#dc2626",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontWeight: "500",
-                  }}
-                >
-                  Yes
-                </button>
+          <div className="logout-modal-overlay">
+            <div className="logout-modal">
+              <h3>Confirm Logout</h3>
+              <p>Are you sure you want to log out?</p>
+              <div className="logout-modal-buttons">
+                <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
+                <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
               </div>
             </div>
           </div>
@@ -663,61 +566,13 @@ export default function Result() {
       
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9999,
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "16px",
-            padding: "24px",
-            maxWidth: "400px",
-            width: "90%",
-            textAlign: "center",
-          }}>
-            <h3 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px", color: "#1e293b" }}>
-              Confirm Logout
-            </h3>
-            <p style={{ color: "#64748b", marginBottom: "24px" }}>
-              Are you sure you want to log out?
-            </p>
-            <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-              <button
-                onClick={cancelLogout}
-                style={{
-                  padding: "10px 24px",
-                  backgroundColor: "#e2e8f0",
-                  color: "#334155",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "500",
-                }}
-              >
-                No
-              </button>
-              <button
-                onClick={confirmLogout}
-                style={{
-                  padding: "10px 24px",
-                  backgroundColor: "#dc2626",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "500",
-                }}
-              >
-                Yes
-              </button>
+        <div className="logout-modal-overlay">
+          <div className="logout-modal">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to log out?</p>
+            <div className="logout-modal-buttons">
+              <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
+              <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
             </div>
           </div>
         </div>

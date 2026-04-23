@@ -11,6 +11,9 @@ export default function Profile() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [userData, setUserData] = useState(null);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -435,30 +438,54 @@ export default function Profile() {
                     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                       <div className="profile-field__passwordWrap">
                         <input
-                          type="password"
+                          type={showCurrentPassword ? "text" : "password"}
                           className="profile-field__input profile-field__input--password"
                           placeholder="Current password"
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
                         />
+                        <button 
+                          type="button" 
+                          className="profile-field__eye" 
+                          aria-label="Toggle current password visibility"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        >
+                          {showCurrentPassword ? <Eye aria-hidden="true" /> : <EyeOff aria-hidden="true" />}
+                        </button>
                       </div>
                       <div className="profile-field__passwordWrap">
                         <input
-                          type="password"
+                          type={showNewPassword ? "text" : "password"}
                           className="profile-field__input profile-field__input--password"
                           placeholder="New password (min 6 characters)"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                         />
+                        <button 
+                          type="button" 
+                          className="profile-field__eye" 
+                          aria-label="Toggle new password visibility"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                        >
+                          {showNewPassword ? <Eye aria-hidden="true" /> : <EyeOff aria-hidden="true" />}
+                        </button>
                       </div>
                       <div className="profile-field__passwordWrap">
                         <input
-                          type="password"
+                          type={showConfirmPassword ? "text" : "password"}
                           className="profile-field__input profile-field__input--password"
                           placeholder="Confirm new password"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                         />
+                        <button 
+                          type="button" 
+                          className="profile-field__eye" 
+                          aria-label="Toggle confirm password visibility"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? <Eye aria-hidden="true" /> : <EyeOff aria-hidden="true" />}
+                        </button>
                       </div>
                     </div>
                   )}

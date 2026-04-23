@@ -1,16 +1,139 @@
-# React + Vite
+## Logo and Short Description
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**AGAP (Automated Geospatial Alert Platform)** is a web-based system that provides interactive map visualizations, flood level monitoring, forecast data insights, and real-time alerts to support early awareness and informed decision-making.  
 
-Currently, two official plugins are available:
+Through predictive analysis based on rainfall and environmental data, AGAP delivers accessible, accurate, and reliable information to its users.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## What is AGAP?
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+AGAP stands for **Automated Geospatial Alert Platform**.  
 
-## Expanding the ESLint configuration
+It is a web-based flood risk monitoring system designed to help communities stay informed and prepared for potential flooding events. By integrating real-time weather data, location-based mapping, and risk analysis, AGAP enables users to quickly and accurately assess flood risks within their barangay.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## What the Platform Monitors
+
+- **Flood Level** – shows the possible flood level in a specific location  
+- **Weather Forecast** – shows the expected weather in the coming days  
+- **Flood Forecast** – shows the predicted flood levels in the coming days  
+
+
+## Overview
+The platform monitors the following:
+
+- **Flood Level** – shows the possible flood level in a specific location  
+- **Weather Forecast** – shows the expected weather in the coming days  
+- **Flood Forecast** – shows the predicted flood levels in the coming days  
+
+---
+
+## Features
+
+### Flood Level Monitoring
+- Level of flood in searched location  
+- Real-time monitoring  
+- Level: Low, Medium, High chance of flooding  
+
+### Weather Forecast
+- Weather prediction  
+- Real-time weather forecast  
+- Weather: Sunny, Cloudy, Rainy  
+
+### Flood Forecast
+- Graphical representation  
+- Real-time flood forecast  
+- Level and date  
+
+### Design & UX
+- Floating hero image animation  
+- Fully responsive — mobile, tablet, and desktop optimized  
+- Smooth animations — page transitions and micro-interactions  
+- Minimalist design  
+- Easy to use  
+
+### User Account
+- Google sign-in  
+- Password management (forgot password)  
+- Email/password registration  
+- Log out  
+
+---
+
+## User Manual
+
+### Landing Page
+- Animated landing page  
+- Click **“Explore Map”** or **“Log in / Sign Up”** to access the website  
+
+### Create an Account
+- Click **Sign Up**  
+- Use email and password (must include a special character)  
+- Option to connect to an existing account  
+
+### Log In
+- Enter email and password  
+- Click **Log In**  
+
+### Forgot Password
+- Click **“Forgot Password”**  
+- Receive authentication  
+- Reset password  
+
+### Welcome Page
+- Redirected after login or signup  
+- Search for a location  
+- Click search to go to the result page  
+
+### Result Page
+- Displays flood level, weather forecast, and flood forecast  
+- Map visualization with marked location  
+- Zoom in and zoom out functionality  
+
+### About Us Page
+- Website description  
+- Shows team members  
+
+### Profile Page
+- Displays account information  
+- Log out button  
+
+### Navigation Bar
+- Logo, website name, Home, About Us, Explore Map, Contact, Profile  
+
+### Footer / Contact
+- Displays email, contact number, and copyright  
+
+---
+
+## Tech Stack
+
+### Frontend
+- React (Vite) + JavaScript  
+- Tailwind CSS (Styling)  
+- React Router (Navigation)  
+- Axios (API Requests)  
+- Chart.js / react-chartjs-2 (Data Visualization)  
+- Google Maps API (Maps & Location)  
+- Lucide React (Icons)  
+
+## Developers
+
+| Name                     | Role      |
+|--------------------------|----------|
+| Balala, Fiona Rose A.    | Developer |
+| Balbin, Alleah Joy M.    | Developer |
+| Nicolas, Abigail B.      | Developer |
+| Santos, Leanna Rose S.   | Developer |
+| Villafranca, Ryza Gwen P.| Developer |
+
+## Acknowledgment
+
+AGAP is a flood risk monitoring system that delivers real-time environmental insights to help users stay informed and prepared.
+
+This project was developed as part of the Computer Engineering program at **Bulacan State University**.
+
+**AGAP: Real-Time Flood Risk Monitoring System**  
+© 2025–2026

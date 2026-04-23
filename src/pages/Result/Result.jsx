@@ -10,6 +10,8 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
+  ChevronLeft,
   Sun,
   Cloud,
   CloudRain,

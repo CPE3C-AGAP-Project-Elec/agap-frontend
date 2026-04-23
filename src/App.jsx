@@ -9,7 +9,7 @@ import Welcome from "./pages/Welcome/Welcome";
 import Profile from "./pages/Profile/Profile";
 import AboutUs from "./pages/AboutUs/AboutUs";
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
-
+import ProtectedRoute from "./components/ProtectedRoute";  // ← ADD THIS
 
 // Get Google Client ID from environment variables
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -25,9 +25,16 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        
+        {/* Protected Routes - User must be logged in */}
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </GoogleOAuthProvider>
   );

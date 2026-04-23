@@ -1,112 +1,136 @@
 .verify-page {
   min-height: 100vh;
+  background: linear-gradient(135deg, #1a5f7a 0%, #0d3b4f 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1e5fa1 0%, #2d6cae 100%);
   padding: 20px;
 }
 
+.verify-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('../../assets/philippines-map-bg.svg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+  z-index: 0;
+}
+
 .verify-container {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 450px;
+  max-width: 480px;
 }
 
 .verify-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 24px;
   padding: 40px 32px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   text-align: center;
 }
 
 .verify-logo {
-  width: 80px;
   margin-bottom: 24px;
 }
 
-.verify-card h1 {
-  color: #1e293b;
+.verify-logo img {
+  height: 60px;
+  margin: 0 auto;
+}
+
+.verify-title {
   font-size: 28px;
-  margin-bottom: 12px;
   font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
 }
 
-.verify-email-text {
+.verify-subtitle {
   color: #64748b;
-  margin-bottom: 32px;
   font-size: 14px;
-}
-
-.verify-email-text strong {
-  color: #1e5fa1;
-  font-weight: 600;
-}
-
-.verify-input-group {
+  line-height: 1.6;
   margin-bottom: 24px;
-  text-align: left;
 }
 
-.verify-input-group label {
-  display: block;
-  margin-bottom: 8px;
+.verify-subtitle strong {
   color: #1e293b;
   font-weight: 600;
-  font-size: 14px;
-}
-
-.verify-input-group input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 20px;
-  text-align: center;
-  letter-spacing: 8px;
-  font-weight: 600;
-  transition: border-color 0.2s;
-}
-
-.verify-input-group input:focus {
-  outline: none;
-  border-color: #2d6cae;
-  box-shadow: 0 0 0 3px rgba(45, 108, 174, 0.1);
 }
 
 .verify-error {
   background: #fee2e2;
   color: #dc2626;
   padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  border-radius: 12px;
   font-size: 14px;
+  margin-bottom: 20px;
 }
 
 .verify-success {
   background: #d1fae5;
   color: #059669;
   padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  border-radius: 12px;
   font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.verify-form {
+  margin-bottom: 24px;
+}
+
+.verify-input-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.verify-input-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.verify-input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s;
+  text-align: center;
+  letter-spacing: 4px;
+  font-weight: 600;
+}
+
+.verify-input-group input:focus {
+  outline: none;
+  border-color: #1a5f7a;
+  box-shadow: 0 0 0 3px rgba(26, 95, 122, 0.1);
 }
 
 .verify-btn {
   width: 100%;
-  background: #2d6cae;
+  background: #1a5f7a;
   color: white;
   border: none;
   padding: 14px;
-  border-radius: 10px;
   font-size: 16px;
   font-weight: 600;
+  border-radius: 12px;
   cursor: pointer;
   transition: background 0.2s;
 }
 
-.verify-btn:hover:not(:disabled) {
-  background: #1f5388;
+.verify-btn:hover {
+  background: #0d3b4f;
 }
 
 .verify-btn:disabled {
@@ -114,61 +138,45 @@
   cursor: not-allowed;
 }
 
-.verify-resend {
-  margin: 20px 0;
-}
-
-.resend-btn {
-  background: none;
-  border: none;
-  color: #2d6cae;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.resend-btn:hover:not(:disabled) {
-  background: #f1f5f9;
-}
-
-.resend-btn:disabled {
-  color: #94a3b8;
-  cursor: not-allowed;
-}
-
-.verify-links {
-  margin-top: 24px;
+.verify-footer {
   display: flex;
   justify-content: center;
   gap: 12px;
   font-size: 14px;
 }
 
-.verify-links a {
-  color: #64748b;
-  text-decoration: none;
+.verify-resend,
+.verify-back {
+  background: none;
+  border: none;
+  color: #1a5f7a;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
   transition: color 0.2s;
 }
 
-.verify-links a:hover {
-  color: #2d6cae;
+.verify-resend:hover,
+.verify-back:hover {
+  color: #0d3b4f;
+  text-decoration: underline;
 }
 
-@media (max-width: 480px) {
+.verify-divider {
+  color: #cbd5e1;
+}
+
+.verify-resend:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
   .verify-card {
     padding: 32px 24px;
   }
-
-  .verify-card h1 {
+  
+  .verify-title {
     font-size: 24px;
-  }
-
-  .verify-input-group input {
-    font-size: 18px;
-    letter-spacing: 6px;
-    padding: 12px;
   }
 }

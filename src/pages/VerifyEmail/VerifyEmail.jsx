@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { verifyEmail, resendVerificationCode } from "../../services/auth";
-import logoWithText from "../../assets/logoWithText.png";
+import logoWithText from "../../assets/logowithtext.png";
 
 export default function VerifyEmail() {
   const navigate = useNavigate();

@@ -65,7 +65,7 @@ export const logout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   localStorage.removeItem('pendingVerificationEmail');
-  window.location.href = '/login';
+  window.location.href = '/';
 };
 
 export const isAuthenticated = () => {

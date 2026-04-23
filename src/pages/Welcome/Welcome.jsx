@@ -137,26 +137,9 @@ export default function Welcome() {
               </Link>
             </div>
 
-            {/* OPTIONAL: Show user name next to profile icon */}
-            {isLoggedIn && userName && (
-              <span className="hidden md:inline-block text-white text-sm">
-                Hi, {userName}
-              </span>
-            )}
-
             <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
               <User size={20} className="md:scale-110" />
             </Link>
-
-            {/* OPTIONAL: Add logout button for logged in users */}
-            {isLoggedIn && (
-              <button
-                onClick={handleLogout}
-                className="hidden md:block text-white text-sm bg-red-600/20 hover:bg-red-600/30 px-3 py-1.5 rounded-lg transition-colors"
-              >
-                Logout
-              </button>
-            )}
 
             <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -188,18 +171,7 @@ export default function Welcome() {
               >
                 Contact
               </Link>
-              {isLoggedIn && (
-                <button
-                  onClick={() => {
-                    closeMenu();
-                    handleLogout();
-                  }}
-                  className="block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-red-600/30 transition-colors"
-                >
-                  Logout
-                </button>
-              )}
-            </div>
+                          </div>
           </div>
         )}
       </header>

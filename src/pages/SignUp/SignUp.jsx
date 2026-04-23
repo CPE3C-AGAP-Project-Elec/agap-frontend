@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
-import logoWithText from "../../assets/logoWithText.png";
+import logoWithText from "../../assets/logowithtext.png";
 import googleIcon from "../../assets/icons/google.svg";
 import { register } from "../../services/auth";
 import { googleLogin } from "../../services/googleAuth";

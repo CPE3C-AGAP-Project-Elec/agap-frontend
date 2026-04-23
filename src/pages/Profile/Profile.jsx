@@ -1,11 +1,7 @@
-import { Plus, Minus, Compass, Map, User, EyeOff, Eye } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getUser, logout, isAuthenticated, getCurrentUser } from "../../services/auth";
-import backgroundImage from "../../assets/philippines-map-bg.svg";
-import { Plus, Minus, Compass, Map, User, EyeOff, Eye, Menu, X } from "lucide-react";
+import { Plus, Minus, Compass, Map, User, EyeOff, Eye, Menu, X, Edit2, Save, XCircle } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { getUser, isAuthenticated, logout, getCurrentUser, updateUserDetails } from "../../services/auth";
 import backgroundImage from "../../assets/profile-bg.svg";
 import heroBackgroundImage from "../../assets/philippines-map-bg.svg";
 import logoImage from "../../assets/logo.png";
@@ -13,30 +9,51 @@ import "./profile.css";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showPassword, setShowPassword] = useState(false);
-  const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [isEditingPassword, setIsEditingPassword] = useState(false);
-  const [newEmail, setNewEmail] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  
-  // Get user data from localStorage
-  let userData = {};
-  try {
-    userData = JSON.parse(localStorage.getItem("user") || "{}");
-  } catch {
-    userData = {};
-  }
-  const userEmail = userData.email || 'user@example.com';
-  const userName = userData.name || 'User';
+  const [userData, setUserData] = useState(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [editEmail, setEditEmail] = useState("");
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState({ type: "", text: "" });
+  const [loading, setLoading] = useState(false);
+
+  // Check authentication and load user data
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate("/login");
+      return;
+    }
+    loadUserData();
+  }, [navigate]);
+
+  const loadUserData = async () => {
+    try {
+      const localUser = getUser();
+      if (localUser) {
+        setUserData(localUser);
+        setEditName(localUser.name || "");
+        setEditEmail(localUser.email || "");
+      }
+      
+      const response = await getCurrentUser();
+      if (response.success) {
+        setUserData(response.data);
+        setEditName(response.data.name || "");
+        setEditEmail(response.data.email || "");
+        localStorage.setItem("user", JSON.stringify(response.data));
+      }
+    } catch (error) {
+      console.error("Error loading user data:", error);
+      setMessage({ type: "error", text: "Failed to load user data" });
+    }
+  };
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -55,115 +72,114 @@ export default function Profile() {
   // Determine which background to use
   const currentBackground = isSmallScreen ? heroBackgroundImage : backgroundImage;
 
-  // Check authentication and load user data
-  useEffect(() => {
-    // Redirect if not logged in
-    if (!isAuthenticated()) {
-      navigate("/login");
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logout();
+  };
+
+  // Handle Name Update
+  const handleUpdateName = async () => {
+    if (!editName.trim()) {
+      setMessage({ type: "error", text: "Name cannot be empty" });
       return;
     }
 
-    // Load user data
-    loadUserData();
-  }, [navigate]);
-
-  const loadUserData = async () => {
+    setLoading(true);
     try {
-      // First try to get from localStorage
-      const localUser = getUser();
-      if (localUser) {
-        setUserData(localUser);
-      }
-      
-      // Then fetch fresh data from backend
-      const response = await getCurrentUser();
+      const response = await updateUserDetails({ name: editName });
       if (response.success) {
-        setUserData(response.data);
-        // Update localStorage with fresh data
-        localStorage.setItem('user', JSON.stringify(response.data));
+        setUserData(prev => ({ ...prev, name: editName }));
+        localStorage.setItem("user", JSON.stringify({ ...userData, name: editName }));
+        setMessage({ type: "success", text: "Name updated successfully!" });
+        setIsEditingName(false);
+        setTimeout(() => setMessage({ type: "", text: "" }), 3000);
       }
     } catch (error) {
-      console.error("Error loading user data:", error);
-      setError("Failed to load user data");
+      setMessage({ type: "error", text: error.message || "Failed to update name" });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = async (e) => {
-    e.preventDefault();
-    logout(); // This will redirect to login page
-  };
-
-  const handleChangeEmail = async () => {
-    if (!newEmail) {
-      setError("Please enter a new email address");
+  // Handle Email Update
+  const handleUpdateEmail = async () => {
+    if (!editEmail.trim()) {
+      setMessage({ type: "error", text: "Email cannot be empty" });
       return;
     }
     
-    if (!/\S+@\S+\.\S+/.test(newEmail)) {
-      setError("Please enter a valid email address");
+    if (!/\S+@\S+\.\S+/.test(editEmail)) {
+      setMessage({ type: "error", text: "Please enter a valid email address" });
       return;
     }
 
+    setLoading(true);
     try {
-      // You'll need to add this endpoint to your backend
-      // For now, we'll just update locally
-      setError("");
-      setSuccess("Email update functionality coming soon!");
-      
-      // Reset editing state
-      setIsEditingEmail(false);
-      setNewEmail("");
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError(err.message || "Failed to update email");
-      setTimeout(() => setError(""), 3000);
+      const response = await updateUserDetails({ email: editEmail });
+      if (response.success) {
+        setUserData(prev => ({ ...prev, email: editEmail }));
+        localStorage.setItem("user", JSON.stringify({ ...userData, email: editEmail }));
+        setMessage({ type: "success", text: "Email updated successfully! Please login again." });
+        setIsEditingEmail(false);
+        setTimeout(() => {
+          logout();
+        }, 2000);
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: error.message || "Failed to update email" });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleChangePassword = async () => {
+  // Handle Password Update
+  const handleUpdatePassword = async () => {
     if (!currentPassword || !newPassword) {
-      setError("Please fill in all password fields");
+      setMessage({ type: "error", text: "Please fill in all password fields" });
       return;
     }
     
     if (newPassword.length < 6) {
-      setError("New password must be at least 6 characters");
+      setMessage({ type: "error", text: "New password must be at least 6 characters" });
       return;
     }
     
     if (newPassword !== confirmPassword) {
-      setError("New passwords do not match");
+      setMessage({ type: "error", text: "New passwords do not match" });
       return;
     }
 
+    setLoading(true);
     try {
-      // You'll need to add this endpoint to your backend
-      // For now, we'll just show a message
-      setError("");
-      setSuccess("Password update functionality coming soon!");
-      
-      // Reset editing state
-      setIsEditingPassword(false);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError(err.message || "Failed to update password");
-      setTimeout(() => setError(""), 3000);
+      const response = await updateUserDetails({ 
+        currentPassword, 
+        newPassword 
+      });
+      if (response.success) {
+        setMessage({ type: "success", text: "Password updated successfully!" });
+        setIsEditingPassword(false);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setTimeout(() => setMessage({ type: "", text: "" }), 3000);
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: error.message || "Failed to update password" });
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const cancelNameEdit = () => {
+    setIsEditingName(false);
+    setEditName(userData?.name || "");
+    setMessage({ type: "", text: "" });
   };
 
   const cancelEmailEdit = () => {
     setIsEditingEmail(false);
-    setNewEmail("");
-    setError("");
+    setEditEmail(userData?.email || "");
+    setMessage({ type: "", text: "" });
   };
 
   const cancelPasswordEdit = () => {
@@ -171,57 +187,11 @@ export default function Profile() {
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
-    setError("");
+    setMessage({ type: "", text: "" });
   };
 
-  if (loading) {
-    return (
-      <div className="profile-page">
-        <div className="profile-bg" style={{ backgroundImage: `url(${backgroundImage})` }} />
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh',
-          fontSize: '1.5rem',
-          color: '#2565a8'
-        }}>
-          Loading profile...
-        </div>
-      </div>
-    );
-  }
-
-  if (!userData) {
-    return (
-      <div className="profile-page">
-        <div className="profile-bg" style={{ backgroundImage: `url(${backgroundImage})` }} />
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh',
-          flexDirection: 'column',
-          gap: '20px'
-        }}>
-          <p style={{ fontSize: '1.5rem', color: '#2565a8' }}>Unable to load profile data</p>
-          <button 
-            onClick={() => navigate("/login")}
-            style={{
-              padding: '10px 20px',
-              background: '#2565a8',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const userEmail = userData?.email || 'user@example.com';
+  const userName = userData?.name || 'User';
 
   return (
     <div className="profile-page">
@@ -245,46 +215,20 @@ export default function Profile() {
 
           <div className="flex items-center gap-6 md:gap-12">
             <div className="hidden md:flex items-center gap-8 lg:gap-12">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`
-                }
-              >
+              <NavLink to="/" end className={({ isActive }) => `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`}>
                 Home
               </NavLink>
-              <NavLink
-                to="/about-us"
-                className={({ isActive }) =>
-                  `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`
-                }
-              >
+              <NavLink to="/about-us" className={({ isActive }) => `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`}>
                 About Us
               </NavLink>
-              <NavLink
-                to="/result"
-                className={({ isActive }) =>
-                  `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`
-                }
-              >
+              <NavLink to="/result" className={({ isActive }) => `app-nav-link text-white px-3 py-2 profile-top-link${isActive ? " profile-top-link--active" : ""}`}>
                 Explore Map
               </NavLink>
-              <Link
-                to="/"
-                state={{ scrollToLandingContact: true }}
-                className="app-nav-link text-white px-3 py-2"
-              >
+              <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link text-white px-3 py-2">
                 Contact
               </Link>
             </div>
-            <NavLink
-              to="/profile"
-              className={({ isActive }) =>
-                `app-profile-link app-profile-link--on-dark p-2 md:p-3${isActive ? " app-profile-link--active" : ""}`
-              }
-              aria-label="Go to profile"
-            >
+            <NavLink to="/profile" className={({ isActive }) => `app-profile-link app-profile-link--on-dark p-2 md:p-3${isActive ? " app-profile-link--active" : ""}`} aria-label="Go to profile">
               <User size={20} className="md:scale-110" />
             </NavLink>
             <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
@@ -296,40 +240,16 @@ export default function Profile() {
         {isMenuOpen && (
           <div className="md:hidden bg-[#234d73] border-t border-white/20">
             <div className="px-6 py-4 space-y-2">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`
-                }
-                onClick={closeMenu}
-              >
+              <NavLink to="/" end className={({ isActive }) => `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`} onClick={closeMenu}>
                 Home
               </NavLink>
-              <NavLink
-                to="/about-us"
-                className={({ isActive }) =>
-                  `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`
-                }
-                onClick={closeMenu}
-              >
+              <NavLink to="/about-us" className={({ isActive }) => `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`} onClick={closeMenu}>
                 About Us
               </NavLink>
-              <NavLink
-                to="/result"
-                className={({ isActive }) =>
-                  `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`
-                }
-                onClick={closeMenu}
-              >
+              <NavLink to="/result" className={({ isActive }) => `app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors profile-top-link${isActive ? " profile-top-link--active" : ""}`} onClick={closeMenu}>
                 Explore Map
               </NavLink>
-              <Link
-                to="/"
-                state={{ scrollToLandingContact: true }}
-                className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
-                onClick={closeMenu}
-              >
+              <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors" onClick={closeMenu}>
                 Contact
               </Link>
             </div>
@@ -340,93 +260,97 @@ export default function Profile() {
       <main className="profile-main">
         <div className="profile-main__inner">
           <section className="profile-map" aria-label="Map">
+            <div className="profile-map__controls">
+              <button type="button" className="profile-map__btn" aria-label="Zoom in">
+                <Plus className="profile-map__icon-lg" strokeWidth={3} aria-hidden="true" />
+              </button>
+              <button type="button" className="profile-map__btn" aria-label="Zoom out">
+                <Minus className="profile-map__icon-lg" strokeWidth={3} aria-hidden="true" />
+              </button>
+              <button type="button" className="profile-map__btn profile-map__btn--outlined" aria-label="Compass">
+                <Compass className="profile-map__icon-sm" aria-hidden="true" />
+              </button>
+              <button type="button" className="profile-map__btn" aria-label="Map layers">
+                <Map className="profile-map__icon-sm" aria-hidden="true" />
+              </button>
+            </div>
           </section>
 
           <aside className="profile-panel" aria-label="Account settings">
             <div className="profile-panel__inner">
-              {/* Dynamic greeting with user's name */}
-              <h2 className="profile-panel__greeting">
-                HI, {userData.name?.toUpperCase() || userData.email?.split('@')[0]?.toUpperCase() || "USER"}!!
-              </h2>
-              <h1 className="profile-panel__title">ACCOUNT SETTINGS</h1>
+              <h2 className="profile-panel__greeting">Hi, {userName}!</h2>
+              <h1 className="profile-panel__title">Account Settings</h1>
 
-              {/* Display error or success messages */}
-              {error && (
-                <div style={{
-                  background: '#fee2e2',
-                  color: '#dc2626',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  marginBottom: '20px',
-                  textAlign: 'center'
+              {message.text && (
+                <div className={`message-box message-${message.type}`} style={{
+                  padding: "12px",
+                  borderRadius: "8px",
+                  marginBottom: "20px",
+                  backgroundColor: message.type === "success" ? "#d1fae5" : "#fee2e2",
+                  color: message.type === "success" ? "#059669" : "#dc2626",
+                  textAlign: "center"
                 }}>
-                  {error}
-                </div>
-              )}
-              
-              {success && (
-                <div style={{
-                  background: '#d1fae5',
-                  color: '#059669',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  marginBottom: '20px',
-                  textAlign: 'center'
-                }}>
-                  {success}
+                  {message.text}
                 </div>
               )}
 
               <div className="profile-form">
-                {/* Name Field - Add this before Email field */}
+                {/* Name Field - Editable */}
                 <div className="profile-field">
                   <div className="profile-field__row">
-                    <label className="profile-field__label" htmlFor="profile-name">
-                      Name
-                    </label>
-                    <button type="button" className="profile-field__action">
-                      Change Name
-                    </button>
-                  </div>
-                  <input
-                    id="profile-name"
-                    type="text"
-                    className="profile-field__input"
-                    value={userData.name || ""}
-                    readOnly
-                  />
-                </div>
-                {/* Email Field */}
-                <div className="profile-field">
-                  <div className="profile-field__row">
-                    <label className="profile-field__label" htmlFor="profile-email">
-                      Email
-                    </label>
-                    {!isEditingEmail ? (
-                      <button 
-                        type="button" 
-                        className="profile-field__action"
-                        onClick={() => setIsEditingEmail(true)}
-                      >
-                        Change Email
+                    <label className="profile-field__label" htmlFor="profile-name">Name</label>
+                    {!isEditingName ? (
+                      <button type="button" className="profile-field__action" onClick={() => setIsEditingName(true)}>
+                        <Edit2 size={16} style={{ marginRight: "4px" }} /> Edit
                       </button>
                     ) : (
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <button 
-                          type="button" 
-                          className="profile-field__action"
-                          onClick={handleChangeEmail}
-                          style={{ color: '#059669' }}
-                        >
-                          Save
+                      <div style={{ display: "flex", gap: "10px" }}>
+                        <button type="button" className="profile-field__action" onClick={handleUpdateName} disabled={loading} style={{ color: "#059669" }}>
+                          <Save size={16} style={{ marginRight: "4px" }} /> Save
                         </button>
-                        <button 
-                          type="button" 
-                          className="profile-field__action"
-                          onClick={cancelEmailEdit}
-                          style={{ color: '#dc2626' }}
-                        >
-                          Cancel
+                        <button type="button" className="profile-field__action" onClick={cancelNameEdit} style={{ color: "#dc2626" }}>
+                          <XCircle size={16} style={{ marginRight: "4px" }} /> Cancel
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {!isEditingName ? (
+                    <input
+                      id="profile-name"
+                      type="text"
+                      className="profile-field__input"
+                      value={userName}
+                      readOnly
+                    />
+                  ) : (
+                    <input
+                      id="profile-name"
+                      type="text"
+                      className="profile-field__input"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      placeholder="Enter your name"
+                      autoFocus
+                    />
+                  )}
+                </div>
+
+                {/* Email Field - Editable */}
+                <div className="profile-field">
+                  <div className="profile-field__row">
+                    <label className="profile-field__label" htmlFor="profile-email">Email</label>
+                    {!isEditingEmail ? (
+                      <button type="button" className="profile-field__action" onClick={() => setIsEditingEmail(true)}>
+                        <Edit2 size={16} style={{ marginRight: "4px" }} /> Edit
+                      </button>
+                    ) : (
+                      <div style={{ display: "flex", gap: "10px" }}>
+                        <button type="button" className="profile-field__action" onClick={handleUpdateEmail} disabled={loading} style={{ color: "#059669" }}>
+                          <Save size={16} style={{ marginRight: "4px" }} /> Save
+                        </button>
+                        <button type="button" className="profile-field__action" onClick={cancelEmailEdit} style={{ color: "#dc2626" }}>
+                          <XCircle size={16} style={{ marginRight: "4px" }} /> Cancel
                         </button>
                       </div>
                     )}
@@ -437,7 +361,7 @@ export default function Profile() {
                       id="profile-email"
                       type="email"
                       className="profile-field__input"
-                      value={userData.email || ""}
+                      value={userEmail}
                       readOnly
                     />
                   ) : (
@@ -445,69 +369,39 @@ export default function Profile() {
                       id="profile-email"
                       type="email"
                       className="profile-field__input"
-                      placeholder="Enter new email"
-                      value={newEmail}
-                      onChange={(e) => setNewEmail(e.target.value)}
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      placeholder="Enter your email"
                       autoFocus
                     />
                   )}
                 </div>
 
-                {/* Password Field */}
+                {/* Password Field - Hidden by default */}
                 <div className="profile-field">
                   <div className="profile-field__row">
-                    <label className="profile-field__label" htmlFor="profile-password">
-                      Password
-                    </label>
+                    <label className="profile-field__label" htmlFor="profile-password">Password</label>
                     {!isEditingPassword ? (
-                      <button 
-                        type="button" 
-                        className="profile-field__action"
-                        onClick={() => setIsEditingPassword(true)}
-                      >
-                        Change Password
+                      <button type="button" className="profile-field__action" onClick={() => setIsEditingPassword(true)}>
+                        <Edit2 size={16} style={{ marginRight: "4px" }} /> Change
                       </button>
                     ) : (
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <button 
-                          type="button" 
-                          className="profile-field__action"
-                          onClick={handleChangePassword}
-                          style={{ color: '#059669' }}
-                        >
-                          Save
+                      <div style={{ display: "flex", gap: "10px" }}>
+                        <button type="button" className="profile-field__action" onClick={handleUpdatePassword} disabled={loading} style={{ color: "#059669" }}>
+                          <Save size={16} style={{ marginRight: "4px" }} /> Save
                         </button>
-                        <button 
-                          type="button" 
-                          className="profile-field__action"
-                          onClick={cancelPasswordEdit}
-                          style={{ color: '#dc2626' }}
-                        >
-                          Cancel
+                        <button type="button" className="profile-field__action" onClick={cancelPasswordEdit} style={{ color: "#dc2626" }}>
+                          <XCircle size={16} style={{ marginRight: "4px" }} /> Cancel
                         </button>
                       </div>
                     )}
-                      id="profile-password"
-                      type={showPassword ? "text" : "password"}
-                      className="profile-field__input profile-field__input--password"
-                      value={userData.password || "password1234"}
-                      readOnly
-                    />
-                    <button 
-                      type="button" 
-                      className="profile-field__eye" 
-                      aria-label="Toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <Eye aria-hidden /> : <EyeOff aria-hidden />}
-                    </button>
                   </div>
                   
                   {!isEditingPassword ? (
                     <div className="profile-field__passwordWrap">
                       <input
                         id="profile-password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         className="profile-field__input profile-field__input--password"
                         value="········"
                         readOnly
@@ -518,11 +412,11 @@ export default function Profile() {
                         aria-label="Toggle password visibility"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <Eye aria-hidden /> : <EyeOff aria-hidden />}
+                        {showPassword ? <Eye aria-hidden="true" /> : <EyeOff aria-hidden="true" />}
                       </button>
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                       <div className="profile-field__passwordWrap">
                         <input
                           type="password"

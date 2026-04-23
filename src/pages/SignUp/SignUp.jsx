@@ -26,7 +26,7 @@ export function SignUp() {
   const [errors, setErrors] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [backendError, setBackendError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   // Password strength state
   const [passwordStrength, setPasswordStrength] = useState({
     hasMinLength: false,
@@ -67,16 +67,16 @@ export function SignUp() {
       number: /[0-9]/.test(pwd),
       specialChar: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pwd),
     };
-    
-    return checks.minLength && checks.upperCase && checks.lowerCase && 
-           checks.number && checks.specialChar;
+
+    return checks.minLength && checks.upperCase && checks.lowerCase &&
+      checks.number && checks.specialChar;
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    
+
     setBackendError("");
-    
+
     const newErrors = { name: "", email: "", password: "", confirmPassword: "" };
     let hasError = false;
 
@@ -120,23 +120,23 @@ export function SignUp() {
 
     if (!hasError) {
       setLoading(true);
-      
+
       try {
         const result = await register({
           name: name,
           email: email,
           password: password
         });
-        
+
         console.log("Registration successful:", result);
-        
+
         sessionStorage.setItem('pendingVerificationEmail', email);
-        
-        navigate("/verify-email", { 
+
+        navigate("/verify-email", {
           state: { email: email },
-          replace: true 
+          replace: true
         });
-        
+
       } catch (err) {
         console.error("Registration error:", err);
         setBackendError(err.message || "Registration failed. Please try again.");
@@ -150,11 +150,19 @@ export function SignUp() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     console.log("Google signup success:", credentialResponse);
-    
+
     try {
       const result = await googleLogin(credentialResponse.credential);
-      
-      if (result.success) {
+
+      if (result.requiresVerification) {
+        // Redirect to verification page
+        console.log("Google signup needs verification:", result.email);
+        sessionStorage.setItem('pendingVerificationEmail', result.email);
+        navigate("/verify-email", {
+          state: { email: result.email, fromGoogle: true },
+          replace: true
+        });
+      } else if (result.success) {
         console.log("Google signup successful:", result);
         navigate("/welcome");
       }
@@ -227,17 +235,17 @@ export function SignUp() {
 
           <form onSubmit={handleSignup} noValidate autoComplete="off">
             {backendError && (
-              <div className="field-error" style={{ 
-                marginBottom: "16px", 
-                padding: "10px", 
-                background: "#fee2e2", 
+              <div className="field-error" style={{
+                marginBottom: "16px",
+                padding: "10px",
+                background: "#fee2e2",
                 borderRadius: "6px",
                 textAlign: "center"
               }}>
                 {backendError}
               </div>
             )}
-            
+
             <div className="field-wrap">
               <label htmlFor="signup-name">Full Name</label>
               <input
@@ -299,15 +307,15 @@ export function SignUp() {
                   {passwordToggleIcon(showPassword)}
                 </button>
               </div>
-              
+
               {/* Password Requirements */}
               {password && (
                 <div className="password-requirements">
                   <div className="strength-bar-container">
-                    <div 
-                      className="strength-bar" 
-                      style={{ 
-                        width: `${getStrengthPercentage()}%`, 
+                    <div
+                      className="strength-bar"
+                      style={{
+                        width: `${getStrengthPercentage()}%`,
                         backgroundColor: getStrengthColor(),
                         transition: "width 0.3s ease"
                       }}

@@ -232,9 +232,37 @@ function WeatherForecast({ data, loading, error }) {
 }
 
 function MapView({ latitude, longitude, locationName, floodRiskLevel }) {
+  if (!latitude || !longitude) {
+    return (
+      <div className="result-map placeholder">
+        <div style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#1a5f7a',
+          borderRadius: '12px',
+          color: 'white',
+          textAlign: 'center',
+          flexDirection: 'column'
+        }}>
+          <MapPin size={48} />
+          <h3>Map View</h3>
+          <p>Search a location to see the map</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="result-map">
-      <GoogleMapView latitude={latitude} longitude={longitude} locationName={locationName} floodRiskLevel={floodRiskLevel} />
+      <GoogleMapView 
+        latitude={latitude} 
+        longitude={longitude} 
+        locationName={locationName} 
+        floodRiskLevel={floodRiskLevel} 
+      />
     </div>
   );
 }

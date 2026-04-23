@@ -5,6 +5,13 @@
   background: #eef0f5;
 }
 
+.login-left-panel {.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #eef0f5;
+}
+
 .login-left-panel {
   position: relative;
   border-radius: 0 28px 28px 0;

@@ -9,6 +9,7 @@ import abigailImage from '../../assets/team/abigail.png';
 import alleahImage from '../../assets/team/alleah.png';
 import fionaImage from '../../assets/team/fiona.png';
 import ryzaImage from '../../assets/team/ryza.png';
+import { isAuthenticated } from "../../services/auth";
 import './AboutUs.css';
 
 const ERROR_IMG_SRC =
@@ -43,13 +44,28 @@ function ImageWithFallback(props) {
 
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
-  const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
-  const profileRoute = isLoggedIn ? '/profile' : '/login';
+
+  // Check authentication using the same service as Home page
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+  }, []);
+
   const closeMenu = () => setIsMenuOpen(false);
+
   const handleExploreMap = () => {
     closeMenu();
-    navigate(isLoggedIn ? '/result' : '/login');
+    // Use the same authentication check as Home page
+    if (isAuthenticated()) {
+      navigate("/result");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const handleProfile = () => {
+    navigate("/welcome");
   };
 
   return (
@@ -71,22 +87,44 @@ function Navigation() {
 
         <div className="flex items-center gap-6 md:gap-12">
           <div className="hidden md:flex items-center gap-8 lg:gap-12">
-            <Link to="/" className="app-nav-link text-white px-3 py-2">
+            <Link to="/" className="app-nav-link text-white px-3 py-2" onClick={closeMenu}>
               Home
             </Link>
-            <Link to="/about-us#about" className="app-nav-link text-white px-3 py-2">
+            <Link to="/about-us#about" className="app-nav-link text-white px-3 py-2" onClick={closeMenu}>
               About Us
             </Link>
-            <button type="button" className="app-nav-link text-white px-3 py-2" onClick={handleExploreMap}>
+            <button 
+              type="button" 
+              className="app-nav-link text-white px-3 py-2" 
+              onClick={handleExploreMap}
+            >
               Explore Map
             </button>
-            <Link to="/about-us#contact" className="app-nav-link text-white px-3 py-2">
+            <Link to="/about-us#contact" className="app-nav-link text-white px-3 py-2" onClick={closeMenu}>
               Contact
             </Link>
           </div>
-          <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
-            <User size={20} className="md:scale-110" />
-          </Link>
+          
+          {/* Profile/Login button - updated to match Home page logic */}
+          {isLoggedIn ? (
+            <button
+              type="button"
+              className="app-profile-link app-profile-link--on-dark p-2 md:p-3"
+              aria-label="Profile"
+              onClick={handleProfile}
+            >
+              <User size={20} className="md:scale-110" />
+            </button>
+          ) : (
+            <Link 
+              to="/login" 
+              className="app-profile-link app-profile-link--on-dark p-2 md:p-3"
+              aria-label="Login"
+            >
+              <User size={20} className="md:scale-110" />
+            </Link>
+          )}
+          
           <button
             type="button"
             className="md:hidden p-2.5"
@@ -239,7 +277,7 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
+                    className="w-full h-full rounded-lg object-cover"
                   />
                 </div>
                 <div className="p-5 text-center">
@@ -264,7 +302,7 @@ function TeamMembers() {
                   <ImageWithFallback
                     src={member.image}
                     alt={member.name}
-                    className={`w-full h-full rounded-lg ${member.imageClassName ?? 'object-cover'}`}
+                    className="w-full h-full rounded-lg object-cover"
                   />
                 </div>
                 <div className="p-5 text-center">

@@ -1,7 +1,7 @@
 import { User, EyeOff, Eye, Menu, X, Edit2, Save, XCircle } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getUser, isAuthenticated, logout, getCurrentUser, updateUserDetails } from "../../services/auth";
+import { getUser, isAuthenticated, logout, getCurrentUser, updateUserDetails, deleteAccount } from "../../services/auth";
 import backgroundImage from "../../assets/profile-bg.svg";
 import heroBackgroundImage from "../../assets/philippines-map-bg.svg";
 import logoImage from "../../assets/logo.png";
@@ -27,6 +27,7 @@ export default function Profile() {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [loading, setLoading] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Check authentication and load user data
   useEffect(() => {
@@ -108,6 +109,33 @@ export default function Profile() {
 
   const cancelLogout = () => {
     setShowLogoutModal(false);
+  };
+
+  const handleDeleteAccount = (e) => {
+    e.preventDefault();
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteAccount = async () => {
+    setLoading(true);
+    try {
+      const response = await deleteAccount();
+      if (response.success) {
+        setMessage({ type: "success", text: "Account deleted successfully!" });
+        setTimeout(() => {
+          logout(); // This will redirect to landing page
+        }, 2000);
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: error.message || "Failed to delete account" });
+    } finally {
+      setLoading(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const cancelDeleteAccount = () => {
+    setShowDeleteModal(false);
   };
 
   // Handle Name Update
@@ -498,6 +526,12 @@ export default function Profile() {
                   Log Out
                 </button>
               </div>
+
+              <div className="profile-delete">
+                <button type="button" onClick={handleDeleteAccount} className="profile-delete__link" disabled={loading}>
+                  Delete Account
+                </button>
+              </div>
             </div>
           </aside>
         </div>
@@ -548,6 +582,71 @@ export default function Profile() {
               </button>
               <button
                 onClick={confirmLogout}
+                style={{
+                  padding: "10px 24px",
+                  backgroundColor: "#dc2626",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontWeight: "500",
+                }}
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+        }}>
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "16px",
+            padding: "24px",
+            maxWidth: "400px",
+            width: "90%",
+            textAlign: "center",
+          }}>
+            <h3 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px", color: "#1e293b" }}>
+              Delete Account
+            </h3>
+            <p style={{ color: "#64748b", marginBottom: "12px" }}>
+              Are you sure you want to delete your account?
+            </p>
+            <p style={{ color: "#dc2626", fontSize: "14px", marginBottom: "24px" }}>
+              This action cannot be undone. All your data will be permanently deleted.
+            </p>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+              <button
+                onClick={cancelDeleteAccount}
+                style={{
+                  padding: "10px 24px",
+                  backgroundColor: "#e2e8f0",
+                  color: "#334155",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontWeight: "500",
+                }}
+              >
+                No
+              </button>
+              <button
+                onClick={confirmDeleteAccount}
                 style={{
                   padding: "10px 24px",
                   backgroundColor: "#dc2626",

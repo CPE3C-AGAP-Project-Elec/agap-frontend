@@ -115,3 +115,13 @@ export const resetPassword = async (email, code, newPassword) => {
     throw error.response?.data || { message: 'Failed to reset password' };
   }
 };
+
+export const deleteAccount = async () => {
+  try {
+    const response = await api.delete('/auth/delete-account');
+    return response.data;
+  } catch (error) {
+    console.error("Delete account error:", error);
+    throw error.response?.data || { message: 'Failed to delete account' };
+  }
+};

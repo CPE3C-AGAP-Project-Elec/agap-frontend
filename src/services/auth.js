@@ -49,3 +49,20 @@ export const getCurrentUser = async () => {
     throw error.response?.data || { message: 'Failed to get user' };
   }
 };
+export const verifyEmail = async (email, code) => {
+  try {
+    const response = await api.post('/auth/verify-email', { email, code });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Verification failed' };
+  }
+};
+
+export const resendVerificationCode = async (email) => {
+  try {
+    const response = await api.post('/auth/resend-verification', { email });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to resend code' };
+  }
+};

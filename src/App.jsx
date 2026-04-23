@@ -7,6 +7,8 @@ import Result from "./pages/Result/Result";
 import Welcome from "./pages/Welcome/Welcome";
 import Profile from "./pages/Profile/Profile";
 import AboutUs from "./pages/AboutUs/AboutUs";
+import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
+
 
 function App() {
   return (
@@ -20,6 +22,7 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
     </Routes>
   );
 }

@@ -241,6 +241,7 @@ export default function Result() {
   const [showFloodHazardOpen, setShowFloodHazardOpen] = useState(true);
   const [showFloodForecast, setShowFloodForecast] = useState(false);
   const [showWeatherForecast, setShowWeatherForecast] = useState(false);
+  const [showRightPanel, setShowRightPanel] = useState(true);
   const [floodLevel, setFloodLevel] = useState(null);
   const [weatherData, setWeatherData] = useState([]);
   const [weatherLoading, setWeatherLoading] = useState(false);
@@ -254,21 +255,10 @@ export default function Result() {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const toggleFloodHazard = () => {
-    setShowFloodForecast(false);
-    setShowWeatherForecast(false);
-    setShowFloodHazardOpen((prev) => !prev);
-  };
-  const toggleFloodForecast = () => {
-    setShowFloodHazardOpen(false);
-    setShowWeatherForecast(false);
-    setShowFloodForecast((prev) => !prev);
-  };
-  const toggleWeatherForecast = () => {
-    setShowFloodHazardOpen(false);
-    setShowFloodForecast(false);
-    setShowWeatherForecast((prev) => !prev);
-  };
+  const toggleFloodHazard = () => setShowFloodHazardOpen(!showFloodHazardOpen);
+  const toggleFloodForecast = () => setShowFloodForecast(!showFloodForecast);
+  const toggleWeatherForecast = () => setShowWeatherForecast(!showWeatherForecast);
+  const toggleRightPanel = () => setShowRightPanel(!showRightPanel);
 
   const handleLogoutClick = () => {
     console.log("Logout button clicked - showing modal");
@@ -537,8 +527,20 @@ export default function Result() {
         </main>
         
         {/* RIGHT COLUMN - Risk Forecast */}
-        <aside className="result-sidebar-right">
-          <FloodRiskWidget location={searchQuery} coordinates={coordinates} />
+        <aside className={`result-sidebar-right ${showRightPanel ? 'is-expanded' : 'is-collapsed'}`}>
+          <button 
+            type="button" 
+            className="result-sidebar-right__toggle" 
+            onClick={toggleRightPanel}
+            aria-label={showRightPanel ? "Hide risk panel" : "Show risk panel"}
+          >
+            {showRightPanel ? <ChevronRight aria-hidden /> : <ChevronLeft aria-hidden />}
+          </button>
+          {showRightPanel && (
+            <div className="result-sidebar-right__content">
+              <FloodRiskWidget location={searchQuery} coordinates={coordinates} />
+            </div>
+          )}
         </aside>
       </div>
       

@@ -100,6 +100,61 @@
   height: calc(100vh - 70px);
   position: sticky;
   top: 70px;
+  transition: width 0.3s ease, transform 0.3s ease;
+}
+
+.result-sidebar-right.is-collapsed {
+  width: 50px;
+  overflow: hidden;
+}
+
+.result-sidebar-right.is-expanded {
+  width: 340px;
+}
+
+.result-sidebar-right__toggle {
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: #2d6cae;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.result-sidebar-right__toggle:hover {
+  background: #245d98;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.result-sidebar-right__toggle:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.result-sidebar-right__content {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.result-sidebar-right.is-collapsed .result-sidebar-right__content {
+  opacity: 0;
+  transform: translateX(-20px);
+  pointer-events: none;
+}
+
+.result-sidebar-right.is-expanded .result-sidebar-right__content {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
 }
 
 .result-sidebar-right .risk-widget {

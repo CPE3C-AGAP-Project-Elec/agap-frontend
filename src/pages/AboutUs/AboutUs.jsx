@@ -65,7 +65,7 @@ function Navigation() {
   };
 
   const handleProfile = () => {
-    navigate("/welcome");
+    navigate("/profile");
   };
 
   return (

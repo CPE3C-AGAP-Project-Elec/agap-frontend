@@ -30,7 +30,7 @@ export default function LandingPage() {
   };
 
   const handleProfile = () => {
-    navigate("/welcome");
+    navigate("/profile");
   };
 
   useLayoutEffect(() => {

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
 import logoWithText from "../../assets/logoWithText.png";
 import googleIcon from "../../assets/icons/google.svg";
 import { register } from "../../services/auth";
+import { googleLogin } from "../../services/googleAuth";
 import "./SignUp.css";
 
 export function SignUp() {
@@ -15,7 +17,6 @@ export function SignUp() {
   const [welcomeIndex, setWelcomeIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
 
-  // NEW: Added name field
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,6 +26,15 @@ export function SignUp() {
   const [errors, setErrors] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [backendError, setBackendError] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  // Password strength state
+  const [passwordStrength, setPasswordStrength] = useState({
+    hasMinLength: false,
+    hasUpperCase: false,
+    hasLowerCase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -38,6 +48,30 @@ export function SignUp() {
     return () => clearInterval(interval);
   }, [welcomeLines.length]);
 
+  // Check password strength in real-time
+  useEffect(() => {
+    setPasswordStrength({
+      hasMinLength: password.length >= 8,
+      hasUpperCase: /[A-Z]/.test(password),
+      hasLowerCase: /[a-z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
+    });
+  }, [password]);
+
+  const validatePassword = (pwd) => {
+    const checks = {
+      minLength: pwd.length >= 8,
+      upperCase: /[A-Z]/.test(pwd),
+      lowerCase: /[a-z]/.test(pwd),
+      number: /[0-9]/.test(pwd),
+      specialChar: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pwd),
+    };
+    
+    return checks.minLength && checks.upperCase && checks.lowerCase && 
+           checks.number && checks.specialChar;
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
     
@@ -46,7 +80,7 @@ export function SignUp() {
     const newErrors = { name: "", email: "", password: "", confirmPassword: "" };
     let hasError = false;
 
-    // NEW: Validate name
+    // Validate name
     if (!name) {
       newErrors.name = "Full name is required";
       hasError = true;
@@ -55,6 +89,7 @@ export function SignUp() {
       hasError = true;
     }
 
+    // Validate email
     if (!email) {
       newErrors.email = "Email is required";
       hasError = true;
@@ -63,14 +98,16 @@ export function SignUp() {
       hasError = true;
     }
 
+    // Validate password with new requirements
     if (!password) {
       newErrors.password = "Password is required";
       hasError = true;
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (!validatePassword(password)) {
+      newErrors.password = "Password must contain at least 8 characters, 1 uppercase letter, 1 number, and 1 special character";
       hasError = true;
     }
 
+    // Validate confirm password
     if (!confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
       hasError = true;
@@ -85,20 +122,16 @@ export function SignUp() {
       setLoading(true);
       
       try {
-        console.log("Registering with:", { name, email, password });
-        
         const result = await register({
-          name: name,  // Now using the actual name field
+          name: name,
           email: email,
           password: password
         });
         
         console.log("Registration successful:", result);
         
-        // Store email for verification
         sessionStorage.setItem('pendingVerificationEmail', email);
         
-        // Navigate to verification page
         navigate("/verify-email", { 
           state: { email: email },
           replace: true 
@@ -115,6 +148,27 @@ export function SignUp() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    console.log("Google signup success:", credentialResponse);
+    
+    try {
+      const result = await googleLogin(credentialResponse.credential);
+      
+      if (result.success) {
+        console.log("Google signup successful:", result);
+        navigate("/welcome");
+      }
+    } catch (error) {
+      console.error("Google signup error:", error);
+      setBackendError(error.message || "Google signup failed. Please try again.");
+    }
+  };
+
+  const handleGoogleError = () => {
+    console.log("Google signup failed");
+    setBackendError("Google signup failed. Please try again.");
+  };
+
   const passwordToggleIcon = (visible) =>
     visible ? (
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -126,6 +180,33 @@ export function SignUp() {
         <circle cx="12" cy="12" r="3" />
       </svg>
     );
+
+  // Get password strength percentage
+  const getStrengthPercentage = () => {
+    const checks = Object.values(passwordStrength);
+    const passed = checks.filter(check => check === true).length;
+    return (passed / 5) * 100;
+  };
+
+  // Get password strength color
+  const getStrengthColor = () => {
+    const percentage = getStrengthPercentage();
+    if (percentage <= 20) return "#dc2626";
+    if (percentage <= 40) return "#f97316";
+    if (percentage <= 60) return "#eab308";
+    if (percentage <= 80) return "#84cc16";
+    return "#22c55e";
+  };
+
+  // Get password strength text
+  const getStrengthText = () => {
+    const percentage = getStrengthPercentage();
+    if (percentage <= 20) return "Very Weak";
+    if (percentage <= 40) return "Weak";
+    if (percentage <= 60) return "Fair";
+    if (percentage <= 80) return "Good";
+    return "Strong";
+  };
 
   return (
     <div className="login-page signup-page">
@@ -157,7 +238,6 @@ export function SignUp() {
               </div>
             )}
             
-            {/* NEW: Full Name Field */}
             <div className="field-wrap">
               <label htmlFor="signup-name">Full Name</label>
               <input
@@ -202,7 +282,7 @@ export function SignUp() {
                   name="new-password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  placeholder="Enter your password (min 6 characters)"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -219,6 +299,42 @@ export function SignUp() {
                   {passwordToggleIcon(showPassword)}
                 </button>
               </div>
+              
+              {/* Password Requirements */}
+              {password && (
+                <div className="password-requirements">
+                  <div className="strength-bar-container">
+                    <div 
+                      className="strength-bar" 
+                      style={{ 
+                        width: `${getStrengthPercentage()}%`, 
+                        backgroundColor: getStrengthColor(),
+                        transition: "width 0.3s ease"
+                      }}
+                    />
+                  </div>
+                  <p className="strength-text" style={{ color: getStrengthColor() }}>
+                    {getStrengthText()} Password
+                  </p>
+                  <ul className="requirements-list">
+                    <li style={{ color: passwordStrength.hasMinLength ? "#22c55e" : "#dc2626" }}>
+                      {passwordStrength.hasMinLength ? "✓" : "○"} At least 8 characters
+                    </li>
+                    <li style={{ color: passwordStrength.hasUpperCase ? "#22c55e" : "#dc2626" }}>
+                      {passwordStrength.hasUpperCase ? "✓" : "○"} At least 1 uppercase letter
+                    </li>
+                    <li style={{ color: passwordStrength.hasLowerCase ? "#22c55e" : "#dc2626" }}>
+                      {passwordStrength.hasLowerCase ? "✓" : "○"} At least 1 lowercase letter
+                    </li>
+                    <li style={{ color: passwordStrength.hasNumber ? "#22c55e" : "#dc2626" }}>
+                      {passwordStrength.hasNumber ? "✓" : "○"} At least 1 number
+                    </li>
+                    <li style={{ color: passwordStrength.hasSpecialChar ? "#22c55e" : "#dc2626" }}>
+                      {passwordStrength.hasSpecialChar ? "✓" : "○"} At least 1 special character (!@#$%^&*)
+                    </li>
+                  </ul>
+                </div>
+              )}
               {errors.password ? <p className="field-error">{errors.password}</p> : null}
             </div>
 
@@ -254,10 +370,17 @@ export function SignUp() {
               <span>Or with</span>
             </div>
 
-            <button type="button" className="google-btn">
-              <img src={googleIcon} alt="Google" className="google-icon" />
-              <span>Sign Up with Google</span>
-            </button>
+            <div className="google-btn-wrapper">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap={false}
+                text="signup_with"
+                shape="rectangular"
+                width="100%"
+                locale="en"
+              />
+            </div>
 
             <button type="submit" className="login-submit-btn" disabled={loading}>
               {loading ? "Creating Account..." : "Sign Up"}

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
 import logoWithText from "../../assets/logoWithText.png";
-import googleIcon from "../../assets/icons/google.svg";
 import { login } from "../../services/auth";
+import { googleLogin } from "../../services/googleAuth";
 import "./LoginPage.css";
 
 export default function LoginPage() {
@@ -21,6 +22,7 @@ export default function LoginPage() {
   const [isFading, setIsFading] = useState(false);
   const [backendError, setBackendError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [failedEmail, setFailedEmail] = useState(""); // Track email that failed
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,9 +38,9 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+
     setBackendError("");
-    
+
     const nextErrors = { email: "", password: "" };
     let hasError = false;
 
@@ -59,30 +61,76 @@ export default function LoginPage() {
 
     if (!hasError) {
       setLoading(true);
-      
+
       try {
         const result = await login(email, password);
         console.log("Login successful:", result);
-        
+
         if (rememberMe) {
           localStorage.setItem("rememberMe", "true");
         }
-        
+
         navigate("/welcome");
       } catch (err) {
         console.error("Login error:", err);
-        
-        // Check if error is due to unverified email
+
         if (err.requiresVerification) {
           navigate("/verify-email", { state: { email: email } });
         } else {
           setBackendError(err.message || "Login failed. Please check your credentials.");
+
+          // Check if the error is about email (user not found) or password
+          const errorMessage = err.message?.toLowerCase() || "";
+
+          if (errorMessage.includes("user not found") ||
+            errorMessage.includes("invalid credentials") ||
+            errorMessage.includes("email")) {
+            // Email is wrong - clear both email and password
+            setEmail("");
+            setPassword("");
+            setFailedEmail(email); // Store failed email for reference
+          } else {
+            // Password is wrong - clear only password
+            setPassword("");
+          }
         }
-        setPassword("");
       } finally {
         setLoading(false);
       }
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+  console.log("Google credential received:", credentialResponse);
+  
+  try {
+    const result = await googleLogin(credentialResponse.credential);
+    
+    console.log("RESULT FROM googleLogin:", result);
+    console.log("REQUIRES VERIFICATION FLAG:", result.requiresVerification);
+    
+    if (result.requiresVerification === true) {
+      console.log("✅ SHOULD REDIRECT TO VERIFY PAGE. Email:", result.email);
+      alert("Please verify your email. Redirecting to verification page...");
+      navigate("/verify-email", { 
+        state: { email: result.email, fromGoogle: true },
+        replace: true 
+      });
+    } else if (result.success) {
+      console.log("Login successful, navigating to welcome");
+      navigate("/welcome");
+    } else {
+      console.log("Unexpected result:", result);
+    }
+  } catch (error) {
+    console.error("Google login error:", error);
+    setBackendError(error.message || "Google login failed. Please try again.");
+  }
+};
+
+  const handleGoogleError = () => {
+    console.log("Google login failed");
+    setBackendError("Google login failed. Please try again.");
   };
 
   return (
@@ -103,17 +151,17 @@ export default function LoginPage() {
           <h2>Login</h2>
           <form onSubmit={handleLogin} noValidate>
             {backendError && (
-              <div className="field-error" style={{ 
-                marginBottom: "16px", 
-                padding: "10px", 
-                background: "#fee2e2", 
+              <div className="field-error" style={{
+                marginBottom: "16px",
+                padding: "10px",
+                background: "#fee2e2",
                 borderRadius: "6px",
                 textAlign: "center"
               }}>
                 {backendError}
               </div>
             )}
-            
+
             <div className="field-wrap">
               <label htmlFor="login-email">Email</label>
               <input
@@ -125,6 +173,7 @@ export default function LoginPage() {
                   setEmail(e.target.value);
                   setErrors((prev) => ({ ...prev, email: "" }));
                   setBackendError("");
+                  setFailedEmail(""); // Clear failed email tracking
                 }}
               />
               {errors.email ? <p className="field-error">{errors.email}</p> : null}
@@ -181,10 +230,17 @@ export default function LoginPage() {
               <span>Or with</span>
             </div>
 
-            <button type="button" className="google-btn">
-              <img src={googleIcon} alt="Google" className="google-icon" />
-              <span>Sign Up with Google</span>
-            </button>
+            <div className="google-btn-wrapper">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap={false}
+                text="signin_with"
+                shape="rectangular"
+                width="100%"
+                locale="en"
+              />
+            </div>
 
             <button type="submit" className="login-submit-btn" disabled={loading}>
               {loading ? "Logging in..." : "Login"}

@@ -133,7 +133,15 @@ export default function Profile() {
     } catch (error) {
       console.error('Delete account error:', error);
       console.error('Error response:', error.response);
-      const errorMessage = error.response?.data?.message || error.message || "Failed to delete account";
+      
+      // Show detailed error info in UI for debugging
+      let errorMessage = "Failed to delete account";
+      if (error.response) {
+        errorMessage = `Error ${error.response.status}: ${error.response.data?.message || error.response.statusText || 'Unknown error'}`;
+      } else if (error.message) {
+        errorMessage = `Network error: ${error.message}`;
+      }
+      
       setMessage({ type: "error", text: errorMessage });
     } finally {
       setLoading(false);

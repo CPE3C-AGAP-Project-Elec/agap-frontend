@@ -26,16 +26,33 @@ export default function Profile() {
 
   // Check authentication and load user data
   useEffect(() => {
+    // DEBUG: Check authentication status
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    
+    console.log('===== PROFILE PAGE DEBUG =====');
+    console.log('Current path:', window.location.pathname);
+    console.log('Token exists?', !!token);
+    console.log('Token value:', token ? token.substring(0, 50) + '...' : 'null');
+    console.log('User exists?', !!user);
+    console.log('User data:', user);
+    console.log('isAuthenticated() returns:', isAuthenticated());
+    console.log('===============================');
+    
     if (!isAuthenticated()) {
+      console.log('Not authenticated, redirecting to login');
       navigate("/login");
       return;
     }
+    console.log('Authenticated! Loading user data...');
     loadUserData();
   }, [navigate]);
 
   const loadUserData = async () => {
     try {
       const localUser = getUser();
+      console.log('Local user from localStorage:', localUser);
+      
       if (localUser) {
         setUserData(localUser);
         setEditName(localUser.name || "");
@@ -43,6 +60,8 @@ export default function Profile() {
       }
       
       const response = await getCurrentUser();
+      console.log('getCurrentUser response:', response);
+      
       if (response.success) {
         setUserData(response.data);
         setEditName(response.data.name || "");
@@ -74,6 +93,7 @@ export default function Profile() {
 
   const handleLogout = (e) => {
     e.preventDefault();
+    console.log('Logout clicked - clearing storage');
     logout();
   };
 

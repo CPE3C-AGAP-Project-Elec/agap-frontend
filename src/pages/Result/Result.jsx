@@ -548,6 +548,7 @@ export default function Result() {
         {/* MIDDLE COLUMN - Map */}
         <main className="result-main">
           <MapView 
+            key={`map-${coordinates?.latitude}-${coordinates?.longitude}`} // Stable key
             latitude={coordinates?.latitude} 
             longitude={coordinates?.longitude} 
             locationName={searchQuery} 

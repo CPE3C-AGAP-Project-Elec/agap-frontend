@@ -1,4 +1,4 @@
-import { Plus, Minus, Compass, Map, User, EyeOff, Eye, Menu, X, Edit2, Save, XCircle } from "lucide-react";
+import { User, EyeOff, Eye, Menu, X, Edit2, Save, XCircle } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getUser, isAuthenticated, logout, getCurrentUser, updateUserDetails } from "../../services/auth";
@@ -290,20 +290,6 @@ export default function Profile() {
       <main className="profile-main">
         <div className="profile-main__inner">
           <section className="profile-map" aria-label="Map">
-            <div className="profile-map__controls">
-              <button type="button" className="profile-map__btn" aria-label="Zoom in">
-                <Plus className="profile-map__icon-lg" strokeWidth={3} aria-hidden="true" />
-              </button>
-              <button type="button" className="profile-map__btn" aria-label="Zoom out">
-                <Minus className="profile-map__icon-lg" strokeWidth={3} aria-hidden="true" />
-              </button>
-              <button type="button" className="profile-map__btn profile-map__btn--outlined" aria-label="Compass">
-                <Compass className="profile-map__icon-sm" aria-hidden="true" />
-              </button>
-              <button type="button" className="profile-map__btn" aria-label="Map layers">
-                <Map className="profile-map__icon-sm" aria-hidden="true" />
-              </button>
-            </div>
           </section>
 
           <aside className="profile-panel" aria-label="Account settings">
@@ -433,7 +419,7 @@ export default function Profile() {
                         id="profile-password"
                         type={showPassword ? "text" : "password"}
                         className="profile-field__input profile-field__input--password"
-                        value="········"
+                        value={userData?.password || "········"}
                         readOnly
                       />
                       <button 

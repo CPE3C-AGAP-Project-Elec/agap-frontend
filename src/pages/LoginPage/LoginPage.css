@@ -108,42 +108,64 @@
   font-size: 14px;
 }
 
+/* Password toggle button styles - Add to your existing CSS */
 .password-input-wrap {
   position: relative;
-  overflow: hidden;
+  width: 100%;
 }
 
 .password-input-wrap input {
-  padding-right: 72px;
+  width: 100%;
+  padding-right: 45px;
 }
 
 .password-toggle {
   position: absolute;
   top: 50%;
-  right: 10px;
+  right: 8px;
   transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
-  border: 0;
-  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  border: none;
   background: transparent;
-  color: #2d6cae;
-  font-size: 12px;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 6px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.password-toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #374151;
+}
+
+.password-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(45, 108, 174, 0.3);
 }
 
 .password-toggle svg {
   width: 18px;
   height: 18px;
+  display: block;
 }
 
-.password-toggle:hover {
-  background: rgba(45, 108, 174, 0.12);
-  color: #1f5388;
+/* Remove default browser password reveal button for better consistency */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
 }
 
 .field-error {

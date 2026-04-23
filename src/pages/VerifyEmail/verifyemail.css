@@ -1,136 +1,138 @@
+/* Verify Email — layout, matching forgot password format */
+
 .verify-page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a5f7a 0%, #0d3b4f 100%);
+  min-height: 100dvh;
+  margin: 0;
+  padding: max(24px, env(safe-area-inset-top, 0px))
+    max(20px, env(safe-area-inset-right, 0px))
+    max(24px, env(safe-area-inset-bottom, 0px))
+    max(20px, env(safe-area-inset-left, 0px));
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  background: #eef0f5;
 }
 
-.verify-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url('../../assets/philippines-map-bg.svg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.1;
-  z-index: 0;
-}
-
-.verify-container {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 480px;
+.verify-page *,
+.verify-page *::before,
+.verify-page *::after {
+  box-sizing: border-box;
 }
 
 .verify-card {
-  background: white;
-  border-radius: 24px;
-  padding: 40px 32px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  text-align: center;
-}
-
-.verify-logo {
-  margin-bottom: 24px;
-}
-
-.verify-logo img {
-  height: 60px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: min(40rem, 100%);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+  padding: clamp(28px, 5vw, 48px) clamp(22px, 4vw, 44px);
 }
 
 .verify-title {
-  font-size: 28px;
+  margin: 0 0 10px;
+  color: #121212;
+  font-size: clamp(1.5rem, 4vw, 1.875rem);
   font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 12px;
+  line-height: 1.2;
 }
 
-.verify-subtitle {
-  color: #64748b;
-  font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 24px;
+.verify-email-text {
+  margin: 0 0 clamp(24px, 4vw, 36px);
+  color: #4b5563;
+  font-size: clamp(0.9375rem, 2.2vw, 1.0625rem);
+  line-height: 1.55;
+  max-width: 36rem;
 }
 
-.verify-subtitle strong {
-  color: #1e293b;
+.verify-email-text strong {
+  color: #111827;
   font-weight: 600;
 }
 
-.verify-error {
-  background: #fee2e2;
-  color: #dc2626;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-.verify-success {
-  background: #d1fae5;
-  color: #059669;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-.verify-form {
-  margin-bottom: 24px;
-}
-
 .verify-input-group {
-  text-align: left;
-  margin-bottom: 20px;
+  margin-bottom: clamp(20px, 3vw, 28px);
 }
 
 .verify-input-group label {
   display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: #334155;
   margin-bottom: 8px;
+  color: #374151;
+  font-size: clamp(0.9375rem, 2vw, 1rem);
+  font-weight: 600;
 }
 
 .verify-input-group input {
   width: 100%;
-  padding: 12px 16px;
-  font-size: 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  transition: all 0.2s;
+  height: 52px;
+  padding: 0 16px;
+  border: 2px solid #cfd3da;
+  border-radius: 10px;
+  background: #f0f1f4;
+  font-size: clamp(16px, 2.4vw, 17px);
+  color: #1f1f1f;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   text-align: center;
   letter-spacing: 4px;
   font-weight: 600;
 }
 
+.verify-input-group input::placeholder {
+  color: #8e96a3;
+}
+
 .verify-input-group input:focus {
-  outline: none;
-  border-color: #1a5f7a;
-  box-shadow: 0 0 0 3px rgba(26, 95, 122, 0.1);
+  border-color: #2d6cae;
+  box-shadow: 0 0 0 4px rgba(45, 108, 174, 0.12);
+  background: #f7f9fc;
+}
+
+.verify-error {
+  margin: 8px 0 0;
+  color: #cc2e2e;
+  font-size: 0.875rem;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fee2e2;
+  margin-bottom: 20px;
+}
+
+.verify-success {
+  margin: 8px 0 0;
+  color: #059669;
+  font-size: 0.875rem;
+  padding: 12px;
+  border-radius: 8px;
+  background: #d1fae5;
+  margin-bottom: 20px;
 }
 
 .verify-btn {
   width: 100%;
-  background: #1a5f7a;
-  color: white;
-  border: none;
-  padding: 14px;
-  font-size: 16px;
+  min-height: 52px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #2d6cae;
+  color: #fff;
+  font-size: clamp(1rem, 2.4vw, 1.0625rem);
   font-weight: 600;
-  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .verify-btn:hover {
-  background: #0d3b4f;
+  background: #245d98;
+  box-shadow: 0 8px 18px rgba(45, 108, 174, 0.28);
+}
+
+.verify-btn:active {
+  transform: translateY(1px);
 }
 
 .verify-btn:disabled {
@@ -138,45 +140,79 @@
   cursor: not-allowed;
 }
 
-.verify-footer {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  font-size: 14px;
+.verify-resend {
+  margin-bottom: 16px;
+  text-align: center;
 }
 
-.verify-resend,
-.verify-back {
+.verify-resend button {
+  padding: 0;
+  border: 0;
   background: none;
-  border: none;
-  color: #1a5f7a;
+  color: #2d6cae;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.verify-resend:hover,
-.verify-back:hover {
-  color: #0d3b4f;
   text-decoration: underline;
 }
 
-.verify-divider {
-  color: #cbd5e1;
+.verify-resend button:hover {
+  color: #1f5388;
 }
 
-.verify-resend:disabled {
+.verify-resend button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-@media (max-width: 640px) {
+.verify-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
+}
+
+.verify-links a {
+  color: #2d6cae;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.verify-links a:hover {
+  color: #1f5388;
+  text-decoration: underline;
+}
+
+.verify-links span {
+  color: #9ca3af;
+}
+
+@media (max-width: 480px) {
   .verify-card {
-    padding: 32px 24px;
+    border-radius: 14px;
+    padding: 22px 18px 20px;
   }
-  
-  .verify-title {
-    font-size: 24px;
+
+  .verify-input-group input {
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .verify-btn {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 360px) {
+  .verify-page {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .verify-card {
+    padding: 18px 14px 16px;
   }
 }

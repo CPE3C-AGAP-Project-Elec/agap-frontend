@@ -73,58 +73,53 @@ export default function VerifyEmail() {
 
   return (
     <div className="verify-page">
-      <div className="verify-container">
-        <div className="verify-card">
-          <img src={logoWithText} alt="AGAP logo" className="verify-logo" />
-          <h1>Verify Your Email</h1>
-          <p className="verify-email-text">
-            We sent a verification code to <strong>{email}</strong>
-          </p>
-          
-          <form onSubmit={handleVerify}>
-            <div className="verify-input-group">
-              <label htmlFor="verification-code">Verification Code</label>
-              <input
-                id="verification-code"
-                type="text"
-                maxLength="6"
-                placeholder="Enter 6-digit code"
-                value={verificationCode}
-                onChange={(e) => {
-                  setVerificationCode(e.target.value.replace(/\D/g, ''));
-                  setError("");
-                }}
-                autoFocus
-              />
-            </div>
+      <div className="verify-card">
+        <h2 className="verify-title">Verify Your Email</h2>
+        <p className="verify-email-text">
+          We sent a verification code to <strong>{email}</strong>
+        </p>
 
+        <form onSubmit={handleVerify} noValidate>
+          <div className="verify-input-group">
+            <label htmlFor="verification-code">Verification Code</label>
+            <input
+              id="verification-code"
+              type="text"
+              maxLength="6"
+              placeholder="Enter 6-digit code"
+              value={verificationCode}
+              onChange={(e) => {
+                setVerificationCode(e.target.value.replace(/\D/g, ''));
+                setError("");
+              }}
+              autoFocus
+            />
             {error && <div className="verify-error">{error}</div>}
             {success && <div className="verify-success">{success}</div>}
+          </div>
 
-            <button type="submit" className="verify-btn" disabled={loading}>
-              {loading ? "Verifying..." : "Verify Email"}
+          <button type="submit" className="verify-btn" disabled={loading}>
+            {loading ? "Verifying..." : "Verify Email"}
+          </button>
+
+          <div className="verify-resend">
+            <button
+              type="button"
+              onClick={handleResendCode}
+              disabled={resendCooldown > 0}
+            >
+              {resendCooldown > 0
+                ? `Resend code in ${resendCooldown}s`
+                : "Resend verification code"}
             </button>
+          </div>
 
-            <div className="verify-resend">
-              <button
-                type="button"
-                onClick={handleResendCode}
-                disabled={resendCooldown > 0}
-                className="resend-btn"
-              >
-                {resendCooldown > 0
-                  ? `Resend code in ${resendCooldown}s`
-                  : "Resend verification code"}
-              </button>
-            </div>
-
-            <div className="verify-links">
-              <Link to="/signup">Use different email</Link>
-              <span>•</span>
-              <Link to="/login">Back to Login</Link>
-            </div>
-          </form>
-        </div>
+          <div className="verify-links">
+            <Link to="/signup">Use different email</Link>
+            <span>•</span>
+            <Link to="/login">Back to Login</Link>
+          </div>
+        </form>
       </div>
     </div>
   );

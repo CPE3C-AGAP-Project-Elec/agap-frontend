@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { verifyEmail, resendVerificationCode } from "../../services/auth";
 import logoWithText from "../../assets/logowithtext.png";
+import "./verifyemail.css";
 
 
 export default function VerifyEmail() {

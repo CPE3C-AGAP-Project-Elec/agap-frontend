@@ -78,19 +78,7 @@ function Header({ onLogout }) {
             <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link text-white">Contact</Link>
           </div>
           
-          {/* Logout Button - Only show if logged in */}
-          {isLoggedIn && (
-            <button 
-              onClick={handleLogoutClick} 
-              className="flex items-center gap-1 text-white hover:text-gray-200 transition-colors"
-              aria-label="Logout"
-              style={{ background: "none", border: "none", cursor: "pointer" }}
-            >
-              <LogOut size={18} />
-              <span className="hidden sm:inline text-sm">Logout</span>
-            </button>
-          )}
-          
+                    
           <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
             <User size={20} aria-hidden />
           </Link>
@@ -106,14 +94,6 @@ function Header({ onLogout }) {
             <Link to="/" className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>Home</Link>
             <Link to="/about-us" className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>About Us</Link>
             <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>Contact</Link>
-            {isLoggedIn && (
-              <button 
-                onClick={() => { handleLogoutClick(); closeMenu(); }} 
-                className="app-nav-link block w-full text-left py-2 text-white"
-              >
-                Logout
-              </button>
-            )}
           </div>
         </div>
       )}

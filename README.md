@@ -1,4 +1,4 @@
-## Logo and Short Description
+# AGAP: AUTOMATED GEOSPATIAL ALERT PLATFORM
 
 <img width="1280" height="1280" alt="agap - logo (6)" src="https://github.com/user-attachments/assets/40ce1dcc-b8ff-4c33-bd95-0f36bee9d6e5" />
 

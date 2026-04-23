@@ -48,6 +48,12 @@ function Header({ onLogout }) {
   const profileRoute = isLoggedIn ? '/profile' : '/login';
   const closeMenu = () => setIsMenuOpen(false);
 
+  const handleLogoutClick = () => {
+    if (onLogout) {
+      onLogout();
+    }
+  };
+
   return (
     <header className="result-header about-nav text-white shadow-md sticky top-0 z-50">
       <div className="about-nav__inner app-nav-inner">
@@ -75,7 +81,7 @@ function Header({ onLogout }) {
           {/* Logout Button - Only show if logged in */}
           {isLoggedIn && (
             <button 
-              onClick={onLogout} 
+              onClick={handleLogoutClick} 
               className="flex items-center gap-1 text-white hover:text-gray-200 transition-colors"
               aria-label="Logout"
               style={{ background: "none", border: "none", cursor: "pointer" }}
@@ -102,7 +108,7 @@ function Header({ onLogout }) {
             <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>Contact</Link>
             {isLoggedIn && (
               <button 
-                onClick={() => { onLogout(); closeMenu(); }} 
+                onClick={() => { handleLogoutClick(); closeMenu(); }} 
                 className="app-nav-link block w-full text-left py-2 text-white"
               >
                 Logout
@@ -285,16 +291,19 @@ export default function Result() {
   };
 
   const handleLogoutClick = () => {
+    console.log("Logout button clicked - showing modal");
     setShowLogoutModal(true);
   };
 
   const confirmLogout = () => {
+    console.log("Logout confirmed");
     logout();
     setShowLogoutModal(false);
     navigate('/login');
   };
 
   const cancelLogout = () => {
+    console.log("Logout cancelled");
     setShowLogoutModal(false);
   };
 
@@ -418,6 +427,20 @@ export default function Result() {
 
   const handleSearch = async () => { await performSearch(searchQuery); };
 
+  // Shared modal component
+  const LogoutModal = () => (
+    <div className="logout-modal-overlay">
+      <div className="logout-modal">
+        <h3>Confirm Logout</h3>
+        <p>Are you sure you want to log out?</p>
+        <div className="logout-modal-buttons">
+          <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
+          <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
+        </div>
+      </div>
+    </div>
+  );
+
   // Show error page if location not found
   if (locationError === 'not_found') {
     return (
@@ -444,20 +467,7 @@ export default function Result() {
             </div>
           </div>
         </div>
-        
-        {/* Logout Confirmation Modal */}
-        {showLogoutModal && (
-          <div className="logout-modal-overlay">
-            <div className="logout-modal">
-              <h3>Confirm Logout</h3>
-              <p>Are you sure you want to log out?</p>
-              <div className="logout-modal-buttons">
-                <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
-                <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
-              </div>
-            </div>
-          </div>
-        )}
+        {showLogoutModal && <LogoutModal />}
       </div>
     );
   }
@@ -477,20 +487,7 @@ export default function Result() {
             </div>
           </div>
         </div>
-        
-        {/* Logout Confirmation Modal */}
-        {showLogoutModal && (
-          <div className="logout-modal-overlay">
-            <div className="logout-modal">
-              <h3>Confirm Logout</h3>
-              <p>Are you sure you want to log out?</p>
-              <div className="logout-modal-buttons">
-                <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
-                <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
-              </div>
-            </div>
-          </div>
-        )}
+        {showLogoutModal && <LogoutModal />}
       </div>
     );
   }
@@ -564,19 +561,7 @@ export default function Result() {
         </aside>
       </div>
       
-      {/* Logout Confirmation Modal */}
-      {showLogoutModal && (
-        <div className="logout-modal-overlay">
-          <div className="logout-modal">
-            <h3>Confirm Logout</h3>
-            <p>Are you sure you want to log out?</p>
-            <div className="logout-modal-buttons">
-              <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
-              <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {showLogoutModal && <LogoutModal />}
     </div>
   );
 }

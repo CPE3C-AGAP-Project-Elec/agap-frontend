@@ -1,3 +1,4 @@
+// agap-frontend/src/services/auth.js
 import api from './api';
 
 export const login = async (email, password) => {
@@ -16,24 +17,60 @@ export const login = async (email, password) => {
 export const register = async (userData) => {
   try {
     const response = await api.post('/auth/register', userData);
+    
     if (response.data.success) {
-      localStorage.setItem('token', response.data.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.data));
+      // Don't auto-login, just save email for verification
+      if (response.data.data?.email) {
+        localStorage.setItem('pendingVerificationEmail', response.data.data.email);
+      }
+      // Clear any existing tokens (user not verified yet)
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
+    
     return response.data;
   } catch (error) {
+    console.error('Registration error details:', error.response?.data);
     throw error.response?.data || { message: 'Registration failed' };
+  }
+};
+
+export const verifyEmail = async (email, code) => {
+  try {
+    const response = await api.post('/auth/verify-email', { email, code });
+    
+    if (response.data.success) {
+      // Clear pending email
+      localStorage.removeItem('pendingVerificationEmail');
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error('Verification error:', error.response?.data);
+    throw error.response?.data || { message: 'Verification failed' };
+  }
+};
+
+export const resendVerificationCode = async (email) => {
+  try {
+    const response = await api.post('/auth/resend-verification', { email });
+    return response.data;
+  } catch (error) {
+    console.error('Resend error:', error.response?.data);
+    throw error.response?.data || { message: 'Failed to resend code' };
   }
 };
 
 export const logout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  localStorage.removeItem('pendingVerificationEmail');
   window.location.href = '/login';
 };
 
 export const isAuthenticated = () => {
-  return !!localStorage.getItem('token');
+  const token = localStorage.getItem('token');
+  return !!token;
 };
 
 export const getUser = () => {
@@ -49,25 +86,7 @@ export const getCurrentUser = async () => {
     throw error.response?.data || { message: 'Failed to get user' };
   }
 };
-export const verifyEmail = async (email, code) => {
-  try {
-    const response = await api.post('/auth/verify-email', { email, code });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { message: 'Verification failed' };
-  }
-};
 
-export const resendVerificationCode = async (email) => {
-  try {
-    const response = await api.post('/auth/resend-verification', { email });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { message: 'Failed to resend code' };
-  }
-};
-
-// Add this function to your auth.js
 export const updateUserDetails = async (userData) => {
   try {
     const response = await api.put('/auth/updatedetails', userData);
@@ -76,7 +95,7 @@ export const updateUserDetails = async (userData) => {
     throw error.response?.data || { message: 'Failed to update user details' };
   }
 };
-// Forgot Password
+
 export const forgotPassword = async (email) => {
   try {
     const response = await api.post('/auth/forgot-password', { email });
@@ -87,7 +106,6 @@ export const forgotPassword = async (email) => {
   }
 };
 
-// Reset Password
 export const resetPassword = async (email, code, newPassword) => {
   try {
     const response = await api.post('/auth/reset-password', { email, code, newPassword });

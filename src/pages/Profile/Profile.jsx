@@ -422,8 +422,9 @@ export default function Profile() {
                         id="profile-password"
                         type={showPassword ? "text" : "password"}
                         className="profile-field__input profile-field__input--password"
-                        value={userData?.password || "········"}
+                        value={showPassword ? "Password hidden for security" : "••••••••"}
                         readOnly
+                        style={{ color: showPassword ? "#6b7280" : "inherit" }}
                       />
                       <button 
                         type="button" 

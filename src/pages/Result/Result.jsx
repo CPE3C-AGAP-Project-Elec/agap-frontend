@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { getWeatherAndFloodData } from '../../utils/weatherUtils';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getWeatherAndFloodData } from "../../utils/weatherUtils";
+import { getCurrentLocation, getLocationName } from "../../utils/geolocation";
+import FloodRiskWidget from "../../components/FloodRiskWidget/FloodRiskWidget";
 import {
   User,
   Search,
@@ -11,21 +13,20 @@ import {
   Sun,
   Cloud,
   CloudRain,
-} from 'lucide-react';
-import GoogleMapView from '../../components/Googlemapview/GoogleMapView.jsx';
-import logoImage from '../../assets/logo.png';
-import './Result.css';
+  Navigation,
+  MapPin,
+  AlertCircle,
+} from "lucide-react";
+import GoogleMapView from "../../components/Googlemapview/GoogleMapView.jsx";
+import logoImage from "../../assets/logo.png";
+import "./Result.css";
 
 const ERROR_IMG_SRC =
   'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhlaWdodD0iODgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyBzdHJva2U9IiMwMDAiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIG9wYWNpdHk9Ii4zIiBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjMuNyI+PHJlY3QgeD0iMTYiIHk9IjE2IiB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHJ4PSI2Ii8+PHBhdGggZD0ibTE2IDU4IDE2LTE4IDMyIDMyIi8+PGNpcmNsZSBjeD0iNTMiIGN5PSIzNSIgcj0iNyIvPjwvc3ZnPgoKCg==';
 
 function ImageWithFallback(props) {
   const [didError, setDidError] = useState(false);
-
-  const handleError = () => {
-    setDidError(true);
-  };
-
+  const handleError = () => setDidError(true);
   const { src, alt, style, className, ...rest } = props;
 
   return didError ? (
@@ -38,9 +39,6 @@ function ImageWithFallback(props) {
     <img src={src} alt={alt} className={className} style={style} {...rest} onError={handleError} />
   );
 }
-
-
-
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -67,15 +65,9 @@ function Header() {
 
         <div className="flex items-center gap-4 md:gap-10">
           <div className="hidden md:flex items-center gap-10">
-            <Link to="/" className="app-nav-link text-white">
-              Home
-            </Link>
-            <Link to="/about-us" className="app-nav-link text-white">
-              About Us
-            </Link>
-            <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link text-white">
-              Contact
-            </Link>
+            <Link to="/" className="app-nav-link text-white">Home</Link>
+            <Link to="/about-us" className="app-nav-link text-white">About Us</Link>
+            <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link text-white">Contact</Link>
           </div>
           <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
             <User size={20} aria-hidden />
@@ -89,28 +81,9 @@ function Header() {
       {isMenuOpen && (
         <div className="md:hidden bg-[#234d73] border-t border-white/20">
           <div className="px-4 py-3 space-y-3">
-            <Link
-              to="/"
-              className="app-nav-link block w-full text-left py-2 text-white"
-              onClick={closeMenu}
-            >
-              Home
-            </Link>
-            <Link
-              to="/about-us"
-              className="app-nav-link block w-full text-left py-2 text-white"
-              onClick={closeMenu}
-            >
-              About Us
-            </Link>
-            <Link
-              to="/"
-              state={{ scrollToLandingContact: true }}
-              className="app-nav-link block w-full text-left py-2 text-white"
-              onClick={closeMenu}
-            >
-              Contact
-            </Link>
+            <Link to="/" className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>Home</Link>
+            <Link to="/about-us" className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>About Us</Link>
+            <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>Contact</Link>
           </div>
         </div>
       )}
@@ -123,21 +96,12 @@ function SearchBar({ value, onChange, onSearch }) {
     e.preventDefault();
     onSearch();
   };
-
   return (
     <form onSubmit={handleSubmit} className="result-search">
       <div className="result-search__row">
         <Search aria-hidden />
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Search location..."
-          className="result-search__input"
-        />
-        <button type="submit" className="result-search__submit">
-          Search
-        </button>
+        <input type="text" value={value} onChange={(e) => onChange(e.target.value)} placeholder="Search location..." className="result-search__input" />
+        <button type="submit" className="result-search__submit">Search</button>
       </div>
     </form>
   );
@@ -149,21 +113,14 @@ function FloodHazardLevel({ level }) {
     { id: 'medium', label: 'MEDIUM CHANCE OF FLOOD' },
     { id: 'high', label: 'HIGH CHANCE OF FLOOD' },
   ];
-
   return (
     <div className="result-hazard">
       {levels.map((lvl) => {
         const isActive = level === lvl.id;
         return (
-          <div
-            key={lvl.id}
-            className={`result-hazard__row result-hazard__row--${lvl.id}${isActive ? ' is-active' : ''}`}
-          >
+          <div key={lvl.id} className={`result-hazard__row result-hazard__row--${lvl.id}${isActive ? ' is-active' : ''}`}>
             <div className="result-hazard__swatch" aria-label={`${lvl.id} warning symbol`}>
-              <span
-                className={`result-warning-triangle result-warning-triangle--${lvl.id}`}
-                aria-hidden
-              >
+              <span className={`result-warning-triangle result-warning-triangle--${lvl.id}`} aria-hidden>
                 <span className="result-warning-triangle__mark">!</span>
               </span>
             </div>
@@ -182,94 +139,40 @@ function FloodForecast({ data, loading, error }) {
     high: { label: 'High', value: 3, colorVar: '--result-hazard-high' },
   };
 
-  if (loading) {
-    return (
-      <div className="result-placeholder">
-        <div className="result-placeholder__row">
-          <div className="result-placeholder__block result-placeholder__block--lg" />
-          <div className="result-placeholder__block result-placeholder__block--tall" />
-        </div>
-        <p className="result-placeholder__message">Loading flood forecast...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="result-placeholder">
-        <p className="result-placeholder__message" style={{ color: '#dc143c' }}>
-          Error loading flood forecast: {error}
-        </p>
-      </div>
-    );
-  }
-
-  if (!data?.length) {
-    return (
-      <div className="result-placeholder">
-        <p className="result-placeholder__message">No flood forecast data available for this location.</p>
-        <div className="result-placeholder__row">
-          <div className="result-placeholder__block result-placeholder__block--sm" />
-          <div className="result-placeholder__block result-placeholder__block--sm" />
-          <div className="result-placeholder__block result-placeholder__block--sm" />
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="result-placeholder"><p>Loading flood forecast...</p></div>;
+  if (error) return <div className="result-placeholder"><p style={{ color: '#dc143c' }}>Error: {error}</p></div>;
+  if (!data?.length) return <div className="result-placeholder"><p>No flood forecast data available.</p></div>;
 
   return (
     <div className="result-weather-chart">
       <div className="result-weather-chart__plot">
         <div className="result-weather-chart__y-axis">
-          <span>High</span>
-          <span>Medium</span>
-          <span>Low</span>
+          <span>High</span><span>Medium</span><span>Low</span>
         </div>
-
         <div className="result-weather-chart__bars">
           {data.map((item) => {
             const levelMeta = floodLevelMeta[item.level] ?? floodLevelMeta.low;
             const barHeight = `${(levelMeta.value / 3) * 100}%`;
-
             return (
               <div key={`${item.date}-${item.level}`} className="result-weather-chart__col">
                 <div className="result-weather-chart__bar-wrap">
-                  <div
-                    className="result-weather-chart__bar"
-                    style={{ height: barHeight, backgroundColor: `var(${levelMeta.colorVar})` }}
-                    title={`${item.date} - ${levelMeta.label}`}
-                    aria-label={`${item.date} flood forecast ${levelMeta.label}`}
-                  >
-                    <span
-                      className={`result-warning-triangle result-warning-triangle--${item.level}`}
-                      aria-hidden
-                    >
+                  <div className="result-weather-chart__bar" style={{ height: barHeight, backgroundColor: `var(${levelMeta.colorVar})` }}>
+                    <span className={`result-warning-triangle result-warning-triangle--${item.level}`} aria-hidden>
                       <span className="result-warning-triangle__mark">!</span>
                     </span>
                   </div>
                 </div>
                 <span className="result-weather-chart__date">{item.date}</span>
-                {item.rainfall && (
-                  <span style={{ fontSize: '0.7rem', color: '#6b7280' }}>
-                    {item.rainfall}mm
-                  </span>
-                )}
+                {item.rainfall && <span style={{ fontSize: '0.7rem', color: '#6b7280' }}>{item.rainfall}mm</span>}
               </div>
             );
           })}
         </div>
       </div>
-
       <div className="result-weather-chart__legend">
-        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--low">
-          Low
-        </span>
-        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--medium">
-          Medium
-        </span>
-        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--high">
-          High
-        </span>
+        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--low">Low</span>
+        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--medium">Medium</span>
+        <span className="result-weather-chart__legend-item result-weather-chart__legend-item--high">High</span>
       </div>
     </div>
   );
@@ -278,77 +181,28 @@ function FloodForecast({ data, loading, error }) {
 function WeatherForecast({ data, loading, error }) {
   const getWeatherIcon = (weatherMain, iconCode, description) => {
     if (iconCode) {
-      return (
-        <img
-          src={`https://openweathermap.org/img/w/${iconCode}.png`}
-          alt={description || weatherMain}
-          className="result-weather__icon"
-          title={description || weatherMain}
-        />
-      );
+      return <img src={`https://openweathermap.org/img/w/${iconCode}.png`} alt={description || weatherMain} className="result-weather__icon" />;
     }
-
     const condition = (weatherMain + ' ' + (description || '')).toLowerCase();
-
-    if (condition.includes('clear')) {
-      return <Sun className="result-weather__icon result-weather__icon--sun" aria-hidden />;
-    }
-    if (condition.includes('few clouds') || condition.includes('scattered clouds')) {
-      return <Cloud className="result-weather__icon result-weather__icon--cloud" aria-hidden />;
-    }
-    if (condition.includes('broken clouds') || condition.includes('overcast')) {
-      return <Cloud className="result-weather__icon result-weather__icon--cloud" style={{ opacity: 0.8 }} aria-hidden />;
-    }
-    if (condition.includes('light rain') || condition.includes('moderate rain') || 
-        condition.includes('heavy rain') || condition.includes('rain') || condition.includes('drizzle')) {
-      return <CloudRain className="result-weather__icon result-weather__icon--rain" aria-hidden />;
-    }
-    if (condition.includes('thunderstorm')) {
-      return <CloudRain className="result-weather__icon result-weather__icon--rain" style={{ color: '#fbbf24' }} aria-hidden />;
-    }
-
+    if (condition.includes('clear')) return <Sun className="result-weather__icon result-weather__icon--sun" aria-hidden />;
+    if (condition.includes('cloud')) return <Cloud className="result-weather__icon result-weather__icon--cloud" aria-hidden />;
+    if (condition.includes('rain')) return <CloudRain className="result-weather__icon result-weather__icon--rain" aria-hidden />;
     return <Sun className="result-weather__icon result-weather__icon--sun" aria-hidden />;
   };
 
-  if (loading) {
-    return (
-      <div className="result-placeholder">
-        <p className="result-weather__empty">Loading weather forecast...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="result-placeholder">
-        <p className="result-weather__empty" style={{ color: '#dc143c' }}>
-          Error loading weather forecast: {error}
-        </p>
-      </div>
-    );
-  }
-
-  if (!data?.length) {
-    return (
-      <div className="result-placeholder">
-        <p className="result-weather__empty">No weather forecast available for this location.</p>
-      </div>
-    );
-  }
+  if (loading) return <div className="result-placeholder"><p>Loading weather forecast...</p></div>;
+  if (error) return <div className="result-placeholder"><p style={{ color: '#dc143c' }}>Error: {error}</p></div>;
+  if (!data?.length) return <div className="result-placeholder"><p>No weather forecast available.</p></div>;
 
   return (
     <div className="result-weather">
       {data.map((weather, index) => (
         <div key={index} className="result-weather__card">
-          <div className="result-weather__date">
-            <strong>{weather.date}</strong>
-          </div>
+          <div className="result-weather__date"><strong>{weather.date}</strong></div>
           <div className="result-weather__meta">
             <div style={{ textAlign: 'right' }}>
               <div>{weather.temp}°C</div>
-              <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>
-                {weather.description || weather.condition}
-              </div>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'capitalize' }}>{weather.description || weather.condition}</div>
             </div>
             {getWeatherIcon(weather.condition, weather.icon, weather.description)}
           </div>
@@ -358,16 +212,10 @@ function WeatherForecast({ data, loading, error }) {
   );
 }
 
-// Replace the entire MapView function with this:
 function MapView({ latitude, longitude, locationName, floodRiskLevel }) {
   return (
     <div className="result-map">
-      <GoogleMapView 
-        latitude={latitude}
-        longitude={longitude}
-        locationName={locationName}
-        floodRiskLevel={floodRiskLevel}
-      />
+      <GoogleMapView latitude={latitude} longitude={longitude} locationName={locationName} floodRiskLevel={floodRiskLevel} />
     </div>
   );
 }
@@ -376,36 +224,35 @@ const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || false;
 
 export default function Result() {
   const location = useLocation();
+  const navigate = useNavigate();
   const welcomeSearchHandledKey = useRef(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showFloodHazardOpen, setShowFloodHazardOpen] = useState(true);
   const [showFloodForecast, setShowFloodForecast] = useState(false);
   const [showWeatherForecast, setShowWeatherForecast] = useState(false);
-
   const [floodLevel, setFloodLevel] = useState(null);
   const [weatherData, setWeatherData] = useState([]);
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [weatherError, setWeatherError] = useState(null);
-
   const [floodForecastData, setFloodForecastData] = useState([]);
   const [floodForecastLoading, setFloodForecastLoading] = useState(false);
   const [floodForecastError, setFloodForecastError] = useState(null);
-
   const [coordinates, setCoordinates] = useState(null);
+  const [locationError, setLocationError] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   const toggleFloodHazard = () => {
     setShowFloodForecast(false);
     setShowWeatherForecast(false);
     setShowFloodHazardOpen((prev) => !prev);
   };
-
   const toggleFloodForecast = () => {
     setShowFloodHazardOpen(false);
     setShowWeatherForecast(false);
     setShowFloodForecast((prev) => !prev);
   };
-
   const toggleWeatherForecast = () => {
     setShowFloodHazardOpen(false);
     setShowFloodForecast(false);
@@ -417,27 +264,15 @@ export default function Result() {
     setWeatherError(null);
     setFloodForecastLoading(true);
     setFloodForecastError(null);
-
     try {
       const data = await getWeatherAndFloodData(lat, lon, USE_MOCK_DATA);
-      
       setWeatherData(data.weather);
-      setFloodForecastData(data.floodHistory); // The API returns forecast data
+      setFloodForecastData(data.floodHistory);
       setFloodLevel(data.floodRisk);
-      
-      if (data.isMock) {
-        console.log('Using mock weather data (development mode)');
-      } else {
-        console.log('Using live weather data from OpenWeatherMap');
-      }
-      
     } catch (error) {
       console.error('Error fetching weather data:', error);
       setWeatherError(error.message);
       setFloodForecastError(error.message);
-      
-      // Fallback to mock data if real API fails
-      console.log('Falling back to mock data...');
       try {
         const mockData = await getWeatherAndFloodData(lat, lon, true);
         setWeatherData(mockData.weather);
@@ -455,38 +290,84 @@ export default function Result() {
   const performSearch = useCallback(async (rawQuery) => {
     const q = String(rawQuery ?? '').trim();
     if (!q) return;
-
     setSearchQuery(q);
     setShowFloodHazardOpen(true);
     setShowFloodForecast(false);
     setShowWeatherForecast(false);
-
+    setLocationError(null);
+    setIsSearching(true);
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=ph&format=json&limit=1`
-      );
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=ph&format=json&limit=1`);
       const data = await response.json();
-
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
-        const coords = {
-          latitude: parseFloat(lat),
-          longitude: parseFloat(lon),
-        };
+        const coords = { latitude: parseFloat(lat), longitude: parseFloat(lon) };
         setCoordinates(coords);
         await fetchWeatherAndFloodData(coords.latitude, coords.longitude);
       } else {
         setCoordinates(null);
         setFloodLevel(null);
-        alert('Location not found in the Philippines. Please try a different search term.');
+        setLocationError('not_found');
       }
     } catch (error) {
       console.error('Geocoding error:', error);
       setCoordinates(null);
       setFloodLevel(null);
-      alert('Error searching for location. Please try again.');
+      setLocationError('api_error');
+    } finally {
+      setIsSearching(false);
     }
   }, [fetchWeatherAndFloodData]);
+
+  const performSearchWithCoords = useCallback(async (lat, lon, locationName) => {
+    setSearchQuery(locationName);
+    setShowFloodHazardOpen(true);
+    setShowFloodForecast(false);
+    setShowWeatherForecast(false);
+    setLocationError(null);
+    setIsSearching(true);
+
+    try {
+      const coords = {
+        latitude: lat,
+        longitude: lon,
+      };
+      setCoordinates(coords);
+      await fetchWeatherAndFloodData(coords.latitude, coords.longitude);
+    } catch (error) {
+      console.error('Error fetching data for location:', error);
+      setLocationError('Failed to load data for your location');
+    } finally {
+      setIsSearching(false);
+    }
+  }, [fetchWeatherAndFloodData]);
+
+  const handleUseMyLocation = async () => {
+    setIsLoadingLocation(true);
+    setLocationError(null);
+    
+    try {
+      const coords = await getCurrentLocation();
+      console.log('Got coordinates:', coords);
+      
+      const locationInfo = await getLocationName(coords.lat, coords.lon);
+      console.log('Location name:', locationInfo);
+      
+      const locationQuery = locationInfo.city || locationInfo.name || 'Current Location';
+      await performSearchWithCoords(coords.lat, coords.lon, locationQuery);
+      
+    } catch (err) {
+      console.error('Location error:', err);
+      setLocationError(err.message);
+      setTimeout(() => setLocationError(null), 5000);
+    } finally {
+      setIsLoadingLocation(false);
+    }
+  };
+
+  const handleRetry = () => { if (searchQuery) performSearch(searchQuery); };
+  const handleNewSearch = () => navigate('/welcome');
+  const handleGoHome = () => navigate('/');
 
   useEffect(() => {
     const q = location.state?.welcomeSearchQuery;
@@ -496,80 +377,125 @@ export default function Result() {
     void performSearch(String(q).trim());
   }, [location.key, location.state, performSearch]);
 
-  const handleSearch = async () => {
-    await performSearch(searchQuery);
-  };
+  const handleSearch = async () => { await performSearch(searchQuery); };
+
+  // Show error page if location not found
+  if (locationError === 'not_found') {
+    return (
+      <div className="result-page">
+        <Header />
+        <div className="result-error-container">
+          <div className="result-error-card">
+            <div className="error-icon"><AlertCircle size={64} style={{ color: '#f59e0b' }} /></div>
+            <h2>Location Not Found</h2>
+            <p>"{searchQuery}" is not a valid location in the Philippines. Please try a different search term.</p>
+            <div className="error-suggestions">
+              <h3>Try these suggestions:</h3>
+              <ul>
+                <li>Check the spelling of the location</li>
+                <li>Try a nearby city or municipality</li>
+                <li>Use a more specific location name</li>
+                <li>Examples: "Manila", "Quezon City", "Cebu", "Davao"</li>
+              </ul>
+            </div>
+            <div className="error-buttons">
+              <button onClick={handleNewSearch} className="error-btn error-btn-primary"><Search size={18} /> New Search</button>
+              <button onClick={handleUseMyLocation} className="error-btn error-btn-secondary"><Navigation size={18} /> Use My Location</button>
+              <button onClick={handleGoHome} className="error-btn error-btn-outline"><MapPin size={18} /> Go Home</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (locationError === 'api_error' && !coordinates) {
+    return (
+      <div className="result-page">
+        <Header />
+        <div className="result-error-container">
+          <div className="result-error-card">
+            <div className="error-icon"><AlertCircle size={64} style={{ color: '#ef4444' }} /></div>
+            <h2>Unable to Load Data</h2>
+            <p>Unable to search for location. Please check your connection and try again.</p>
+            <div className="error-buttons">
+              <button onClick={handleRetry} className="error-btn error-btn-primary"><Search size={18} /> Try Again</button>
+              <button onClick={handleGoHome} className="error-btn error-btn-outline"><MapPin size={18} /> Go Home</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="result-page">
       <Header />
-
       <div className="result-page__body">
-        <aside className="result-sidebar">
+        {/* LEFT COLUMN - Weather, Flood Forecast, Hazard Level */}
+        <aside className="result-sidebar-left">
           <div className="result-sidebar__inner">
             <SearchBar value={searchQuery} onChange={setSearchQuery} onSearch={handleSearch} />
+            
+            <div className="result-location-btn">
+              <button 
+                onClick={handleUseMyLocation} 
+                disabled={isLoadingLocation}
+                className={`location-btn ${isLoadingLocation ? 'loading' : ''}`}
+              >
+                <Navigation size={16} />
+                {isLoadingLocation ? 'Getting location...' : '📍 Use My Current Location'}
+              </button>
+            </div>
+            
+            {locationError && (
+              <div className="location-error">
+                <AlertCircle size={14} />
+                <span>{locationError}</span>
+              </div>
+            )}
+            
+            <section className="result-section">
+              <button type="button" className="result-section__toggle" onClick={toggleWeatherForecast}>
+                <span>WEATHER FORECAST</span>
+                {showWeatherForecast ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
+              </button>
+              {showWeatherForecast && <WeatherForecast data={weatherData} loading={weatherLoading} error={weatherError} />}
+            </section>
 
             <section className="result-section">
-              <button
-                type="button"
-                className="result-section__toggle"
-                onClick={toggleFloodHazard}
-              >
+              <button type="button" className="result-section__toggle" onClick={toggleFloodForecast}>
+                <span>FLOOD FORECAST</span>
+                {showFloodForecast ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
+              </button>
+              {showFloodForecast && <FloodForecast data={floodForecastData} loading={floodForecastLoading} error={floodForecastError} />}
+            </section>
+
+            <section className="result-section">
+              <button type="button" className="result-section__toggle" onClick={toggleFloodHazard}>
                 <span>FLOOD HAZARD LEVEL</span>
                 {showFloodHazardOpen ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
               {showFloodHazardOpen ? <FloodHazardLevel level={floodLevel} /> : null}
             </section>
-
-            <section className="result-section">
-              <button
-                type="button"
-                className="result-section__toggle"
-                onClick={toggleFloodForecast}
-              >
-                <span>FLOOD FORECAST</span>
-                {showFloodForecast ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
-              </button>
-              {showFloodForecast && (
-                <FloodForecast
-                  data={floodForecastData}
-                  loading={floodForecastLoading}
-                  error={floodForecastError}
-                />
-              )}
-            </section>
-
-            <section className="result-section">
-              <button
-                type="button"
-                className="result-section__toggle"
-                onClick={toggleWeatherForecast}
-              >
-                <span>WEATHER FORECAST</span>
-                {showWeatherForecast ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
-              </button>
-              {showWeatherForecast && (
-                <WeatherForecast
-                  data={weatherData}
-                  loading={weatherLoading}
-                  error={weatherError}
-                />
-              )}
-            </section>
           </div>
         </aside>
-
+        
+        {/* MIDDLE COLUMN - Map */}
         <main className="result-main">
-          <MapView
-            latitude={coordinates?.latitude}
-            longitude={coordinates?.longitude}
-            locationName={searchQuery}
-            floodRiskLevel={floodLevel}
+          <MapView 
+            latitude={coordinates?.latitude} 
+            longitude={coordinates?.longitude} 
+            locationName={searchQuery} 
+            floodRiskLevel={floodLevel} 
           />
         </main>
+        
+        {/* RIGHT COLUMN - Risk Forecast */}
+        <aside className="result-sidebar-right">
+          <FloodRiskWidget location={searchQuery} coordinates={coordinates} />
+        </aside>
       </div>
     </div>
   );
 }
-
-

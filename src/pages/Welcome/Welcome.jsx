@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../../assets/logo.png";
 import SiteFooter from "../../components/SiteFooter/SiteFooter";
 import { isAuthenticated, getUser, logout } from "../../services/auth";
+import { getCurrentLocation, getLocationName } from '../../utils/geolocation';
 import "./Welcome.css";
 
 const NOMINATIM_HEADERS = {
@@ -29,7 +30,7 @@ export default function Welcome() {
   const [isSearching, setIsSearching] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userName, setUserName] = useState(""); // ADD THIS for user greeting
-  
+
   // REPLACE the old isLoggedIn check with this:
   const isLoggedIn = isAuthenticated();
   const profileRoute = isLoggedIn ? "/profile" : "/login";
@@ -56,6 +57,29 @@ export default function Welcome() {
       });
     }
   }, [location.pathname, location.hash]);
+  const handleUseMyLocation = async () => {
+    try {
+      const coords = await getCurrentLocation();
+      const locationInfo = await getLocationName(coords.lat, coords.lon);
+      const locationName = locationInfo.city || locationInfo.name;
+
+      // Navigate to result page with location
+      navigate("/result", {
+        state: {
+          welcomeSearchQuery: locationName,
+          coordinates: { lat: coords.lat, lon: coords.lon }
+        }
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  // Add button in your JSX
+  <button onClick={handleUseMyLocation} className="location-button">
+    <Navigation size={18} />
+    Use My Current Location
+  </button>
 
   const handleSearchSubmit = async (event) => {
     event.preventDefault();
@@ -112,28 +136,28 @@ export default function Welcome() {
                 Contact
               </Link>
             </div>
-            
+
             {/* OPTIONAL: Show user name next to profile icon */}
             {isLoggedIn && userName && (
               <span className="hidden md:inline-block text-white text-sm">
                 Hi, {userName}
               </span>
             )}
-            
+
             <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
               <User size={20} className="md:scale-110" />
             </Link>
-            
+
             {/* OPTIONAL: Add logout button for logged in users */}
             {isLoggedIn && (
-              <button 
+              <button
                 onClick={handleLogout}
                 className="hidden md:block text-white text-sm bg-red-600/20 hover:bg-red-600/30 px-3 py-1.5 rounded-lg transition-colors"
               >
                 Logout
               </button>
             )}
-            
+
             <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>

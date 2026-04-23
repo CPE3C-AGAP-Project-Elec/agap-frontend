@@ -22,7 +22,18 @@ export default function LoginPage() {
   const [isFading, setIsFading] = useState(false);
   const [backendError, setBackendError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [failedEmail, setFailedEmail] = useState(""); // Track email that failed
+  const [failedEmail, setFailedEmail] = useState("");
+
+  // Load saved email if Remember Me was checked
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    const savedRememberMe = localStorage.getItem("rememberMe") === "true";
+    
+    if (savedRememberMe && savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,8 +77,13 @@ export default function LoginPage() {
         const result = await login(email, password);
         console.log("Login successful:", result);
 
+        // Handle Remember Me - Save email if checked
         if (rememberMe) {
+          localStorage.setItem("rememberedEmail", email);
           localStorage.setItem("rememberMe", "true");
+        } else {
+          localStorage.removeItem("rememberedEmail");
+          localStorage.setItem("rememberMe", "false");
         }
 
         navigate("/welcome");
@@ -88,7 +104,14 @@ export default function LoginPage() {
             // Email is wrong - clear both email and password
             setEmail("");
             setPassword("");
-            setFailedEmail(email); // Store failed email for reference
+            setFailedEmail(email);
+            
+            // Clear remembered email if it was wrong
+            if (rememberMe) {
+              localStorage.removeItem("rememberedEmail");
+              localStorage.setItem("rememberMe", "false");
+              setRememberMe(false);
+            }
           } else {
             // Password is wrong - clear only password
             setPassword("");
@@ -101,32 +124,32 @@ export default function LoginPage() {
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
-  console.log("Google credential received:", credentialResponse);
-  
-  try {
-    const result = await googleLogin(credentialResponse.credential);
+    console.log("Google credential received:", credentialResponse);
     
-    console.log("RESULT FROM googleLogin:", result);
-    console.log("REQUIRES VERIFICATION FLAG:", result.requiresVerification);
-    
-    if (result.requiresVerification === true) {
-      console.log("✅ SHOULD REDIRECT TO VERIFY PAGE. Email:", result.email);
-      alert("Please verify your email. Redirecting to verification page...");
-      navigate("/verify-email", { 
-        state: { email: result.email, fromGoogle: true },
-        replace: true 
-      });
-    } else if (result.success) {
-      console.log("Login successful, navigating to welcome");
-      navigate("/welcome");
-    } else {
-      console.log("Unexpected result:", result);
+    try {
+      const result = await googleLogin(credentialResponse.credential);
+      
+      console.log("RESULT FROM googleLogin:", result);
+      console.log("REQUIRES VERIFICATION FLAG:", result.requiresVerification);
+      
+      if (result.requiresVerification === true) {
+        console.log("✅ SHOULD REDIRECT TO VERIFY PAGE. Email:", result.email);
+        alert("Please verify your email. Redirecting to verification page...");
+        navigate("/verify-email", { 
+          state: { email: result.email, fromGoogle: true },
+          replace: true 
+        });
+      } else if (result.success) {
+        console.log("Login successful, navigating to welcome");
+        navigate("/welcome");
+      } else {
+        console.log("Unexpected result:", result);
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      setBackendError(error.message || "Google login failed. Please try again.");
     }
-  } catch (error) {
-    console.error("Google login error:", error);
-    setBackendError(error.message || "Google login failed. Please try again.");
-  }
-};
+  };
 
   const handleGoogleError = () => {
     console.log("Google login failed");
@@ -173,7 +196,7 @@ export default function LoginPage() {
                   setEmail(e.target.value);
                   setErrors((prev) => ({ ...prev, email: "" }));
                   setBackendError("");
-                  setFailedEmail(""); // Clear failed email tracking
+                  setFailedEmail("");
                 }}
               />
               {errors.email ? <p className="field-error">{errors.email}</p> : null}

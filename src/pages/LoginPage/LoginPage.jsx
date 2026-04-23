@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logoWithText from "../../assets/logoWithText.png";
 import googleIcon from "../../assets/icons/google.svg";
+import { login } from "../../services/auth";
 import "./LoginPage.css";
 
 export default function LoginPage() {
@@ -18,6 +19,8 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [welcomeIndex, setWelcomeIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
+  const [backendError, setBackendError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -31,9 +34,11 @@ export default function LoginPage() {
     return () => clearInterval(interval);
   }, [welcomeLines.length]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
+    
+    setBackendError("");
+    
     const nextErrors = { email: "", password: "" };
     let hasError = false;
 
@@ -53,9 +58,24 @@ export default function LoginPage() {
     setErrors(nextErrors);
 
     if (!hasError) {
-      console.log("Login:", { email, password, rememberMe });
-      localStorage.setItem("agapIsLoggedIn", "true");
-      navigate("/welcome");
+      setLoading(true);
+      
+      try {
+        const result = await login(email, password);
+        console.log("Login successful:", result);
+        
+        if (rememberMe) {
+          localStorage.setItem("rememberMe", "true");
+        }
+        
+        navigate("/welcome");
+      } catch (err) {
+        console.error("Login error:", err);
+        setBackendError(err.message || "Login failed. Please check your credentials.");
+        setPassword("");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -76,6 +96,18 @@ export default function LoginPage() {
         <div className="login-card">
           <h2>Login</h2>
           <form onSubmit={handleLogin} noValidate>
+            {backendError && (
+              <div className="field-error" style={{ 
+                marginBottom: "16px", 
+                padding: "10px", 
+                background: "#fee2e2", 
+                borderRadius: "6px",
+                textAlign: "center"
+              }}>
+                {backendError}
+              </div>
+            )}
+            
             <div className="field-wrap">
               <label htmlFor="login-email">Email</label>
               <input
@@ -86,6 +118,7 @@ export default function LoginPage() {
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setErrors((prev) => ({ ...prev, email: "" }));
+                  setBackendError("");
                 }}
               />
               {errors.email ? <p className="field-error">{errors.email}</p> : null}
@@ -102,6 +135,7 @@ export default function LoginPage() {
                   onChange={(e) => {
                     setPassword(e.target.value);
                     setErrors((prev) => ({ ...prev, password: "" }));
+                    setBackendError("");
                   }}
                 />
                 <button
@@ -109,20 +143,15 @@ export default function LoginPage() {
                   className="password-toggle"
                   onClick={() => setShowPassword((prev) => !prev)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  title={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        d="M3 3L21 21M10.58 10.59A2 2 0 0 0 13.41 13.4M9.88 5.09A10.94 10.94 0 0 1 12 5C17 5 21.27 8.11 23 12C22.18 13.84 20.79 15.43 19 16.54M14.12 18.88A10.78 10.78 0 0 1 12 19C7 19 2.73 15.89 1 12C1.95 9.86 3.58 8.07 5.66 6.79"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M3 3L21 21M10.58 10.59A2 2 0 0 0 13.41 13.4M9.88 5.09A10.94 10.94 0 0 1 12 5C17 5 21.27 8.11 23 12C22.18 13.84 20.79 15.43 19 16.54M14.12 18.88A10.78 10.78 0 0 1 12 19C7 19 2.73 15.89 1 12C1.95 9.86 3.58 8.07 5.66 6.79" />
                     </svg>
                   ) : (
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M1 12C2.73 8.11 7 5 12 5S21.27 8.11 23 12C21.27 15.89 17 19 12 19S2.73 15.89 1 12Z" />
+                      <circle cx="12" cy="12" r="3" />
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <path
                         d="M1 12C2.73 8.11 7 5 12 5S21.27 8.11 23 12C21.27 15.89 17 19 12 19S2.73 15.89 1 12Z"
@@ -133,6 +162,17 @@ export default function LoginPage() {
                         strokeLinejoin="round"
                       />
                       <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M3 3L21 21M10.58 10.59A2 2 0 0 0 13.41 13.4M9.88 5.09A10.94 10.94 0 0 1 12 5C17 5 21.27 8.11 23 12C22.18 13.84 20.79 15.43 19 16.54M14.12 18.88A10.78 10.78 0 0 1 12 19C7 19 2.73 15.89 1 12C1.95 9.86 3.58 8.07 5.66 6.79"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   )}
                 </button>
@@ -161,8 +201,8 @@ export default function LoginPage() {
               <span>Sign Up with Google</span>
             </button>
 
-            <button type="submit" className="login-submit-btn">
-              Login
+            <button type="submit" className="login-submit-btn" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
             </button>
 
             <p className="login-signup-text">

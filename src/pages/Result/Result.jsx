@@ -48,6 +48,8 @@ function ImageWithFallback(props) {
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
+  const profileRoute = isLoggedIn ? '/profile' : '/login';
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
@@ -79,7 +81,7 @@ function Header() {
               Contact
             </Link>
           </div>
-          <Link to="/login" className="app-profile-link app-profile-link--on-dark" aria-label="Go to login">
+          <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
             <User size={20} aria-hidden />
           </Link>
           <button type="button" className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -359,13 +361,6 @@ export default function Result() {
 
     setSearchQuery(q);
 
-    const levels = ['low', 'medium', 'high'];
-    const randomLevel = levels[Math.floor(Math.random() * levels.length)];
-    setFloodLevel(randomLevel);
-    setShowFloodHazardOpen(true);
-    setShowFloodHistory(false);
-    setShowWeatherHistory(false);
-
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=ph&format=json&limit=1`
@@ -374,15 +369,26 @@ export default function Result() {
 
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
+        const levels = ['low', 'medium', 'high'];
+        const randomLevel = levels[Math.floor(Math.random() * levels.length)];
+
         setCoordinates({
           latitude: parseFloat(lat),
           longitude: parseFloat(lon),
         });
+        setFloodLevel(randomLevel);
+        setShowFloodHazardOpen(true);
+        setShowFloodHistory(false);
+        setShowWeatherHistory(false);
       } else {
+        setCoordinates(null);
+        setFloodLevel(null);
         alert('Location not found in the Philippines. Please try a different search term.');
       }
     } catch (error) {
       console.error('Geocoding error:', error);
+      setCoordinates(null);
+      setFloodLevel(null);
       alert('Error searching for location. Please try again.');
     }
   }, []);
@@ -417,7 +423,7 @@ export default function Result() {
                 <span>FLOOD HAZARD LEVEL</span>
                 {showFloodHazardOpen ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
-              {showFloodHazardOpen && <FloodHazardLevel level={floodLevel} />}
+              {showFloodHazardOpen ? <FloodHazardLevel level={floodLevel} /> : null}
             </section>
 
             <section className="result-section">
@@ -426,10 +432,10 @@ export default function Result() {
                 className="result-section__toggle"
                 onClick={toggleFloodHistory}
               >
-                <span>FLOOD HISTORY</span>
+                <span>FLOOD FORECAST</span>
                 {showFloodHistory ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
-              {showFloodHistory && <FloodHistory data={floodHistoryData} />}
+              {showFloodHistory ? <FloodHistory data={floodHistoryData} /> : null}
             </section>
 
             <section className="result-section">
@@ -438,10 +444,10 @@ export default function Result() {
                 className="result-section__toggle"
                 onClick={toggleWeatherHistory}
               >
-                <span>WEATHER HISTORY</span>
+                <span>WEATHER FORECAST</span>
                 {showWeatherHistory ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
-              {showWeatherHistory && <WeatherHistory data={weatherData} />}
+              {showWeatherHistory ? <WeatherHistory data={weatherData} /> : null}
             </section>
           </div>
         </aside>

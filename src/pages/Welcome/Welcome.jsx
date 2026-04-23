@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { LogOut, MapPin, Search, Menu, X } from "lucide-react";
+import { MapPin, Search, Menu, User, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../../assets/logo.png";
 import SiteFooter from "../../components/SiteFooter/SiteFooter";
+import { isAuthenticated, getUser, logout } from "../../services/auth";
 import "./Welcome.css";
 
 const NOMINATIM_HEADERS = {
@@ -27,14 +28,24 @@ export default function Welcome() {
   const [searchError, setSearchError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isLoggedIn = localStorage.getItem("agapIsLoggedIn") === "true";
+  const [userName, setUserName] = useState(""); // ADD THIS for user greeting
+  
+  // REPLACE the old isLoggedIn check with this:
+  const isLoggedIn = isAuthenticated();
+  const profileRoute = isLoggedIn ? "/profile" : "/login";
 
   const closeMenu = () => setIsMenuOpen(false);
-  const handleLogout = () => {
-    localStorage.removeItem("agapIsLoggedIn");
-    closeMenu();
-    navigate("/");
-  };
+
+  // ADD THIS: Load user data on component mount
+  useEffect(() => {
+    if (isLoggedIn) {
+      const user = getUser();
+      if (user) {
+        setUserName(user.name || user.email?.split('@')[0] || "User");
+        console.log("Welcome back,", user.name || user.email);
+      }
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (location.hash !== "#contact") return;
@@ -70,6 +81,11 @@ export default function Welcome() {
     }
   };
 
+  // ADD THIS: Handle logout
+  const handleLogout = () => {
+    logout(); // This will redirect to login page
+  };
+
   return (
     <div className="welcome-page">
       <header className="welcome-header">
@@ -96,14 +112,28 @@ export default function Welcome() {
                 Contact
               </Link>
             </div>
-            <button
-              type="button"
-              className="app-profile-link app-profile-link--on-dark p-2 md:p-3"
-              aria-label="Logout"
-              onClick={handleLogout}
-            >
-              <LogOut size={20} className="md:scale-110" />
-            </button>
+            
+            {/* OPTIONAL: Show user name next to profile icon */}
+            {isLoggedIn && userName && (
+              <span className="hidden md:inline-block text-white text-sm">
+                Hi, {userName}
+              </span>
+            )}
+            
+            <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
+              <User size={20} className="md:scale-110" />
+            </Link>
+            
+            {/* OPTIONAL: Add logout button for logged in users */}
+            {isLoggedIn && (
+              <button 
+                onClick={handleLogout}
+                className="hidden md:block text-white text-sm bg-red-600/20 hover:bg-red-600/30 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Logout
+              </button>
+            )}
+            
             <button type="button" className="md:hidden p-2.5" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -134,15 +164,17 @@ export default function Welcome() {
               >
                 Contact
               </Link>
-              {isLoggedIn ? (
+              {isLoggedIn && (
                 <button
-                  type="button"
-                  className="app-nav-link block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-white/10 transition-colors"
-                  onClick={handleLogout}
+                  onClick={() => {
+                    closeMenu();
+                    handleLogout();
+                  }}
+                  className="block w-full text-left py-3 px-4 text-white rounded-lg hover:bg-red-600/30 transition-colors"
                 >
                   Logout
                 </button>
-              ) : null}
+              )}
             </div>
           </div>
         )}

@@ -1,25 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import heroImage from "../../assets/hero-img.svg";
 import logoImage from "../../assets/logo.png";
 import { useLayoutEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
 import SiteFooter from "../../components/SiteFooter/SiteFooter";
+import { isAuthenticated, getUser } from "../../services/auth"; // ADD THIS
 import "./LandingPage.css";
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // ADD THIS
   const navigate = useNavigate();
   const location = useLocation();
   const scrollFromResult = location.state?.scrollToLandingContact === true;
-  const isLoggedIn = localStorage.getItem("agapIsLoggedIn") === "true";
+
+  // ADD THIS: Check authentication on component mount
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+  }, []);
 
   const handleExploreMap = () => {
-    navigate(isLoggedIn ? "/result" : "/login");
+    // UPDATED: Use real authentication check
+    if (isAuthenticated()) {
+      navigate("/result");
+    } else {
+      navigate("/login");
+    }
   };
 
   const handleProfile = () => {
-    navigate("/welcome");
+    navigate("/profile");
   };
 
   useLayoutEffect(() => {
@@ -67,26 +78,42 @@ export default function LandingPage() {
                 Contact
               </Link>
               <div className="landing-nav-auth">
-                <button 
-                  type="button" 
-                  className="landing-login-btn landing-nav-auth-btn" 
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigate("/login");
-                  }}
-                >
-                  Login
-                </button>
-                <button 
-                  type="button" 
-                  className="landing-signup-btn landing-nav-auth-btn" 
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigate("/signup");
-                  }}
-                >
-                  Sign up
-                </button>
+                {isLoggedIn ? (
+                  <button
+                    type="button"
+                    className="landing-profile-btn landing-nav-auth-btn"
+                    aria-label="Profile"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleProfile();
+                    }}
+                  >
+                    <User size={20} aria-hidden />
+                  </button>
+                ) : (
+                  <>
+                    <button 
+                      type="button" 
+                      className="landing-login-btn landing-nav-auth-btn" 
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/login");
+                      }}
+                    >
+                      Login
+                    </button>
+                    <button 
+                      type="button" 
+                      className="landing-signup-btn landing-nav-auth-btn" 
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/signup");
+                      }}
+                    >
+                      Sign up
+                    </button>
+                  </>
+                )}
               </div>
             </nav>
           </div>

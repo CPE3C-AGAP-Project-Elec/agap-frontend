@@ -1,5 +1,7 @@
 ## Logo and Short Description
 
+<img width="1280" height="1280" alt="agap - logo (6)" src="https://github.com/user-attachments/assets/40ce1dcc-b8ff-4c33-bd95-0f36bee9d6e5" />
+
 **AGAP (Automated Geospatial Alert Platform)** is a web-based system that provides interactive map visualizations, flood level monitoring, forecast data insights, and real-time alerts to support early awareness and informed decision-making.  
 
 Through predictive analysis based on rainfall and environmental data, AGAP delivers accessible, accurate, and reliable information to its users.

@@ -66,3 +66,13 @@ export const resendVerificationCode = async (email) => {
     throw error.response?.data || { message: 'Failed to resend code' };
   }
 };
+
+// Add this function to your auth.js
+export const updateUserDetails = async (userData) => {
+  try {
+    const response = await api.put('/auth/updatedetails', userData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to update user details' };
+  }
+};

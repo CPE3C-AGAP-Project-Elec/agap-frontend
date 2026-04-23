@@ -48,12 +48,6 @@ function Header({ onLogout }) {
   const profileRoute = isLoggedIn ? '/profile' : '/login';
   const closeMenu = () => setIsMenuOpen(false);
 
-  const handleLogoutClick = () => {
-    if (onLogout) {
-      onLogout();
-    }
-  };
-
   return (
     <header className="result-header about-nav text-white shadow-md sticky top-0 z-50">
       <div className="about-nav__inner app-nav-inner">
@@ -78,12 +72,10 @@ function Header({ onLogout }) {
             <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link text-white">Contact</Link>
           </div>
           
-          {/* Logout Button - Only show if logged in */}
           {isLoggedIn && (
             <button 
-              onClick={handleLogoutClick} 
+              onClick={onLogout} 
               className="flex items-center gap-1 text-white hover:text-gray-200 transition-colors"
-              aria-label="Logout"
               style={{ background: "none", border: "none", cursor: "pointer" }}
             >
               <LogOut size={18} />
@@ -107,10 +99,7 @@ function Header({ onLogout }) {
             <Link to="/about-us" className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>About Us</Link>
             <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>Contact</Link>
             {isLoggedIn && (
-              <button 
-                onClick={() => { handleLogoutClick(); closeMenu(); }} 
-                className="app-nav-link block w-full text-left py-2 text-white"
-              >
+              <button onClick={() => { onLogout(); closeMenu(); }} className="app-nav-link block w-full text-left py-2 text-white">
                 Logout
               </button>
             )}
@@ -291,19 +280,16 @@ export default function Result() {
   };
 
   const handleLogoutClick = () => {
-    console.log("Logout button clicked - showing modal");
     setShowLogoutModal(true);
   };
 
   const confirmLogout = () => {
-    console.log("Logout confirmed");
     logout();
     setShowLogoutModal(false);
     navigate('/login');
   };
 
   const cancelLogout = () => {
-    console.log("Logout cancelled");
     setShowLogoutModal(false);
   };
 
@@ -427,20 +413,6 @@ export default function Result() {
 
   const handleSearch = async () => { await performSearch(searchQuery); };
 
-  // Shared modal component
-  const LogoutModal = () => (
-    <div className="logout-modal-overlay">
-      <div className="logout-modal">
-        <h3>Confirm Logout</h3>
-        <p>Are you sure you want to log out?</p>
-        <div className="logout-modal-buttons">
-          <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
-          <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
-        </div>
-      </div>
-    </div>
-  );
-
   // Show error page if location not found
   if (locationError === 'not_found') {
     return (
@@ -467,7 +439,18 @@ export default function Result() {
             </div>
           </div>
         </div>
-        {showLogoutModal && <LogoutModal />}
+        {showLogoutModal && (
+          <div className="logout-modal-overlay">
+            <div className="logout-modal">
+              <h3>Confirm Logout</h3>
+              <p>Are you sure you want to log out?</p>
+              <div className="logout-modal-buttons">
+                <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
+                <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -487,7 +470,18 @@ export default function Result() {
             </div>
           </div>
         </div>
-        {showLogoutModal && <LogoutModal />}
+        {showLogoutModal && (
+          <div className="logout-modal-overlay">
+            <div className="logout-modal">
+              <h3>Confirm Logout</h3>
+              <p>Are you sure you want to log out?</p>
+              <div className="logout-modal-buttons">
+                <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
+                <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -496,7 +490,6 @@ export default function Result() {
     <div className="result-page">
       <Header onLogout={handleLogoutClick} />
       <div className="result-page__body">
-        {/* LEFT COLUMN - Weather, Flood Forecast, Hazard Level */}
         <aside className="result-sidebar-left">
           <div className="result-sidebar__inner">
             <SearchBar value={searchQuery} onChange={setSearchQuery} onSearch={handleSearch} />
@@ -545,7 +538,6 @@ export default function Result() {
           </div>
         </aside>
         
-        {/* MIDDLE COLUMN - Map */}
         <main className="result-main">
           <MapView 
             latitude={coordinates?.latitude} 
@@ -555,13 +547,23 @@ export default function Result() {
           />
         </main>
         
-        {/* RIGHT COLUMN - Risk Forecast */}
         <aside className="result-sidebar-right">
           <FloodRiskWidget location={searchQuery} coordinates={coordinates} />
         </aside>
       </div>
       
-      {showLogoutModal && <LogoutModal />}
+      {showLogoutModal && (
+        <div className="logout-modal-overlay">
+          <div className="logout-modal">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to log out?</p>
+            <div className="logout-modal-buttons">
+              <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
+              <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

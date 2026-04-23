@@ -1,191 +1,141 @@
-import React, { useState, useCallback } from 'react';
-import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+// src/components/Googlemapview/GoogleMapView.jsx
+import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+import { useState, useCallback } from 'react';
 
-// Map container style - must have height
+// Move libraries OUTSIDE component to prevent re-renders
 const mapContainerStyle = {
   width: '100%',
   height: '100%',
-  minHeight: '500px'
+  borderRadius: '12px',
 };
 
-// Default center: Philippines
 const defaultCenter = {
-  lat: 12.8797,
-  lng: 121.774
+  lat: 14.5995,
+  lng: 120.9842,
 };
 
-// Map options for better user experience
 const mapOptions = {
-  zoomControl: true,
-  zoomControlOptions: {
-    position: window.google?.maps?.ControlPosition?.RIGHT_BOTTOM
-  },
-  streetViewControl: true,
-  mapTypeControl: true,
-  fullscreenControl: true,
-  gestureHandling: 'greedy', // Allows smooth zooming on touch devices
   disableDefaultUI: false,
-  clickableIcons: true,
-  scrollwheel: true, // Enable zoom with mouse wheel
-  draggable: true,   // Enable panning
-  disableDoubleClickZoom: false,
-  keyboardShortcuts: true
+  zoomControl: true,
+  streetViewControl: false,
+  mapTypeControl: false,
+  fullscreenControl: true,
 };
 
-const GoogleMapView = ({ latitude, longitude, locationName, floodRiskLevel }) => {
-  const [infoWindowOpen, setInfoWindowOpen] = useState(false);
-  const [map, setMap] = useState(null);
-  
-  // Load Google Maps script
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: ['places']
-  });
+export default function GoogleMapView({ latitude, longitude, locationName, floodRiskLevel }) {
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
-  const getMarkerColor = (riskLevel) => {
-    const colors = {
-      low: '#22c55e',      // green
-      moderate: '#eab308',  // yellow
-      high: '#f97316',      // orange
-      severe: '#ef4444'     // red
-    };
-    return colors[riskLevel] || '#3b82f6'; // default blue
-  };
-
-  // Calculate center based on props or default
-  const center = (latitude && longitude) 
-    ? { lat: latitude, lng: longitude } 
-    : defaultCenter;
-
-  // Calculate zoom level
-  const zoom = latitude ? 14 : 6;
-
-  // Handle map load
-  const onLoad = useCallback((mapInstance) => {
-    setMap(mapInstance);
-  }, []);
-
-  // Handle map unload
-  const onUnmount = useCallback(() => {
-    setMap(null);
-  }, []);
-
-  // Show error if loading fails
-  if (loadError) {
-    console.error('Google Maps load error:', loadError);
+  // Don't render if no coordinates
+  if (!latitude || !longitude) {
     return (
-      <div style={{ 
-        padding: '20px', 
-        textAlign: 'center', 
-        background: '#fee2e2',
-        borderRadius: '8px',
-        height: '500px',
+      <div className="map-placeholder" style={{
+        width: '100%',
+        height: '100%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        flexDirection: 'column'
+        backgroundColor: '#f0f0f0',
+        borderRadius: '12px',
+        color: '#666'
       }}>
-        <p style={{ color: '#dc2626', marginBottom: '10px' }}>
-          ⚠️ Error loading Google Maps
-        </p>
-        <p style={{ fontSize: '14px', color: '#666' }}>
-          Please check your API key in .env.local file
-        </p>
-        <p style={{ fontSize: '12px', color: '#999', marginTop: '10px' }}>
-          Make sure Maps JavaScript API is enabled in Google Cloud Console
-        </p>
+        <p>Enter a location to view the map</p>
       </div>
     );
   }
 
-  // Show loading state
-  if (!isLoaded) {
+  const center = {
+    lat: parseFloat(latitude),
+    lng: parseFloat(longitude)
+  };
+
+  const getFloodRiskColor = (risk) => {
+    switch (risk) {
+      case 'high': return '#dc2626';
+      case 'medium': return '#f59e0b';
+      case 'low': return '#10b981';
+      default: return '#2565a8';
+    }
+  };
+
+  const onLoad = useCallback((map) => {
+    console.log('Map loaded successfully');
+    setMapLoaded(true);
+  }, []);
+
+  const onError = useCallback((error) => {
+    console.error('Google Maps Error:', error);
+  }, []);
+
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+  // Check if API key exists
+  if (!apiKey) {
     return (
-      <div style={{ 
-        padding: '20px', 
-        textAlign: 'center', 
-        background: '#f0f0f0',
-        borderRadius: '8px',
-        height: '500px',
+      <div className="map-placeholder" style={{
+        width: '100%',
+        height: '100%',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        backgroundColor: '#f0f0f0',
+        borderRadius: '12px',
+        color: '#dc2626',
+        textAlign: 'center',
+        padding: '20px'
       }}>
-        <p>Loading Google Maps... 🗺️</p>
+        <p>Google Maps API key is missing. Please add VITE_GOOGLE_MAPS_API_KEY to your environment variables.</p>
       </div>
     );
   }
 
   return (
-    <GoogleMap
-      mapContainerStyle={mapContainerStyle}
-      center={center}
-      zoom={zoom}
-      onLoad={onLoad}
-      onUnmount={onUnmount}
-      options={mapOptions}
+    <LoadScript 
+      googleMapsApiKey={apiKey} 
+      onError={onError}
     >
-      {/* Marker for selected location */}
-      {latitude && longitude && (
-        <>
-          <Marker
-            position={{ lat: latitude, lng: longitude }}
-            onClick={() => setInfoWindowOpen(true)}
-            icon={{
-              path: google.maps.SymbolPath.CIRCLE,
-              fillColor: getMarkerColor(floodRiskLevel),
-              fillOpacity: 0.8,
-              strokeColor: '#ffffff',
-              strokeWeight: 2,
-              scale: 12,
-              labelOrigin: new google.maps.Point(0, -5)
-            }}
-          />
-          
-          {/* Info window when marker is clicked */}
-          {infoWindowOpen && (
-            <InfoWindow
-              position={{ lat: latitude, lng: longitude }}
-              onCloseClick={() => setInfoWindowOpen(false)}
-            >
-              <div style={{ 
-                padding: '8px', 
-                minWidth: '150px',
-                fontFamily: 'system-ui, -apple-system, sans-serif'
-              }}>
-                <h4 style={{ 
-                  margin: '0 0 8px 0', 
-                  color: '#1f5b9f',
-                  fontSize: '14px',
+      <GoogleMap
+        mapContainerStyle={mapContainerStyle}
+        center={center}
+        zoom={12}
+        options={mapOptions}
+        onLoad={onLoad}
+      >
+        <Marker
+          position={center}
+          onClick={() => setSelectedLocation(center)}
+          icon={{
+            path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z',
+            fillColor: getFloodRiskColor(floodRiskLevel),
+            fillOpacity: 0.8,
+            strokeWeight: 1,
+            strokeColor: '#ffffff',
+            scale: 1.5,
+          }}
+        />
+        
+        {selectedLocation && (
+          <InfoWindow
+            position={selectedLocation}
+            onCloseClick={() => setSelectedLocation(null)}
+          >
+            <div style={{ padding: '4px 8px', minWidth: '150px' }}>
+              <strong style={{ display: 'block', marginBottom: '5px' }}>
+                {locationName || 'Selected Location'}
+              </strong>
+              {floodRiskLevel && (
+                <p style={{ 
+                  margin: 0, 
+                  color: getFloodRiskColor(floodRiskLevel),
                   fontWeight: 'bold'
                 }}>
-                  {locationName || 'Selected Location'}
-                </h4>
-                <p style={{ margin: '4px 0', fontSize: '13px' }}>
-                  <strong>Flood Risk:</strong>{' '}
-                  <span style={{ 
-                    color: getMarkerColor(floodRiskLevel),
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase'
-                  }}>
-                    {floodRiskLevel || 'Unknown'}
-                  </span>
+                  Flood Risk: {floodRiskLevel.toUpperCase()}
                 </p>
-                <p style={{ margin: '4px 0', fontSize: '11px', color: '#666' }}>
-                  📍 {latitude.toFixed(4)}, {longitude.toFixed(4)}
-                </p>
-              </div>
-            </InfoWindow>
-          )}
-        </>
-      )}
-      
-      {/* Optional: Add flood risk overlay circles */}
-      {latitude && longitude && floodRiskLevel && (
-        <></> // You can add circle overlays here for flood zones
-      )}
-    </GoogleMap>
+              )}
+            </div>
+          </InfoWindow>
+        )}
+      </GoogleMap>
+    </LoadScript>
   );
-};
-
-export default GoogleMapView;
+}

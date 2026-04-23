@@ -1,178 +1,128 @@
-// agap-frontend/src/pages/VerifyEmail/VerifyEmail.jsx
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { verifyEmail, resendVerificationCode } from '../../services/auth';
-import './VerifyEmail.css';
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { verifyEmail, resendVerificationCode } from "../../services/auth";
+import logoImage from "../../assets/logo.png";
+import "./verifyemail.css";
 
-const VerifyEmail = () => {
-  const location = useLocation();
+export default function VerifyEmail() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const location = useLocation();
+  const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [resendTimer, setResendTimer] = useState(0);
   const [resendLoading, setResendLoading] = useState(false);
 
   useEffect(() => {
-    // Get email from location state or sessionStorage
-    const storedEmail = location.state?.email || sessionStorage.getItem('pendingVerificationEmail');
-    if (storedEmail) {
-      setEmail(storedEmail);
+    // Get email from location state or localStorage
+    const pendingEmail = location.state?.email || localStorage.getItem("pendingVerificationEmail");
+    if (pendingEmail) {
+      setEmail(pendingEmail);
     } else {
       // No email, redirect to signup
-      navigate('/signup');
+      navigate("/signup");
     }
   }, [location, navigate]);
 
-  useEffect(() => {
-    let timer;
-    if (resendTimer > 0) {
-      timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
-    }
-    return () => clearTimeout(timer);
-  }, [resendTimer]);
-
-  const handleCodeChange = (index, value) => {
-    // Only allow numbers
-    if (value && !/^\d*$/.test(value)) return;
-    
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
-    
-    // Auto-focus next input
-    if (value && index < 5) {
-      const nextInput = document.getElementById(`code-input-${index + 1}`);
-      if (nextInput) nextInput.focus();
-    }
-    
-    // Clear error when user types
-    if (error) setError('');
-  };
-
-  const handleKeyDown = (index, e) => {
-    // Handle backspace
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
-      const prevInput = document.getElementById(`code-input-${index - 1}`);
-      if (prevInput) prevInput.focus();
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
-    const fullCode = code.join('');
-    
-    if (fullCode.length !== 6) {
-      setError('Please enter the complete 6-digit verification code');
+    if (!code || code.length !== 6) {
+      setError("Please enter a valid 6-digit verification code");
       return;
     }
-    
+
     setLoading(true);
-    setError('');
-    
-    console.log("Verifying with:", { email, code: fullCode });
-    
+    setError("");
+    setSuccess("");
+
     try {
-      const result = await verifyEmail(email, fullCode);
-      console.log("Verification result:", result);
-      
-      if (result.success) {
-        setSuccess('Email verified successfully! Redirecting to login...');
+      const response = await verifyEmail(email, code);
+      if (response.success) {
+        setSuccess("Email verified successfully! Redirecting to login...");
         setTimeout(() => {
-          navigate('/login');
+          navigate("/login");
         }, 2000);
       }
     } catch (err) {
-      console.error("Verification error details:", err);
-      setError(err.message || 'Invalid verification code. Please try again.');
+      setError(err.message || "Verification failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleResendCode = async () => {
-    if (resendTimer > 0) return;
-    
     setResendLoading(true);
-    setError('');
-    
+    setError("");
+    setSuccess("");
+
     try {
-      const result = await resendVerificationCode(email);
-      if (result.success) {
-        setSuccess('New verification code sent to your email!');
-        setResendTimer(60); // 60 seconds cooldown
-        setCode(['', '', '', '', '', '']); // Clear code inputs
+      const response = await resendVerificationCode(email);
+      if (response.success) {
+        setSuccess("New verification code sent to your email!");
       }
     } catch (err) {
-      setError(err.message || 'Failed to resend code. Please try again.');
+      setError(err.message || "Failed to resend code. Please try again.");
     } finally {
       setResendLoading(false);
     }
   };
 
   return (
-    <div className="verify-email-container">
-      <div className="verify-email-card">
-        <h2>Verify Your Email</h2>
-        <p>We sent a verification code to:</p>
-        <p className="email-display">{email}</p>
-        
-        {error && <div className="error-message">{error}</div>}
-        {success && <div className="success-message">{success}</div>}
-        
-        <form onSubmit={handleSubmit}>
-          <div className="code-inputs">
-            {code.map((digit, index) => (
-              <input
-                key={index}
-                id={`code-input-${index}`}
-                type="text"
-                maxLength="1"
-                value={digit}
-                onChange={(e) => handleCodeChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className="code-input"
-                autoFocus={index === 0}
-              />
-            ))}
+    <div className="verify-page">
+      <div className="verify-bg"></div>
+      
+      <div className="verify-container">
+        <div className="verify-card">
+          <div className="verify-logo">
+            <img src={logoImage} alt="AGAP Logo" />
           </div>
           
-          <button 
-            type="submit" 
-            className="verify-button"
-            disabled={loading}
-          >
-            {loading ? 'Verifying...' : 'Verify Email'}
-          </button>
-        </form>
-        
-        <div className="resend-section">
-          <p>
-            {resendTimer > 0 ? (
-              `Resend code in ${resendTimer}s`
-            ) : (
-              <button 
-                onClick={handleResendCode}
-                className="resend-button"
-                disabled={resendLoading}
-              >
-                {resendLoading ? 'Sending...' : 'Resend code'}
-              </button>
-            )}
+          <h1 className="verify-title">Verify Your Email</h1>
+          
+          <p className="verify-subtitle">
+            We sent a verification code to:
+            <br />
+            <strong>{email}</strong>
           </p>
+
+          {error && <div className="verify-error">{error}</div>}
+          {success && <div className="verify-success">{success}</div>}
+
+          <form onSubmit={handleVerify} className="verify-form">
+            <div className="verify-input-group">
+              <label htmlFor="code">Verification Code</label>
+              <input
+                id="code"
+                type="text"
+                placeholder="Enter 6-digit code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                maxLength={6}
+                autoFocus
+              />
+            </div>
+
+            <button type="submit" className="verify-btn" disabled={loading}>
+              {loading ? "Verifying..." : "Verify Email"}
+            </button>
+          </form>
+
+          <div className="verify-footer">
+            <button 
+              onClick={handleResendCode} 
+              className="verify-resend"
+              disabled={resendLoading}
+            >
+              {resendLoading ? "Sending..." : "Resend code"}
+            </button>
+            <span className="verify-divider">|</span>
+            <button onClick={() => navigate("/signup")} className="verify-back">
+              Back to Sign Up
+            </button>
+          </div>
         </div>
-        
-        <button 
-          onClick={() => navigate('/signup')}
-          className="back-button"
-        >
-          Back to Sign Up
-        </button>
       </div>
     </div>
   );
-};
-
-export default VerifyEmail;
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   User,
   Search,
@@ -11,8 +11,7 @@ import {
   Cloud,
   CloudRain,
 } from 'lucide-react';
-import GoogleMapView from '../../../agap-backend/GoogleMapView/GoogleMapView.js';
-import { getWeatherAndFloodData } from '../../../agap-backend/utils/weatherUtils.js';
+import GoogleMapView from '../../components/Googlemapview/GoogleMapView.jsx';
 import logoImage from '../../assets/logo.png';
 import './Result.css';
 
@@ -39,17 +38,14 @@ function ImageWithFallback(props) {
   );
 }
 
+
+
+
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
-  const profileRoute = isLoggedIn ? '/welcome' : '/login';
+  const profileRoute = isLoggedIn ? '/profile' : '/login';
   const closeMenu = () => setIsMenuOpen(false);
-  const handleLogout = () => {
-    localStorage.removeItem('agapIsLoggedIn');
-    closeMenu();
-    navigate('/');
-  };
 
   return (
     <header className="result-header about-nav text-white shadow-md sticky top-0 z-50">
@@ -114,15 +110,6 @@ function Header() {
             >
               Contact
             </Link>
-            {isLoggedIn ? (
-              <button
-                type="button"
-                className="app-nav-link block w-full text-left py-2 text-white"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            ) : null}
           </div>
         </div>
       )}
@@ -370,10 +357,11 @@ function WeatherForecast({ data, loading, error }) {
   );
 }
 
+// Replace the entire MapView function with this:
 function MapView({ latitude, longitude, locationName, floodRiskLevel }) {
   return (
     <div className="result-map">
-      <GoogleMapView
+      <GoogleMapView 
         latitude={latitude}
         longitude={longitude}
         locationName={locationName}
@@ -487,10 +475,14 @@ export default function Result() {
         setCoordinates(coords);
         await fetchWeatherAndFloodData(coords.latitude, coords.longitude);
       } else {
+        setCoordinates(null);
+        setFloodLevel(null);
         alert('Location not found in the Philippines. Please try a different search term.');
       }
     } catch (error) {
       console.error('Geocoding error:', error);
+      setCoordinates(null);
+      setFloodLevel(null);
       alert('Error searching for location. Please try again.');
     }
   }, [fetchWeatherAndFloodData]);
@@ -525,7 +517,7 @@ export default function Result() {
                 <span>FLOOD HAZARD LEVEL</span>
                 {showFloodHazardOpen ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}
               </button>
-              {showFloodHazardOpen && <FloodHazardLevel level={floodLevel} />}
+              {showFloodHazardOpen ? <FloodHazardLevel level={floodLevel} /> : null}
             </section>
 
             <section className="result-section">
@@ -578,3 +570,5 @@ export default function Result() {
     </div>
   );
 }
+
+

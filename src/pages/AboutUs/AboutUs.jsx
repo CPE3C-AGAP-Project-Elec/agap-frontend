@@ -45,7 +45,7 @@ function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
-  const profileRoute = isLoggedIn ? '/welcome' : '/login';
+  const profileRoute = isLoggedIn ? '/profile' : '/login';
   const closeMenu = () => setIsMenuOpen(false);
   const handleExploreMap = () => {
     closeMenu();

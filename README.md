@@ -16,14 +16,30 @@ It is a web-based flood risk monitoring system designed to help communities stay
 
 ---
 
+## Table of Contents
+
+- [What the Platform Monitors](#what-the-platform-monitors)  
+- [Overview](#overview)  
+- [Features](#features)  
+- [User Manual](#user-manual)  
+- [Tech Stack](#tech-stack)  
+- [External API](#external-api)  
+- [Developers](#developers)  
+- [Data Sources](#data-sources)  
+- [Acknowledgment](#acknowledgment)
+
+---
+
 ## What the Platform Monitors
 
 - **Flood Level** – shows the possible flood level in a specific location  
 - **Weather Forecast** – shows the expected weather in the coming days  
 - **Flood Forecast** – shows the predicted flood levels in the coming days  
 
+---
 
 ## Overview
+
 The platform monitors the following:
 
 - **Flood Level** – shows the possible flood level in a specific location  
@@ -122,37 +138,40 @@ The platform monitors the following:
 - Lucide React (Icons)
 
 ### Backend
-- Node.js + Express
-- MongoDB Atlas (Database)
-- JWT Authentication
-- bcrypt (Password Hashing)
-- Nodemailer (Email Verification / Reset Password)
+- Node.js + Express  
+- MongoDB Atlas (Database)  
+- JWT Authentication  
+- bcrypt (Password Hashing)  
+- Nodemailer (Email Verification / Reset Password)  
 - Google OAuth 2.0 (Optional Login)
 
-### External API
+---
 
-| API                     | Purpose    |
-|--------------------------|----------|
-| Google Maps API   |     Map visualization and interaction |
-| Geolocation API |     Real-time user location detection |
+## External API
 
+| API | Purpose |
+|-----|--------|
+| Google Maps API | Map visualization and interaction |
+| Geolocation API | Real-time user location detection |
+
+---
 
 ## Developers
 
-| Name                     | Role      |
-|--------------------------|----------|
-| Balala, Fiona Rose A.    | Developer |
-| Balbin, Alleah Joy M.    | Developer |
-| Nicolas, Abigail B.      | Developer |
-| Santos, Leanna Rose S.   | Developer |
-| Villafranca, Ryza Gwen P.| Developer |
+| Name | Role |
+|------|------|
+| Balala, Fiona Rose A. | Developer |
+| Balbin, Alleah Joy M. | Developer |
+| Nicolas, Abigail B. | Developer |
+| Santos, Leanna Rose S. | Developer |
+| Villafranca, Ryza Gwen P. | Developer |
 
 ---
 
 ## Data Sources
 
-- Geolocation API – provides real-time user location data
-- Google Maps – provides map and geographic visualization
+- Geolocation API – provides real-time user location data  
+- Google Maps – provides map and geographic visualization  
 
 ---
 

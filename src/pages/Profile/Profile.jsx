@@ -1,7 +1,7 @@
 import { User, EyeOff, Eye, Menu, X, Edit2, Save, XCircle } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getUser, isAuthenticated, logout, getCurrentUser, updateUserDetails, deleteAccount } from "../../services/auth";
+import { getUser, isAuthenticated, logout, getCurrentUser, updateUserDetails, deleteAccount, changePassword } from "../../services/auth";
 import backgroundImage from "../../assets/profile-bg.svg";
 import heroBackgroundImage from "../../assets/philippines-map-bg.svg";
 import logoImage from "../../assets/logo.png";
@@ -24,6 +24,7 @@ export default function Profile() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [deletePassword, setDeletePassword] = useState(""); // For delete confirmation
   const [message, setMessage] = useState({ type: "", text: "" });
   const [loading, setLoading] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -113,22 +114,32 @@ export default function Profile() {
 
   const handleDeleteAccount = (e) => {
     e.preventDefault();
+    setDeletePassword(""); // Reset password field
     setShowDeleteModal(true);
   };
 
   const confirmDeleteAccount = async () => {
+    if (!deletePassword) {
+      setMessage({ type: "error", text: "Please enter your password to confirm account deletion" });
+      return;
+    }
+    
     setLoading(true);
+    setMessage({ type: "", text: "" });
+    
     try {
       console.log('Attempting to delete account...');
-      const response = await deleteAccount();
+      const response = await deleteAccount(deletePassword); // Pass password for confirmation
       console.log('Delete account response:', response);
+      
       if (response.success) {
-        setMessage({ type: "success", text: "Account deleted successfully!" });
+        setMessage({ type: "success", text: "Account deleted successfully! Redirecting..." });
         setTimeout(() => {
           logout(); // This will redirect to landing page
         }, 2000);
       } else {
         setMessage({ type: "error", text: response.message || "Failed to delete account" });
+        setShowDeleteModal(false);
       }
     } catch (error) {
       console.error('Delete account error:', error);
@@ -137,20 +148,26 @@ export default function Profile() {
       // Show detailed error info in UI for debugging
       let errorMessage = "Failed to delete account";
       if (error.response) {
-        errorMessage = `Error ${error.response.status}: ${error.response.data?.message || error.response.statusText || 'Unknown error'}`;
+        if (error.response.status === 401) {
+          errorMessage = "Incorrect password. Please try again.";
+        } else {
+          errorMessage = `Error ${error.response.status}: ${error.response.data?.message || error.response.statusText || 'Unknown error'}`;
+        }
       } else if (error.message) {
         errorMessage = `Network error: ${error.message}`;
       }
       
       setMessage({ type: "error", text: errorMessage });
+      setShowDeleteModal(false);
     } finally {
       setLoading(false);
-      setShowDeleteModal(false);
     }
   };
 
   const cancelDeleteAccount = () => {
     setShowDeleteModal(false);
+    setDeletePassword("");
+    setMessage({ type: "", text: "" });
   };
 
   // Handle Name Update
@@ -227,10 +244,7 @@ export default function Profile() {
 
     setLoading(true);
     try {
-      const response = await updateUserDetails({ 
-        currentPassword, 
-        newPassword 
-      });
+      const response = await changePassword(currentPassword, newPassword);
       if (response.success) {
         setMessage({ type: "success", text: "Password updated successfully!" });
         setIsEditingPassword(false);
@@ -238,6 +252,8 @@ export default function Profile() {
         setNewPassword("");
         setConfirmPassword("");
         setTimeout(() => setMessage({ type: "", text: "" }), 3000);
+      } else {
+        setMessage({ type: "error", text: response.message || "Failed to update password" });
       }
     } catch (error) {
       setMessage({ type: "error", text: error.message || "Failed to update password" });
@@ -614,7 +630,7 @@ export default function Profile() {
         </div>
       )}
 
-      {/* Delete Account Confirmation Modal */}
+      {/* Delete Account Confirmation Modal with Password */}
       {showDeleteModal && (
         <div style={{
           position: "fixed",
@@ -634,17 +650,39 @@ export default function Profile() {
             padding: "24px",
             maxWidth: "400px",
             width: "90%",
-            textAlign: "center",
           }}>
-            <h3 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px", color: "#1e293b" }}>
+            <h3 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px", color: "#1e293b", textAlign: "center" }}>
               Delete Account
             </h3>
-            <p style={{ color: "#64748b", marginBottom: "12px" }}>
+            <p style={{ color: "#64748b", marginBottom: "12px", textAlign: "center" }}>
               Are you sure you want to delete your account?
             </p>
-            <p style={{ color: "#dc2626", fontSize: "14px", marginBottom: "24px" }}>
+            <p style={{ color: "#dc2626", fontSize: "14px", marginBottom: "24px", textAlign: "center" }}>
               This action cannot be undone. All your data will be permanently deleted.
             </p>
+            
+            <div style={{ marginBottom: "24px" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "8px", color: "#374151" }}>
+                Enter your password to confirm:
+              </label>
+              <div className="profile-field__passwordWrap" style={{ marginBottom: "16px" }}>
+                <input
+                  type="password"
+                  placeholder="Your password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 40px 10px 12px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                  }}
+                  autoFocus
+                />
+              </div>
+            </div>
+            
             <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
               <button
                 onClick={cancelDeleteAccount}
@@ -658,21 +696,23 @@ export default function Profile() {
                   fontWeight: "500",
                 }}
               >
-                No
+                Cancel
               </button>
               <button
                 onClick={confirmDeleteAccount}
+                disabled={!deletePassword || loading}
                 style={{
                   padding: "10px 24px",
                   backgroundColor: "#dc2626",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",
-                  cursor: "pointer",
+                  cursor: !deletePassword || loading ? "not-allowed" : "pointer",
                   fontWeight: "500",
+                  opacity: !deletePassword || loading ? 0.6 : 1,
                 }}
               >
-                Yes
+                {loading ? "Deleting..." : "Yes, Delete My Account"}
               </button>
             </div>
           </div>

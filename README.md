@@ -119,7 +119,15 @@ The platform monitors the following:
 - Axios (API Requests)  
 - Chart.js / react-chartjs-2 (Data Visualization)  
 - Google Maps API (Maps & Location)  
-- Lucide React (Icons)  
+- Lucide React (Icons)
+
+### Backend
+- Node.js + Express
+- MongoDB Atlas (Database)
+- JWT Authentication
+- bcrypt (Password Hashing)
+- Nodemailer (Email Verification / Reset Password)
+- Google OAuth 2.0 (Optional Login)
 
 ## Developers
 

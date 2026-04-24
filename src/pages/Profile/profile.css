@@ -1,9 +1,9 @@
 .profile-page {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
+  overflow: auto;
   font-family:
     system-ui,
     -apple-system,
@@ -21,6 +21,25 @@
   background-size: cover;
   background-repeat: no-repeat;
   filter: saturate(0.9) brightness(1.05);
+}
+
+.profile-top-link {
+  text-decoration: none;
+}
+
+.profile-top-link:hover {
+  text-decoration: underline;
+}
+
+.profile-top-link--active {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.app-profile-link--active {
+  background: #f4f6fc;
+  border-color: #f4f6fc;
+  color: #1f5b9f;
 }
 
 .profile-header {
@@ -475,4 +494,5 @@
   .profile-logout__link {
     font-size: 0.9rem;
   }
+
 }

@@ -93,7 +93,7 @@
 
 /* Right Sidebar - Risk Forecast */
 .result-sidebar-right {
-  width: 350px;  /* Changed from 320px to 340px */
+  width: 340px;  /* Changed from 320px to 340px */
   background: #f8fafc;
   border-left: 1px solid #e2e8f0;
   overflow-y: auto;
@@ -189,6 +189,7 @@
   outline: 2px solid var(--result-primary-deep);
   outline-offset: 2px;
 }
+/* Logout Modal Styles */
 .logout-modal-overlay {
   position: fixed;
   top: 0;
@@ -247,6 +248,14 @@
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
+}
+
+.logout-modal-btn-no:hover {
+  background-color: #cbd5e1;
+}
+
+.logout-modal-btn-yes:hover {
+  background-color: #b91c1c;
 }
 
 /* ----- Section titles & collapses ----- */

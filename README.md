@@ -129,6 +129,14 @@ The platform monitors the following:
 - Nodemailer (Email Verification / Reset Password)
 - Google OAuth 2.0 (Optional Login)
 
+### External API
+
+| API                     | Purpose    |
+|--------------------------|----------|
+| Google Maps API   |     Map visualization and interaction |
+| Geolocation API |     Real-time user location detection |
+
+
 ## Developers
 
 | Name                     | Role      |
@@ -138,6 +146,15 @@ The platform monitors the following:
 | Nicolas, Abigail B.      | Developer |
 | Santos, Leanna Rose S.   | Developer |
 | Villafranca, Ryza Gwen P.| Developer |
+
+---
+
+## Data Sources
+
+- Geolocation API – provides real-time user location data
+- Google Maps – provides map and geographic visualization
+
+---
 
 ## Acknowledgment
 

@@ -16,11 +16,9 @@ import {
   Navigation,
   MapPin,
   AlertCircle,
-  LogOut,
 } from "lucide-react";
 import GoogleMapView from "../../components/Googlemapview/GoogleMapView.jsx";
 import logoImage from "../../assets/logo.png";
-import { logout, isAuthenticated } from "../../services/auth";
 import "./Result.css";
 
 const ERROR_IMG_SRC =
@@ -42,9 +40,9 @@ function ImageWithFallback(props) {
   );
 }
 
-function Header({ onLogout }) {
+function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isLoggedIn = isAuthenticated();
+  const isLoggedIn = localStorage.getItem('agapIsLoggedIn') === 'true';
   const profileRoute = isLoggedIn ? '/profile' : '/login';
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -71,18 +69,6 @@ function Header({ onLogout }) {
             <Link to="/about-us" className="app-nav-link text-white">About Us</Link>
             <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link text-white">Contact</Link>
           </div>
-          
-          {isLoggedIn && (
-            <button 
-              onClick={onLogout} 
-              className="flex items-center gap-1 text-white hover:text-gray-200 transition-colors"
-              style={{ background: "none", border: "none", cursor: "pointer" }}
-            >
-              <LogOut size={18} />
-              <span className="hidden sm:inline text-sm">Logout</span>
-            </button>
-          )}
-          
           <Link to={profileRoute} className="app-profile-link app-profile-link--on-dark p-2 md:p-3" aria-label="Profile">
             <User size={20} aria-hidden />
           </Link>
@@ -98,11 +84,6 @@ function Header({ onLogout }) {
             <Link to="/" className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>Home</Link>
             <Link to="/about-us" className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>About Us</Link>
             <Link to="/" state={{ scrollToLandingContact: true }} className="app-nav-link block w-full text-left py-2 text-white" onClick={closeMenu}>Contact</Link>
-            {isLoggedIn && (
-              <button onClick={() => { onLogout(); closeMenu(); }} className="app-nav-link block w-full text-left py-2 text-white">
-                Logout
-              </button>
-            )}
           </div>
         </div>
       )}
@@ -232,37 +213,9 @@ function WeatherForecast({ data, loading, error }) {
 }
 
 function MapView({ latitude, longitude, locationName, floodRiskLevel }) {
-  if (!latitude || !longitude) {
-    return (
-      <div className="result-map placeholder">
-        <div style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#1a5f7a',
-          borderRadius: '12px',
-          color: 'white',
-          textAlign: 'center',
-          flexDirection: 'column'
-        }}>
-          <MapPin size={48} />
-          <h3>Map View</h3>
-          <p>Search a location to see the map</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="result-map">
-      <GoogleMapView 
-        latitude={latitude} 
-        longitude={longitude} 
-        locationName={locationName} 
-        floodRiskLevel={floodRiskLevel} 
-      />
+      <GoogleMapView latitude={latitude} longitude={longitude} locationName={locationName} floodRiskLevel={floodRiskLevel} />
     </div>
   );
 }
@@ -289,7 +242,6 @@ export default function Result() {
   const [locationError, setLocationError] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const toggleFloodHazard = () => {
     setShowFloodForecast(false);
@@ -305,20 +257,6 @@ export default function Result() {
     setShowFloodHazardOpen(false);
     setShowFloodForecast(false);
     setShowWeatherForecast((prev) => !prev);
-  };
-
-  const handleLogoutClick = () => {
-    setShowLogoutModal(true);
-  };
-
-  const confirmLogout = () => {
-    logout();
-    setShowLogoutModal(false);
-    navigate('/login');
-  };
-
-  const cancelLogout = () => {
-    setShowLogoutModal(false);
   };
 
   const fetchWeatherAndFloodData = useCallback(async (lat, lon) => {
@@ -445,7 +383,7 @@ export default function Result() {
   if (locationError === 'not_found') {
     return (
       <div className="result-page">
-        <Header onLogout={handleLogoutClick} />
+        <Header />
         <div className="result-error-container">
           <div className="result-error-card">
             <div className="error-icon"><AlertCircle size={64} style={{ color: '#f59e0b' }} /></div>
@@ -467,18 +405,6 @@ export default function Result() {
             </div>
           </div>
         </div>
-        {showLogoutModal && (
-          <div className="logout-modal-overlay">
-            <div className="logout-modal">
-              <h3>Confirm Logout</h3>
-              <p>Are you sure you want to log out?</p>
-              <div className="logout-modal-buttons">
-                <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
-                <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
@@ -486,7 +412,7 @@ export default function Result() {
   if (locationError === 'api_error' && !coordinates) {
     return (
       <div className="result-page">
-        <Header onLogout={handleLogoutClick} />
+        <Header />
         <div className="result-error-container">
           <div className="result-error-card">
             <div className="error-icon"><AlertCircle size={64} style={{ color: '#ef4444' }} /></div>
@@ -498,26 +424,15 @@ export default function Result() {
             </div>
           </div>
         </div>
-        {showLogoutModal && (
-          <div className="logout-modal-overlay">
-            <div className="logout-modal">
-              <h3>Confirm Logout</h3>
-              <p>Are you sure you want to log out?</p>
-              <div className="logout-modal-buttons">
-                <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
-                <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
 
   return (
     <div className="result-page">
-      <Header onLogout={handleLogoutClick} />
+      <Header />
       <div className="result-page__body">
+        {/* LEFT COLUMN - Weather, Flood Forecast, Hazard Level */}
         <aside className="result-sidebar-left">
           <div className="result-sidebar__inner">
             <SearchBar value={searchQuery} onChange={setSearchQuery} onSearch={handleSearch} />
@@ -566,6 +481,7 @@ export default function Result() {
           </div>
         </aside>
         
+        {/* MIDDLE COLUMN - Map */}
         <main className="result-main">
           <MapView 
             latitude={coordinates?.latitude} 
@@ -575,23 +491,11 @@ export default function Result() {
           />
         </main>
         
+        {/* RIGHT COLUMN - Risk Forecast */}
         <aside className="result-sidebar-right">
           <FloodRiskWidget location={searchQuery} coordinates={coordinates} />
         </aside>
       </div>
-      
-      {showLogoutModal && (
-        <div className="logout-modal-overlay">
-          <div className="logout-modal">
-            <h3>Confirm Logout</h3>
-            <p>Are you sure you want to log out?</p>
-            <div className="logout-modal-buttons">
-              <button onClick={cancelLogout} className="logout-modal-btn-no">No</button>
-              <button onClick={confirmLogout} className="logout-modal-btn-yes">Yes</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

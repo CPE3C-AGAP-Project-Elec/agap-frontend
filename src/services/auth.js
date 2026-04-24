@@ -116,16 +116,39 @@ export const resetPassword = async (email, code, newPassword) => {
   }
 };
 
-export const deleteAccount = async () => {
+
+// ================= DELETE ACCOUNT =================
+export const deleteAccount = async (password) => {
   try {
-    console.log('Making DELETE request to /auth/delete-account');
-    const response = await api.delete('/auth/delete-account');
-    console.log('Delete account API response:', response);
+    const response = await api.delete('/auth/delete-account', {
+      data: { password }  // Send password in request body
+    });
+    
+    if (response.data.success) {
+      // Clear all local storage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('pendingVerificationEmail');
+      sessionStorage.clear();
+    }
+    
     return response.data;
   } catch (error) {
-    console.error("Delete account error:", error);
-    console.error("Error status:", error.response?.status);
-    console.error("Error data:", error.response?.data);
+    console.error('Delete account error:', error);
     throw error.response?.data || { message: 'Failed to delete account' };
   }
 };
+
+// ================= CHANGE PASSWORD =================
+export const changePassword = async (currentPassword, newPassword) => {
+  try {
+    const response = await api.put('/auth/changepassword', {
+      currentPassword,
+      newPassword
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to change password' };
+  }
+};
+
